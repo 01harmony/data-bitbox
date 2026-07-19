@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>디지털 데이터의 가치 - 개념 탐구</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&family=JetBrains+Mono:wght@700;900&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
+    <link rel="stylesheet" href="./css/value_concept.css">
+</head><body>
+
+    <header>
+        <div class="header-top">
+            <div class="header-left">
+                <span class="target-badge">대상: 중학교 1~3학년</span>
+                <h1 class="main-title" onclick="location.href='index.html'">데이터 비트박스</h1>
+            </div>
+            <div class="status-controller">
+                <button class="status-btn" onclick="setStatus('normal')">🔄 초기화</button>
+                <button class="status-btn btn-help" onclick="setStatus('help')">🙋‍♂️ SOS 요청</button>
+                <button class="status-btn btn-done" onclick="setStatus('done')">✅ 미션 완료</button>
+            </div>
+        </div>
+
+        <nav>
+            <div class="menu-item">
+                <span class="menu-link active">디지털 데이터의 가치</span>
+                <ul class="dropdown">
+                    <li><a href="01_value.html">📖 개념 탐구</a></li>
+                    <li><a href="01_value_play.html">🛠️ 활용 실습</a></li>
+                </ul>
+            </div>
+            <div class="menu-item"><span class="menu-link">비트란?</span><ul class="dropdown"><li><a href="02_bit.html">📖 개념 탐구</a></li><li><a href="02_bit_play.html">🛠️ 활용 실습</a></li></ul></div>
+            <div class="menu-item"><span class="menu-link">숫자의 디지털 표현</span><ul class="dropdown"><li><a href="03_number.html">📖 개념 탐구</a></li><li><a href="03_number_play.html">🛠️ 활용 실습</a></li></ul></div>
+            <div class="menu-item"><span class="menu-link">문자의 디지털 표현</span><ul class="dropdown"><li><a href="04_text.html">📖 개념 탐구</a></li><li><a href="04_text_play.html">🛠️ 활용 실습</a></li></ul></div>
+            <div class="menu-item"><span class="menu-link">이미지의 디지털 표현</span><ul class="dropdown"><li><a href="05_image.html">📖 개념 탐구</a></li><li><a href="05_image_play.html">🛠️ 활용 실습</a></li></ul></div>
+            <div class="menu-item"><span class="menu-link">소리의 디지털 표현</span><ul class="dropdown"><li><a href="06_sound.html">📖 개념 탐구</a></li><li><a href="06_sound_play.html">🛠️ 활용 실습</a></li></ul></div>
+            <div class="menu-item"><span class="menu-link">동영상의 디지털 표현</span><ul class="dropdown"><li><a href="07_video.html">📖 개념 탐구</a></li><li><a href="07_video_play.html">🛠️ 활용 실습</a></li></ul></div>
+        </nav>
+    </header>
+
+    <main>
+        <div class="content-container">
+            <div class="content-card">
+
+                <div class="progress">
+                    <div class="prog-dot cur" id="dot0"></div>
+                    <div class="prog-dot" id="dot1"></div>
+                    <div class="prog-dot" id="dot2"></div>
+                    <div class="prog-dot" id="dot3"></div>
+                    <div class="prog-dot" id="dot4"></div>
+                </div>
+
+                <!-- ══ step0: 생활 속 데이터 유형 탐구 ══ -->
+                <div id="step0-data" class="step-container active">
+                    <div style="font-size:1.25rem;font-weight:900;color:var(--teal-main);margin-bottom:6px;text-align:center;">🌍 생활 속 데이터, 어떤 종류가 있을까?</div>
+                    <p style="font-size:0.88rem;color:var(--text-sub);font-weight:700;text-align:center;margin-bottom:18px;">데이터 활용 상황을 클릭해서 어떤 데이터가 생기는지 확인해보세요!</p>
+
+                    <div class="dtype-grid">
+                        <div class="dtype-scene" onclick="selectDtype(this,'text')">
+                            <svg class="dtype-svg" viewBox="0 0 80 60" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="24" y="4" width="32" height="52" rx="5" fill="#1e293b" stroke="#475569" stroke-width="1.5"/>
+                                <rect x="27" y="10" width="26" height="36" rx="2" fill="#0f172a"/>
+                                <rect x="29" y="13" width="18" height="7" rx="3" fill="#0f766e"/>
+                                <rect x="33" y="23" width="16" height="7" rx="3" fill="#374151"/>
+                                <rect x="29" y="33" width="14" height="7" rx="3" fill="#0f766e"/>
+                                <circle cx="40" cy="52" r="2.5" fill="#475569"/>
+                            </svg>
+                            <div class="dtype-scene-label">📱 문자 메시지</div>
+                            <div class="dtype-tag" data-type="text">📝 문자 데이터</div>
+                        </div>
+                        <div class="dtype-scene" onclick="selectDtype(this,'number')">
+                            <svg class="dtype-svg" viewBox="0 0 80 60" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="5" y="8" width="70" height="38" rx="4" fill="#166534"/>
+                                <rect x="8" y="11" width="64" height="32" rx="2" fill="#15803d"/>
+                                <text x="40" y="30" font-size="16" font-weight="bold" fill="white" text-anchor="middle" font-family="monospace">98점</text>
+                                <text x="40" y="42" font-size="8" fill="#86efac" text-anchor="middle">수학 시험 점수</text>
+                                <rect x="15" y="50" width="20" height="5" rx="2" fill="#e2e8f0"/>
+                            </svg>
+                            <div class="dtype-scene-label">📊 시험 점수</div>
+                            <div class="dtype-tag" data-type="number">🔢 숫자 데이터</div>
+                        </div>
+                        <div class="dtype-scene" onclick="selectDtype(this,'image')">
+                            <svg class="dtype-svg" viewBox="0 0 80 60" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="10" y="16" width="60" height="38" rx="6" fill="#1e293b" stroke="#475569" stroke-width="1.5"/>
+                                <circle cx="40" cy="34" r="12" fill="#0f172a" stroke="#475569" stroke-width="1.5"/>
+                                <circle cx="40" cy="34" r="7" fill="#1e40af"/>
+                                <circle cx="40" cy="34" r="4" fill="#60a5fa" opacity="0.7"/>
+                                <rect x="55" y="20" width="8" height="6" rx="2" fill="#fbbf24"/>
+                                <rect x="30" y="10" width="12" height="7" rx="3" fill="#374151"/>
+                            </svg>
+                            <div class="dtype-scene-label">📸 사진 촬영</div>
+                            <div class="dtype-tag" data-type="image">🖼️ 이미지 데이터</div>
+                        </div>
+                        <div class="dtype-scene" onclick="selectDtype(this,'sound')">
+                            <svg class="dtype-svg" viewBox="0 0 80 60" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="28" cy="32" r="10" fill="#1e293b" stroke="#475569" stroke-width="1.5"/>
+                                <circle cx="28" cy="32" r="5" fill="#0f766e"/>
+                                <circle cx="52" cy="32" r="10" fill="#1e293b" stroke="#475569" stroke-width="1.5"/>
+                                <circle cx="52" cy="32" r="5" fill="#0f766e"/>
+                                <path d="M28 22 Q40 10 52 22" fill="none" stroke="#475569" stroke-width="2"/>
+                                <path d="M16 28 Q14 32 16 36" fill="none" stroke="#5eead4" stroke-width="2" stroke-linecap="round"/>
+                                <path d="M12 24 Q9 32 12 40" fill="none" stroke="#5eead4" stroke-width="2" stroke-linecap="round"/>
+                                <path d="M64 28 Q66 32 64 36" fill="none" stroke="#5eead4" stroke-width="2" stroke-linecap="round"/>
+                                <path d="M68 24 Q71 32 68 40" fill="none" stroke="#5eead4" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                            <div class="dtype-scene-label">🎵 음악 스트리밍</div>
+                            <div class="dtype-tag" data-type="sound">🎵 소리 데이터</div>
+                        </div>
+                        <div class="dtype-scene" onclick="selectDtype(this,'video')">
+                            <svg class="dtype-svg" viewBox="0 0 80 60" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="8" y="6" width="64" height="42" rx="5" fill="#1e293b" stroke="#475569" stroke-width="1.5"/>
+                                <rect x="12" y="10" width="56" height="34" rx="3" fill="#0f172a"/>
+                                <circle cx="40" cy="27" r="10" fill="#dc2626" opacity="0.9"/>
+                                <polygon points="37,22 37,32 47,27" fill="white"/>
+                                <rect x="30" y="48" width="20" height="5" rx="2" fill="#334155"/>
+                                <rect x="25" y="52" width="30" height="3" rx="1" fill="#334155"/>
+                            </svg>
+                            <div class="dtype-scene-label">📺 동영상 시청</div>
+                            <div class="dtype-tag" data-type="video">🎬 동영상 데이터</div>
+                        </div>
+                        <div class="dtype-scene" onclick="selectDtype(this,'sensor')">
+                            <svg class="dtype-svg" viewBox="0 0 80 60" xmlns="http://www.w3.org/2000/svg">
+                                <rect x="26" y="16" width="28" height="30" rx="8" fill="#1e293b" stroke="#475569" stroke-width="1.5"/>
+                                <rect x="29" y="19" width="22" height="24" rx="5" fill="#0f172a"/>
+                                <polyline points="31,31 34,31 36,25 38,37 40,28 42,34 44,31 47,31" fill="none" stroke="#ef4444" stroke-width="1.5" stroke-linecap="round"/>
+                                <rect x="30" y="8" width="6" height="9" rx="2" fill="#374151"/>
+                                <rect x="44" y="8" width="6" height="9" rx="2" fill="#374151"/>
+                                <rect x="30" y="45" width="6" height="9" rx="2" fill="#374151"/>
+                                <rect x="44" y="45" width="6" height="9" rx="2" fill="#374151"/>
+                            </svg>
+                            <div class="dtype-scene-label">⌚ 스마트워치</div>
+                            <div class="dtype-tag" data-type="sensor">📡 센서 데이터</div>
+                        </div>
+                    </div>
+
+                    <div class="dtype-result-panel" id="dtypePanel" style="display:none;">
+                        <div class="dtype-result-icon" id="dtypeIcon"></div>
+                        <div class="dtype-result-content">
+                            <div class="dtype-result-title" id="dtypeTitle"></div>
+                            <div class="dtype-result-desc" id="dtypeDesc"></div>
+                        </div>
+                    </div>
+
+                    <div class="step-navigation">
+                        <div class="nav-arrow next" onclick="goToStep('step0-data', 'step1-intro')">
+                            <div>디지털 데이터 가치</div>
+                            <svg viewBox="0 0 24 24"><path d="M10 17l5-5-5-5v10z"/></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ══ step1: 데이터 흐름 → AI → 사회 ══ -->
+                <div id="step1-intro" class="step-container">
+                    <div style="font-size:1.25rem;font-weight:900;color:var(--teal-main);margin-bottom:16px;text-align:center;">🤖 디지털 데이터가 바꾸는 사회</div>
+
+                    <div class="ai-journey">
+
+                        <!-- ① 생활 데이터 입력 -->
+                        <div class="aj-block aj-input">
+                            <div class="aj-label">① 생활 속 데이터</div>
+                            <div class="aj-input-icons">
+                                <div class="aj-icon">📱<span>문자</span></div>
+                                <div class="aj-icon">📸<span>이미지</span></div>
+                                <div class="aj-icon">🎵<span>소리</span></div>
+                                <div class="aj-icon">🎬<span>동영상</span></div>
+                                <div class="aj-icon">🔢<span>숫자</span></div>
+                                <div class="aj-icon">💓<span>센서</span></div>
+                            </div>
+                        </div>
+
+                        <!-- 도선 1 -->
+                        <div class="aj-wire-wrap">
+                            <div class="aj-wire">
+                                <div class="aj-signal"></div>
+                            </div>
+                            <div class="aj-wire-label">0과 1로 변환</div>
+                        </div>
+
+                        <!-- ② 컴퓨터·스마트폰·AI (이진수 한 줄 왼→오) -->
+                        <div class="aj-block aj-robot">
+                            <div class="aj-label">② 컴퓨터·스마트폰·AI</div>
+                            <!-- 안테나 -->
+                            <div class="ajr-antenna"><div class="ajr-bulb"></div></div>
+                            <!-- 얼굴 -->
+                            <div class="ajr-face">
+                                <div class="ajr-eye"></div>
+                                <div class="ajr-eye"></div>
+                            </div>
+                            <!-- 몸통: 이진수 한 줄 흐름 -->
+                            <div class="ajr-body">
+                                <div class="ajr-stream">
+                                    <span>1</span><span>0</span><span>1</span><span>1</span><span>0</span><span>0</span><span>1</span><span>0</span><span>1</span><span>1</span><span>0</span><span>1</span><span>0</span><span>0</span><span>1</span><span>1</span>
+                                </div>
+                                <div class="ajr-stream ajr-s2">
+                                    <span>0</span><span>1</span><span>1</span><span>0</span><span>1</span><span>0</span><span>0</span><span>1</span><span>1</span><span>0</span><span>1</span><span>1</span><span>0</span><span>1</span><span>0</span><span>0</span>
+                                </div>
+                                <div class="ajr-stream ajr-s3">
+                                    <span>1</span><span>1</span><span>0</span><span>0</span><span>1</span><span>1</span><span>0</span><span>1</span><span>0</span><span>0</span><span>1</span><span>0</span><span>1</span><span>1</span><span>0</span><span>1</span>
+                                </div>
+                            </div>
+                            <!-- 다리 -->
+                            <div class="ajr-legs">
+                                <div class="ajr-leg"></div>
+                                <div class="ajr-leg"></div>
+                            </div>
+                            <div class="ajr-caption">디지털 데이터 처리·학습<br>(공공 데이터 처리·학습)</div>
+                        </div>
+
+                        <!-- 도선 2 -->
+                        <div class="aj-wire-wrap">
+                            <div class="aj-wire aj-wire-gold">
+                                <div class="aj-signal aj-signal-gold"></div>
+                            </div>
+                            <div class="aj-wire-label">사회로 활용</div>
+                        </div>
+
+                        <!-- ③ 사회 혜택 -->
+                        <div class="aj-block aj-output">
+                            <div class="aj-label aj-label-gold">③ 사회 혜택</div>
+                            <div class="aj-benefits">
+                                <div class="aj-benefit">🏥<span>암 조기 진단</span></div>
+                                <div class="aj-benefit">🚗<span>자율주행</span></div>
+                                <div class="aj-benefit">🌍<span>기후 예측</span></div>
+                                <div class="aj-benefit">🎓<span>맞춤 교육</span></div>
+                            </div>
+                        </div>
+
+                    </div><!-- ai-journey -->
+
+                    <div class="catchphrase" style="margin-top:16px;">🤖 세상을 움직이는 보이지 않는 힘!</div>
+                    <p style="font-size:0.88rem;color:var(--text-sub);font-weight:700;margin-top:6px;margin-bottom:24px;text-align:center;line-height:1.7;">
+                        생활 속 데이터 → 0과 1로 변환 → <b>디지털 기기·AI</b>가 처리 → <b>세상을 바꿉니다</b>
+                    </p>
+
+                    <div class="step-navigation">
+                        <div class="nav-arrow prev" onclick="goToStep('step1-intro', 'step0-data')">
+                            <svg viewBox="0 0 24 24"><path d="M14 7l-5 5 5 5V7z"/></svg>
+                            <div>생활 속 데이터</div>
+                        </div>
+                        <div class="nav-arrow next" onclick="goToStep('step1-intro', 'step2-visual')">
+                            <div>아날로그 vs 디지털</div>
+                            <svg viewBox="0 0 24 24"><path d="M10 17l5-5-5-5v10z"/></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="step2-visual" class="step-container">
+                    <div style="font-size: 1.3rem; font-weight: 900; color: var(--teal-main); margin-bottom: 20px; text-align: center;">아날로그 방식 vs 디지털 방식</div>
+                    
+                    <div id="concept-section" style="width: 100%; margin-bottom: 20px;">
+                        <div class="concept-summary">
+                            <div class="summary-item">
+                                <div class="summary-title" style="color:#888;">📼 <button class="pill-btn" onclick="revealInline(this, '아날로그(Analog)', '#888')">❔</button></div>
+                                <div class="summary-desc">소리나 빛 등 연속적으로 변화하는 형태 그대로 기록합니다.<br> 시간이 지나면 훼손되거나, 복사 및 전송을 할 때마다 품질이 떨어지기 쉽습니다.</div>
+                                <div class="example-container" onclick="toggleExample(this)">
+                                    <div class="question-box"><span class="q-text">❓ 실생활 예시 확인하기</span></div>
+                                    <div class="answer-box">
+                                        <ul>
+                                            <li>필름 카메라 (사진)</li>
+                                            <li>카세트 테이프 / LP 판 (음악)</li>
+                                            <li>바늘 시계 / 수은 온도계 (측정)</li>
+                                            <li>종이 지도 / 손으로 쓴 편지 (기록)</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="summary-item">
+                                <div class="summary-title" style="color:var(--teal-main);">💻 <button class="pill-btn" onclick="revealInline(this, '디지털(Digital)', 'var(--teal-main)')">❔</button></div>
+                                <div class="summary-desc">모든 정보를 0과 1(비트)의 불연속적인 숫자로 변환하여 기록합니다.<br> 원본의 손상 없이 영구적으로 보존하고 완벽하게 복제할 수 있습니다.</div>
+                                <div class="example-container" onclick="toggleExample(this)">
+                                    <div class="question-box"><span class="q-text">❓ 실생활 예시 확인하기</span></div>
+                                    <div class="answer-box">
+                                        <ul>
+                                            <li>스마트폰 카메라 / 이미지 파일 (사진)</li>
+                                            <li>MP3 파일 / 스트리밍 (음악)</li>
+                                            <li>스마트워치 / 디지털 온도계 (측정)</li>
+                                            <li>하이패스 단말기 / 고속도로 통행 기록 (결제)</li> 
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div> 
+
+                    <!-- ── 온도계 인터랙션 ── -->
+                    <div class="thermo-section">
+                        <div class="thermo-title">🌡️ 온도를 조절하세요! - 온도 표시 방식이 어떻게 다를까요?</div>
+                        <div class="thermo-slider-wrap">
+                            <span class="thermo-slider-label">🥶 -10°C</span>
+                            <input type="range" id="thermoSlider" min="-10" max="40" value="20" step="0.1" oninput="updateThermo(this.value)" class="thermo-slider">
+                            <span class="thermo-slider-label">🔥 40°C</span>
+                        </div>
+                        <div class="thermo-display">
+                            <!-- 아날로그 카드 -->
+                            <div class="thermo-card analog-card">
+                                <div class="thermo-card-title">📼 아날로그 온도계<br><small>수은 온도계</small></div>
+                                <div class="thermo-body">
+                                    <svg class="analog-thermo-svg" viewBox="0 0 70 220" xmlns="http://www.w3.org/2000/svg">
+                                        <!-- 주 눈금 -->
+                                        <line x1="44" y1="30"  x2="52" y2="30"  stroke="#888" stroke-width="2"/>
+                                        <line x1="44" y1="55"  x2="52" y2="55"  stroke="#888" stroke-width="2"/>
+                                        <line x1="44" y1="80"  x2="52" y2="80"  stroke="#888" stroke-width="2"/>
+                                        <line x1="44" y1="105" x2="52" y2="105" stroke="#888" stroke-width="2"/>
+                                        <line x1="44" y1="130" x2="52" y2="130" stroke="#888" stroke-width="2"/>
+                                        <line x1="44" y1="155" x2="52" y2="155" stroke="#888" stroke-width="2"/>
+                                        <!-- 보조 눈금 -->
+                                        <line x1="46" y1="42"  x2="50" y2="42"  stroke="#bbb" stroke-width="1"/>
+                                        <line x1="46" y1="67"  x2="50" y2="67"  stroke="#bbb" stroke-width="1"/>
+                                        <line x1="46" y1="92"  x2="50" y2="92"  stroke="#bbb" stroke-width="1"/>
+                                        <line x1="46" y1="117" x2="50" y2="117" stroke="#bbb" stroke-width="1"/>
+                                        <line x1="46" y1="142" x2="50" y2="142" stroke="#bbb" stroke-width="1"/>
+                                        <!-- 라벨 -->
+                                        <text x="1"  y="34"  font-size="11" fill="#333" font-weight="bold" font-family="monospace">40°</text>
+                                        <text x="1"  y="59"  font-size="11" fill="#333" font-weight="bold" font-family="monospace">30°</text>
+                                        <text x="1"  y="84"  font-size="11" fill="#333" font-weight="bold" font-family="monospace">20°</text>
+                                        <text x="1"  y="109" font-size="11" fill="#333" font-weight="bold" font-family="monospace">10°</text>
+                                        <text x="1"  y="134" font-size="11" fill="#333" font-weight="bold" font-family="monospace"> 0°</text>
+                                        <text x="0"  y="159" font-size="10" fill="#333" font-weight="bold" font-family="monospace">-10°</text>
+                                        <!-- 온도계 관 -->
+                                        <rect x="32" y="22" width="14" height="148" rx="7" fill="white" stroke="#999" stroke-width="2"/>
+                                        <!-- 수은 -->
+                                        <rect id="mercuryRect" x="35" y="80" width="8" height="90" rx="4" fill="#ef4444"/>
+                                        <!-- 구근 -->
+                                        <circle cx="39" cy="185" r="16" fill="#dc2626"/>
+                                        <circle cx="39" cy="185" r="11" fill="#ef4444"/>
+                                        <circle cx="35" cy="181" r="3" fill="rgba(255,255,255,0.35)"/>
+                                    </svg>
+                                    <div class="thermo-reading analog-reading">
+                                        <div style="font-size:0.82rem; font-weight:900; color:#92400e; text-align:center; line-height:1.5;">↑ 연속적인 값<br><span style="font-size:0.7rem; font-weight:700; color:#b45309;">눈금 사이도<br>무한히 표현돼요</span></div>
+                                    </div>
+                                </div>
+                                <div class="thermo-desc analog-desc">슬라이더를 움직이면 수은이 <b>부드럽게</b> 올라가요.<br>소수점까지 표현되는 <b>연속적인</b> 값입니다.</div>
+                            </div>
+
+                            <div class="thermo-vs">VS</div>
+
+                            <!-- 디지털 카드 -->
+                            <div class="thermo-card digital-card">
+                                <div class="thermo-card-title">💻 디지털 온도계<br><small>스마트 센서</small></div>
+                                <div class="thermo-body">
+                                    <div class="digital-thermo-body">
+                                        <div class="digital-screen">
+                                            <div class="digital-unit">°C</div>
+                                            <div class="digital-number" id="digitalReading">20.0</div>
+                                            <div class="digital-bar-wrap">
+                                                <div class="digital-bar" id="digitalBar" style="width:60%"></div>
+                                            </div>
+                                            <div class="digital-label">DIGITAL THERMOMETER</div>
+                                        </div>
+
+                                    </div>
+                                    <div class="thermo-reading digital-reading">
+                                        <div class="reading-label">측정값</div>
+                                        <div class="reading-value" id="digitalReadingText">20.0°C</div>
+                                        <div class="reading-sub">0.1°C 단위로 끊김</div>
+                                    </div>
+                                </div>
+                                <div class="thermo-desc digital-desc">0.1°C 단위로 <b>끊겨</b> 표시돼요.<br>0과 1로 변환되는 <b>불연속적인</b> 값입니다.</div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <!-- ── // 온도계 인터랙션 ── -->
+
+                    <div class="step-navigation"> 
+                        <div class="nav-arrow prev" onclick="goToStep('step2-visual', 'step1-intro')">
+                            <svg viewBox="0 0 24 24"><path d="M14 7l-5 5 5 5V7z"/></svg> 
+                            <div>디지털 데이터 가치</div>
+                        </div>
+                        <div class="nav-arrow next" onclick="goToStep('step2-visual', 'step3-compare')">
+                            <div>디지털 데이터 장점</div>
+                            <svg viewBox="0 0 24 24"><path d="M10 17l5-5-5-5v10z"/></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="step3-compare" class="step-container">
+                    <div style="font-size: 1.3rem; font-weight: 900; color: var(--teal-main); margin-bottom: 20px; text-align: center;">아날로그 vs 디지털 — 무엇이 다를까?</div>
+
+                    <div class="compare-container" id="compare-section" style="margin-top: 0;">
+                        <div class="compare-card">
+                            <div class="card-title">1. 복제와 보존</div>
+                            <div class="zone analog-zone">
+                                <span class="zone-label">아날로그 방식</span>
+                                <svg class="analog-doc doc1" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+                                <svg class="analog-doc doc2" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+                                <svg class="analog-doc doc3" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+                                <span class="desc-label">복사할수록 열화/훼손됨</span>
+                            </div>
+                            <div class="zone digital-zone">
+                                <span class="zone-label">디지털 방식</span>
+                                <svg class="digital-doc ddoc1" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                                <svg class="digital-doc ddoc2" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                                <svg class="digital-doc ddoc3" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                                <span class="desc-label">원본 손상 없는 무한 복제</span>
+                            </div>
+                        </div>
+                        <div class="compare-card">
+                            <div class="card-title">2. 전송과 공유</div>
+                            <div class="zone analog-zone">
+                                <span class="zone-label">아날로그 방식</span>
+                                <svg class="analog-mail" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                                <span class="desc-label">물리적 이동 한계 (느림)</span>
+                            </div>
+                            <div class="zone digital-zone">
+                                <span class="zone-label">디지털 방식</span>
+                                <div class="digital-spark"></div>
+                                <div class="digital-spark"></div>
+                                <div class="digital-spark"></div>
+                                <span class="desc-label">빛의 속도로 즉시 전송</span>
+                            </div>
+                        </div>
+                        <div class="compare-card">
+                            <div class="card-title">3. 검색과 분석</div>
+                            <div class="zone analog-zone">
+                                <span class="zone-label">아날로그 방식</span>
+                                <svg class="analog-pile" viewBox="0 0 24 24"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12zM10 9h8v2h-8zm0 3h4v2h-4zm0-6h8v2h-8z"/></svg>
+                                <svg class="analog-mag" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                                <span class="desc-label">수동 검색 및 가공 불가</span>
+                            </div>
+                            <div class="zone digital-zone">
+                                <span class="zone-label">디지털 방식</span>
+                                <svg class="digital-gear" viewBox="0 0 24 24"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.06-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.73,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.06,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.43-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59,0.22l1.92-3.32c0.12-0.22,0.07-0.49-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/></svg>
+                                <svg class="digital-chart" viewBox="0 0 24 24"><path d="M3 3v18h18V3H3zm6 14H7v-5h2v5zm4 0h-2v-9h2v9zm4 0h-2V7h2v10z"/></svg>
+                                <span class="desc-label">빠른 검색 및 빅데이터 분석</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ── 실생활 체험 비교 ── -->
+                    <div class="exp-section">
+                        <div class="exp-title">✉️ 직접 비교해보세요! — 편지 vs 이메일</div>
+                        <div class="exp-tabs">
+                            <button class="exp-tab active" onclick="switchExp(this,'letter')">📮 아날로그 편지</button>
+                            <button class="exp-tab" onclick="switchExp(this,'email')">📧 디지털 이메일</button>
+                        </div>
+
+                        <div class="exp-content" id="exp-letter">
+                            <div class="exp-scene letter-scene">
+                                <div class="letter-paper">
+                                    <div class="letter-lines">
+                                        <div class="letter-line">안녕, 잘 지내고 있어?</div>
+                                        <div class="letter-line">오늘 날씨가 너무 좋아서</div>
+                                        <div class="letter-line">너한테 편지 쓰고 싶었어.</div>
+                                        <div class="letter-line letter-sign">— 친구로부터 ✍️</div>
+                                    </div>
+                                </div>
+                                <div class="exp-facts">
+                                    <div class="exp-fact bad">📅 배달까지 2~5일 소요</div>
+                                    <div class="exp-fact bad">📋 복사하면 품질 저하</div>
+                                    <div class="exp-fact bad">🔍 내용 검색 불가</div>
+                                    <div class="exp-fact bad">🌍 해외 발송 시 2~4주</div>
+                                </div>
+                            </div>
+                            <div class="exp-quote analog-quote">"한 번 쓰면 그게 전부예요. 잃어버리면 다시 찾을 수 없어요."</div>
+                        </div>
+
+                        <div class="exp-content" id="exp-email" style="display:none;">
+                            <div class="exp-scene email-scene">
+                                <div class="email-screen">
+                                    <div class="email-header">
+                                        <span class="email-from">보낸 사람: 친구 &lt;friend@email.com&gt;</span>
+                                        <span class="email-time">방금 전 · 전달됨</span>
+                                    </div>
+                                    <div class="email-subject">제목: 안녕! 잘 지내?</div>
+                                    <div class="email-body">
+                                        안녕, 잘 지내고 있어?<br>
+                                        오늘 날씨가 너무 좋아서<br>
+                                        너한테 연락하고 싶었어! 😊
+                                    </div>
+                                </div>
+                                <div class="exp-facts">
+                                    <div class="exp-fact good">⚡ 전송 시간: 0.1초</div>
+                                    <div class="exp-fact good">♾️ 무한 복사·전달 가능</div>
+                                    <div class="exp-fact good">🔍 키워드 검색 가능</div>
+                                    <div class="exp-fact good">🌍 전 세계 즉시 전송</div>
+                                </div>
+                            </div>
+                            <div class="exp-quote digital-quote">"0과 1로 저장되어 영구 보존되고, 전 세계 어디든 즉시 전달돼요."</div>
+                        </div>
+                    </div>
+                    <!-- ── // 실생활 체험 비교 ── -->
+
+                    <div class="step-navigation">
+                        <div class="nav-arrow prev" onclick="goToStep('step3-compare', 'step2-visual')">
+                            <svg viewBox="0 0 24 24"><path d="M14 7l-5 5 5 5V7z"/></svg>
+                            <div>아날로그 vs 디지털</div>
+                        </div>
+                        <div class="nav-arrow next" onclick="goToStep('step3-compare', 'step4-quiz')">
+                            <div>개념 확인 (최종 퀴즈)</div>
+                            <svg viewBox="0 0 24 24"><path d="M10 17l5-5-5-5v10z"/></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="step4-quiz" class="step-container">
+                    <div style="font-size: 1.3rem; font-weight: 900; color: var(--apple-red); margin-bottom: 25px;">🎯 최종 퀴즈: 디지털 데이터의 가치 마스터하기!</div>
+
+                    <div class="quiz-controls-row">
+                        <div class="inline-tip" onclick="openTipPopup()">
+                            <svg viewBox="0 0 24 24" fill="currentColor" style="width:18px; height:18px;"><path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7zm2.85 11.1l-.85.6V16h-4v-2.3l-.85-.6C7.8 12.16 7 10.63 7 9c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.63-.8 3.16-2.15 4.1z"/></svg>
+                            미션 가이드
+                        </div>
+                        <div style="display: flex; gap: 15px; align-items: center;">
+                            <div id="quizTimer" class="quiz-timer">⏱️ 00:00</div>
+                            <button id="startQuizBtn" class="start-quiz-btn" onclick="startQuizTimer()">▶️ 퀴즈 시작</button>
+                            <button id="resetTimerBtn" class="reset-timer-btn" onclick="resetQuiz()">🔄 타이머 초기화</button>
+                        </div>
+                    </div>
+
+                    <div class="word-score-container" id="wordBankWrap">
+                        <div class="word-bank" id="wordBank" style="opacity: 0.4; pointer-events: none;">
+                            <div class="word-item" draggable="true" ondragstart="drag(event)">아날로그</div>
+                            <div class="word-item" draggable="true" ondragstart="drag(event)">디지털</div>
+                            <div class="word-item" draggable="true" ondragstart="drag(event)">기록</div>
+                            <div class="word-item" draggable="true" ondragstart="drag(event)">이미지</div>
+                            <div class="word-item" draggable="true" ondragstart="drag(event)">숫자</div>
+                            <div class="word-item" draggable="true" ondragstart="drag(event)">자산</div>
+                            <div class="word-item" draggable="true" ondragstart="drag(event)">안전</div>
+                        </div>
+                    </div>
+
+                    <div id="quizForm">
+                        <div class="quiz-box">1. 소리나 빛처럼 연속적으로 변화하는 형태 그대로 기록하는 방식을 <input type="text" class="blank" data-answer="아날로그" data-score="10" oninput="check(this)" ondrop="drop(event)" ondragover="allowDrop(event)" autocomplete="off" disabled> 데이터라고 하고, 0과 1의 불연속적인 숫자로 변환하여 기록하는 방식을 <input type="text" class="blank" data-answer="디지털" data-score="10" oninput="check(this)" ondrop="drop(event)" ondragover="allowDrop(event)" autocomplete="off" disabled> 데이터라고 합니다. <span style="color:var(--apple-red); font-weight:900;">[20점]</span></div>
+                        <div class="quiz-box">2. 우리 주변의 모든 현상을 숫자, 문자, 영상 등으로 남기는 것을 <input type="text" class="blank" data-answer="기록" data-score="15" oninput="check(this)" ondrop="drop(event)" ondragover="allowDrop(event)" autocomplete="off" disabled>이라고 합니다. <span style="color:var(--apple-red); font-weight:900;">[15점]</span></div>
+                        <div class="quiz-box">3. 데이터는 우리 주변의 현상을 숫자, 문자, <input type="text" class="blank" data-answer="이미지" data-score="15" oninput="check(this)" ondrop="drop(event)" ondragover="allowDrop(event)" autocomplete="off" disabled>, 영상 등으로 표현한 것입니다. <span style="color:var(--apple-red); font-weight:900;">[15점]</span></div>
+                        <div class="quiz-box">4. 디지털 데이터는 현실의 다양한 정보를 컴퓨터가 처리할 수 있도록 0과 1의 불연속적인 <input type="text" class="blank" data-answer="숫자" data-score="15" oninput="check(this)" ondrop="drop(event)" ondragover="allowDrop(event)" autocomplete="off" disabled> 형태로 변환한 것입니다. <span style="color:var(--apple-red); font-weight:900;">[15점]</span></div>
+                        <div class="quiz-box">5. 일상 속의 다양한 데이터는 우리 사회를 발전시키는 소중한 <input type="text" class="blank" data-answer="자산" data-score="15" oninput="check(this)" ondrop="drop(event)" ondragover="allowDrop(event)" autocomplete="off" disabled>입니다. <span style="color:var(--apple-red); font-weight:900;">[15점]</span></div>
+                        <div class="quiz-box" style="margin-bottom: 0;">6. 공공데이터는 시민의 <input type="text" class="blank" data-answer="안전" data-score="20" oninput="check(this)" ondrop="drop(event)" ondragover="allowDrop(event)" autocomplete="off" disabled>을 지키기 위해 누구나 자유롭게 활용하도록 개방된 데이터입니다. <span style="color:var(--apple-red); font-weight:900;">[20점]</span></div>
+                    </div>
+
+                    <div style="text-align: center; display: none;" id="submitQuizBtnWrap">
+                        <button class="submit-quiz-btn" onclick="submitQuiz()">✏️ 채점하기</button>
+                    </div>
+
+                    <div class="step-navigation"> 
+                        <div class="nav-arrow prev" onclick="goToStep('step4-quiz', 'step3-compare')">
+                            <svg viewBox="0 0 24 24"><path d="M14 7l-5 5 5 5V7z"/></svg> 
+                            <div>디지털 데이터 장점</div>
+                        </div>
+                        <div style="display: flex; gap: 10px; margin-left: auto;">
+                            <div class="nav-arrow report-btn" onclick="downloadReportTXT()">
+                                <div>📄 텍스트 저장</div>
+                            </div>
+                            <div class="nav-arrow img-report-btn" onclick="downloadReportImageOffline()">
+                                <div>🖼️ 이미지(PNG) 저장</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <aside class="sidebar-right">
+            <div class="memo-section">
+                <div class="sidebar-title">📌 배움 노트</div>
+                <textarea id="memoInput" class="memo-area" placeholder="중요한 내용을 기록하세요. 궁금한 사항은 기록하고 질문하세요."></textarea>
+            </div>
+            <div class="reflection-section">
+                <div class="sidebar-title">🌿 배움 활동 소감</div>
+                <textarea id="reflectionInput" class="reflection-area" placeholder="새롭게 알게된 사실과 느낀점을 기록하세요."></textarea>
+                <div class="capture-tip">📸 캡처: Win+Shift+S | Mac: Cmd+Shift+4</div>
+            </div>
+            <div class="erase-section">
+                <button class="erase-btn" onclick="eraseStepContent()">
+                    🗑️ 현재 단원 학습 내용 지우기<br>
+                    <span style="font-size:0.68rem; font-weight:600; opacity:0.7;">(배움노트·소감·퀴즈 기록)</span>
+                </button>
+            </div>
+        </aside>
+    </main>
+
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-content" id="modalContent"></div>
+    </div>
+    
+    <div class="modal-overlay" id="customAlertModal" style="z-index: 9999;">
+        <div class="alert-box">
+            <div style="font-size: 3rem; margin-bottom: 10px;">🚫</div>
+            <h3 id="alertTitle" style="color: var(--apple-red); font-size: 1.5rem; margin-top: 0; margin-bottom: 15px; font-weight: 900;">접근 거부!</h3>
+            <div id="alertMessage" class="alert-message" style="font-size: 1.05rem; font-weight: 600; color: var(--text-main); margin-bottom: 25px; white-space: pre-line; word-break: keep-all;">메시지가 이곳에 표시됩니다.</div>
+            <button onclick="closeCustomAlert()" style="width: 100%; padding: 12px; background: var(--apple-red); color: white; border: none; border-radius: 12px; font-weight: 900; font-size: 1.1rem; cursor: pointer;">확인</button>
+        </div>
+    </div>
+
+    <footer>
+        <div style="font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 4px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                <line x1="12" y1="22.08" x2="12" y2="12"></line>
+            </svg>
+            데이터 비트박스
+        </div>
+        <div style="color: var(--apple-gray);">&copy; 중학교 정보 - 데이터 표현</div>
+    </footer>
+    <script src="./js/value_concept.js"></script>    
+
+
+
+
+    <!-- ── AI 가이드 캐릭터 (비트봇) v10 ── -->
+    <style>
+        #bb-backdrop {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.65);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            z-index: 8400;
+        }
+        .sidebar-right { z-index: 8500 !important; position: relative !important; }
+
+        #bb-scene {
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-62%, -50%);
+            display: flex; align-items: flex-end; gap: 24px;
+            z-index: 8600;
+            animation: bbIn 0.5s cubic-bezier(0.16,1,0.3,1) forwards;
+        }
+        @keyframes bbIn { from{opacity:0;transform:translate(-62%,-46%)} to{opacity:1;transform:translate(-62%,-50%)} }
+        @keyframes bbOut { from{opacity:1} to{opacity:0;transform:translate(-62%,-46%)} }
+        .bb-scene-exit { animation: bbOut 0.3s ease-in forwards !important; }
+
+        /* 봇 — 입체감 (픽셀/박스 느낌) */
+        #bb-bot {
+            width: 200px; flex-shrink: 0;
+            animation: bbBob 2.6s ease-in-out infinite;
+            filter:
+                drop-shadow(4px 4px 0px rgba(0,245,196,0.5))
+                drop-shadow(8px 8px 0px rgba(0,0,0,0.35));
+        }
+        @keyframes bbBob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+        @keyframes bbEye { 0%,88%,100%{opacity:1} 93%{opacity:0.05} }
+        .bb-eye { animation: bbEye 3.5s infinite; }
+
+        /* 말풍선 */
+        #bb-bubble {
+            background: #ffffff;
+            border-radius: 20px 20px 20px 4px;
+            padding: 26px 32px 22px;
+            /* 비트박스 느낌: 픽셀처럼 딱 떨어지는 다단 그림자 */
+            box-shadow:
+                2px 2px 0 rgba(15,118,110,0.15),
+                4px 4px 0 rgba(15,118,110,0.10),
+                6px 6px 0 rgba(15,118,110,0.06),
+                0 20px 50px rgba(0,0,0,0.3);
+            border: 1.5px solid rgba(15,118,110,0.15);
+            position: relative;
+            width: 620px;
+            margin-bottom: 16px;
+        }
+        #bb-bubble::after {
+            content: '';
+            position: absolute; bottom: -13px; left: 32px;
+            border: 13px solid transparent;
+            border-top-color: #ffffff;
+        }
+
+        /* 주제 — 한 줄 고정 */
+        #bb-topic {
+            font-size: 18px; font-weight: 900; color: #0a5c56;
+            white-space: nowrap;
+            margin-bottom: 16px; padding-bottom: 14px;
+            border-bottom: 2px solid rgba(15,118,110,0.1);
+            font-family: 'Apple SD Gothic Neo','Malgun Gothic','Nanum Gothic','Noto Sans KR',sans-serif;
+            letter-spacing: -0.02em;
+        }
+        #bb-topic span { color: #d97706; }
+
+        /* 이야기 — 한 문장 한 줄 */
+        #bb-story {
+            font-size: 16px; font-weight: 700; color: #1a1a1a;
+            line-height: 2.1; word-break: keep-all;
+            white-space: nowrap;
+            min-height: 108px;
+            font-family: 'Apple SD Gothic Neo','Malgun Gothic','Nanum Gothic','Noto Sans KR',sans-serif;
+        }
+        #bb-story em { color: #0f766e; font-style: normal; font-weight: 900; }
+        #bb-story strong { color: #d97706; font-style: normal; font-weight: 900; }
+        .bb-cursor {
+            display: inline-block; width: 2px; height: 0.88em;
+            background: #0f766e; margin-left: 2px;
+            vertical-align: middle; animation: bbBlink 0.65s infinite;
+        }
+        @keyframes bbBlink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+        /* 버튼 */
+        #bb-btns { display: flex; gap: 10px; width: 480px; justify-content: flex-end; }
+        #bb-btn-start {
+            font-size: 15px !important; font-weight: 900 !important;
+            padding: 13px 28px !important; border-radius: 12px !important;
+            border: none !important; cursor: pointer !important;
+            background: #0f766e !important; color: #fff !important;
+            /* 비트박스 느낌 입체 버튼 */
+            box-shadow: 0 5px 0 #0a5c56 !important;
+            font-family: 'Apple SD Gothic Neo','Malgun Gothic','Nanum Gothic',sans-serif !important;
+            letter-spacing: -0.01em !important;
+        }
+        #bb-btn-skip {
+            font-size: 14px !important; font-weight: 700 !important;
+            padding: 13px 20px !important; border-radius: 12px !important;
+            border: 2px solid rgba(255,255,255,0.25) !important; cursor: pointer !important;
+            background: rgba(255,255,255,0.08) !important; color: rgba(255,255,255,0.7) !important;
+            font-family: 'Apple SD Gothic Neo','Malgun Gothic','Nanum Gothic',sans-serif !important;
+        }
+    </style>
+
+    <div id="bb-backdrop"></div>
+
+    <div id="bb-scene">
+        <div id="bb-bot">
+            <svg viewBox="0 0 90 115" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="bbG" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#14b8a6"/><stop offset="100%" stop-color="#0f766e"/></linearGradient>
+                    <linearGradient id="bbGd" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#0f766e"/><stop offset="100%" stop-color="#0a5c56"/></linearGradient>
+                    <linearGradient id="bbSG" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#03050d"/><stop offset="100%" stop-color="#071a14"/></linearGradient>
+                </defs>
+                <rect x="26" y="92" width="14" height="18" rx="5" fill="url(#bbGd)"/>
+                <rect x="50" y="92" width="14" height="18" rx="5" fill="url(#bbGd)"/>
+                <rect x="23" y="104" width="18" height="8" rx="4" fill="#0a5c56"/>
+                <rect x="49" y="104" width="18" height="8" rx="4" fill="#0a5c56"/>
+                <rect x="16" y="50" width="58" height="46" rx="13" fill="url(#bbG)"/>
+                <rect x="3" y="55" width="13" height="9" rx="4.5" fill="#14b8a6"/>
+                <rect x="74" y="55" width="13" height="9" rx="4.5" fill="#14b8a6"/>
+                <circle cx="3" cy="59" r="4" fill="#0f766e"/>
+                <circle cx="87" cy="59" r="4" fill="#0f766e"/>
+                <rect x="24" y="57" width="42" height="28" rx="7" fill="url(#bbSG)"/>
+                <text x="45" y="70" text-anchor="middle" font-size="5.5" fill="#14b8a6" font-family="monospace" font-weight="700">0110 1001</text>
+                <text x="45" y="78" text-anchor="middle" font-size="5" fill="#fbbf24" font-family="monospace">DATA ACTIVE</text>
+                <rect x="16" y="86" width="58" height="5" rx="2" fill="#0a5c56"/>
+                <rect x="18" y="8" width="54" height="46" rx="15" fill="url(#bbG)"/>
+                <line x1="45" y1="8" x2="45" y2="0" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round"/>
+                <circle cx="45" cy="0" r="3.5" fill="#fbbf24"/>
+                <circle cx="45" cy="0" r="5.5" fill="rgba(251,191,36,0.25)"/>
+                <rect x="22" y="20" width="18" height="13" rx="5" fill="url(#bbSG)"/>
+                <rect x="50" y="20" width="18" height="13" rx="5" fill="url(#bbSG)"/>
+                <rect class="bb-eye" x="25" y="23" width="5" height="7" rx="1.5" fill="#00f5c4"/>
+                <rect class="bb-eye" x="32" y="23" width="5" height="7" rx="1.5" fill="#fbbf24" style="animation-delay:.15s"/>
+                <rect class="bb-eye" x="53" y="23" width="5" height="7" rx="1.5" fill="#00f5c4" style="animation-delay:.08s"/>
+                <rect class="bb-eye" x="60" y="23" width="5" height="7" rx="1.5" fill="#fbbf24" style="animation-delay:.2s"/>
+                <rect x="26" y="37" width="38" height="11" rx="4" fill="url(#bbSG)"/>
+                <text x="45" y="46" text-anchor="middle" font-size="6.5" fill="#14b8a6" font-family="monospace" font-weight="700">0 1 0 1</text>
+                <circle cx="18" cy="28" r="4" fill="#0a5c56"/><circle cx="18" cy="28" r="2" fill="#03050d"/>
+                <circle cx="72" cy="28" r="4" fill="#0a5c56"/><circle cx="72" cy="28" r="2" fill="#03050d"/>
+            </svg>
+        </div>
+
+        <div style="display:flex;flex-direction:column;align-items:flex-start;">
+            <div id="bb-bubble">
+                <div id="bb-topic">📌디지털 데이터와 아날로그 데이터를 함께 알아볼까?</div>
+                <div id="bb-story"><span class="bb-cursor"></span></div>
+            </div>
+            <div id="bb-btns">
+                <button id="bb-btn-skip" onclick="bbClose()">건너뛰기</button>
+                <button id="bb-btn-start" onclick="bbClose()">학습 시작 ▶</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+       const bbLines = [
+    { plain:'▪세상의 정보는 크게 아날로그와 디지털, 두 가지로 나뉘어.', html:'▪세상의 정보는 크게 <em>아날로그</em>와 <em>디지털</em>, 두 가지로 나뉘어.' }, 
+    { plain:'▪아날로그는 데이터를 연속적인 신호로 나타내고,', html:'<em>▪아날로그</em>는 데이터를 연속적인 신호로 나타내고,' },
+    { plain:'▪디지털은 데이터를 불연속적인 숫자로 명확하게 표현해.', html:'<em>▪디지털</em>은 데이터를 <em>불연속적인 숫자</em>로 명확하게 표현해.' },
+    { plain:'▪데이터는 아날로그에서 디지털로 변환되어 전 세계로 빠르게 보낼 수 있지.', html:'▪데이터는 아날로그에서  <strong>디지털로 변환</strong>되어 <strong>전 세계</strong>로 빠르게 보낼 수 있지.<br>' },
+    { plain:'➤ 그럼 직접 탐구하며 디지털 데이터에 대해 자세히 알아볼까?', html:'<em>➤ 그럼 직접 탐구하며 디지털 데이터에 대해 자세히 알아볼까?</em>' },
+];
+        let bbLi=0, bbCi=0, bbTm=null;
+        const bbEl=document.getElementById('bb-story');
+
+        function bbType(){
+            const cur=bbLines[bbLi];
+            if(bbCi<cur.plain.length){
+                const done=bbLines.slice(0,bbLi).map(l=>l.html).join('<br>');
+                bbEl.innerHTML=(done?done+'<br>':'')+cur.plain.slice(0,bbCi+1)+'<span class="bb-cursor"></span>';
+                bbCi++; bbTm=setTimeout(bbType,26);
+            } else {
+                bbLi++; bbCi=0;
+                if(bbLi<bbLines.length) bbTm=setTimeout(bbType,320);
+                else bbEl.innerHTML=bbLines.map(l=>l.html).join('<br>');
+            }
+        }
+
+        function bbClose(){
+            if(bbTm)clearTimeout(bbTm);
+            const s=document.getElementById('bb-scene');
+            const b=document.getElementById('bb-backdrop');
+            s.classList.add('bb-scene-exit');
+            setTimeout(()=>{s.style.display='none';b.style.display='none';},300);
+        }
+
+        const btnS=document.getElementById('bb-btn-start');
+        const btnSk=document.getElementById('bb-btn-skip');
+        btnS.addEventListener('mouseenter',()=>{btnS.style.setProperty('background','#0e9b87','important');btnS.style.setProperty('transform','translateY(-2px)','important');btnS.style.setProperty('box-shadow','0 7px 0 #0a5c56','important');});
+        btnS.addEventListener('mouseleave',()=>{btnS.style.setProperty('background','#0f766e','important');btnS.style.setProperty('transform','translateY(0)','important');btnS.style.setProperty('box-shadow','0 5px 0 #0a5c56','important');});
+        btnS.addEventListener('mousedown',()=>{btnS.style.setProperty('transform','translateY(4px)','important');btnS.style.setProperty('box-shadow','0 1px 0 #0a5c56','important');});
+        btnS.addEventListener('mouseup',()=>{btnS.style.setProperty('transform','translateY(-2px)','important');btnS.style.setProperty('box-shadow','0 7px 0 #0a5c56','important');});
+        btnSk.addEventListener('mouseenter',()=>{btnSk.style.setProperty('background','rgba(255,255,255,0.18)','important');btnSk.style.setProperty('color','rgba(255,255,255,0.95)','important');});
+        btnSk.addEventListener('mouseleave',()=>{btnSk.style.setProperty('background','rgba(255,255,255,0.08)','important');btnSk.style.setProperty('color','rgba(255,255,255,0.7)','important');});
+
+        window.addEventListener('load',()=>setTimeout(bbType,600));
+    </script>
+<script src="./js/search_data.js"></script> 
+<script src="./js/concept_common.js"></script>
+</body>
+</html>

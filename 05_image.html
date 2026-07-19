@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>이미지의 디지털 표현 - 개념 탐구</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&family=JetBrains+Mono:wght@700;900&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
+<link rel="stylesheet" href="./css/image_concept.css">
+
+</head>
+<body>
+
+    <header>
+        <div class="header-top">
+            <div class="header-left">
+                <span class="target-badge">대상: 중학교 1~3학년</span>
+                <h1 class="main-title" onclick="location.href='index.html'">데이터 비트박스</h1>
+            </div>
+            <div class="status-controller">
+                <button class="status-btn" onclick="setStatus('normal')">🔄 초기화</button>
+                <button class="status-btn btn-help" onclick="setStatus('help')">🙋‍♂️ SOS 요청</button>
+                <button class="status-btn btn-done" onclick="setStatus('done')">✅ 미션 완료</button>
+            </div>
+        </div>
+
+        <nav>
+            <div class="menu-item">
+                <span class="menu-link">디지털 데이터의 가치</span>
+                <ul class="dropdown">
+                    <li><a href="01_value.html">📖 개념 탐구</a></li>
+                    <li><a href="01_value_play.html">🛠️ 활용 실습</a></li>
+                </ul>
+            </div>
+            <div class="menu-item"><span class="menu-link">비트란?</span><ul class="dropdown"><li><a href="02_bit.html">📖 개념 탐구</a></li><li><a href="02_bit_play.html">🛠️ 활용 실습</a></li></ul></div>
+            <div class="menu-item"><span class="menu-link">숫자의 디지털 표현</span><ul class="dropdown"><li><a href="03_number.html">📖 개념 탐구</a></li><li><a href="03_number_play.html">🛠️ 활용 실습</a></li></ul></div>
+            <div class="menu-item"><span class="menu-link">문자의 디지털 표현</span><ul class="dropdown"><li><a href="04_text.html">📖 개념 탐구</a></li><li><a href="04_text_play.html">🛠️ 활용 실습</a></li></ul></div>
+            <div class="menu-item"><span class="menu-link active">이미지의 디지털 표현</span><ul class="dropdown"><li><a href="05_image.html">📖 개념 탐구</a></li><li><a href="05_image_play.html">🛠️ 활용 실습</a></li></ul></div>
+            <div class="menu-item"><span class="menu-link">소리의 디지털 표현</span><ul class="dropdown"><li><a href="06_sound.html">📖 개념 탐구</a></li><li><a href="06_sound_play.html">🛠️ 활용 실습</a></li></ul></div>
+            <div class="menu-item"><span class="menu-link">동영상의 디지털 표현</span><ul class="dropdown"><li><a href="07_video.html">📖 개념 탐구</a></li><li><a href="07_video_play.html">🛠️ 활용 실습</a></li></ul></div>
+        </nav>
+
+    </header>
+
+    <main>
+        <div class="content-container">
+            <div class="content-card">
+
+                <div class="progress">
+                    <div class="prog-dot cur" id="dot0"></div>
+                    <div class="prog-dot" id="dot1"></div>
+                    <div class="prog-dot" id="dot2"></div>
+                    <div class="prog-dot" id="dot3"></div>
+                    <div class="prog-dot" id="dot4"></div>
+                    <div class="prog-dot" id="dot5"></div>
+                </div>
+
+                <div id="step1-visual" class="step-container active">
+                    <div class="slide-section">
+                        <div class="visual-title">💡 컴퓨터는 복잡한 스마트 시티를 어떻게 기억할까?</div>
+                        <div style="font-size: 0.95rem; color: #424245; font-weight: 700;">
+                            마우스를 움직여 <b>픽셀</b>과 <b>24비트 색상 데이터(RGB)</b>를 확인하세요.<br>
+                            <span style="color: var(--multi-violet);">신호등의 색상을 인식하는 인공지능 자율주행 자동차</span><br>
+		           <span style="color: var(--multi-violet);">🚦 마우스로 캔버스를 클릭하면 신호등이 바뀝니다! </span>
+				
+                        </div>
+                        
+                        <div class="interactive-area">
+                            <div class="canvas-wrapper" id="canvasWrapper">
+                                <canvas id="sourceCanvas" width="620" height="400"></canvas>
+                                <canvas id="loupeCanvas" width="280" height="280"></canvas>
+                            </div>
+                            
+                            <div class="post-it">
+                                🕵️‍♂️ <b>탐구 미션!</b><br><br>
+                                🚨 우측 상단의 <b>경찰서 지붕</b>(파란색)의 RGB 코드는 무엇인가요?<br><br>
+                                ☁️ 하늘에 떠 있는 <b>완전 흰색 구름</b>과 완전 <b>검정색 신호등 몸통</b>의 코드를 찾아보세요!
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step-navigation">
+                        <div class="nav-arrow next" onclick="goStep('step2-concept')">
+                            <div>이미지의 디지털 표현 원리</div>
+                            <svg viewBox="0 0 24 24"><path d="M10 17l5-5-5-5v10z"/></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="step2-concept" class="step-container">
+                    <div style="font-size: 1.3rem; font-weight: 900; color: var(--multi-violet); margin-bottom: 10px; text-align: left; padding-left: 10px;">? 디지털 이미지를 구성하는 원리</div>
+                    <div class="concept-wrap">
+                        <div class="concept-row">
+                            <div class="concept-icon">🔳</div>
+                            <div class="concept-text">
+                                <button class="inline-reveal-btn" onclick="revealInline(this, '픽셀 (Pixel)', '#e84393')">❔</button> : 디지털 화면을 구성하는 가장 작은 사각형 점 단위입니다. (화소라고도 부릅니다.)
+                            </div>
+                        </div>
+                        <div class="concept-row">
+                            <div class="concept-icon">📐</div>
+                            <div class="concept-text">
+                                <button class="inline-reveal-btn" onclick="revealInline(this, '해상도 (Resolution)', '#e84393')">❔</button> : 이미지 하나가 몇 개의 픽셀로 이루어져 있는지를 나타내는 정밀도입니다. (예: 1920x1080)
+                            </div>
+                        </div>
+                        <!-- ── 비트맵 / 벡터 개념 + 포스트잇 나란히 ── -->
+                        <div style="display:flex; align-items:flex-start; width:100%;">
+                            <!-- 왼쪽: 개념 설명 -->
+                            <div style="flex:1; display:flex; flex-direction:column; gap:6px;">
+                                <div class="concept-row" style="margin-bottom:0;">
+                                    <div class="concept-icon">🖼️</div>
+                                    <div class="concept-text">
+                                        <button class="inline-reveal-btn violet" onclick="revealInline(this, '비트맵 (Bitmap)', 'var(--multi-violet)')">❔</button> 방식 : 픽셀들을 격자 모양으로 나열해 이미지를 표현합니다.<br>
+                                        무리하게 확대하면 모서리가 깨지는 <b>'계단 현상'</b>이 발생합니다.
+                                    </div>
+                                </div>
+                                <div class="concept-row" style="margin-bottom:0;">
+                                    <div class="concept-icon">📈</div>
+                                    <div class="concept-text">
+                                        <button class="inline-reveal-btn violet" onclick="revealInline(this, '벡터 (Vector)', 'var(--multi-violet)')">❔</button> 방식 : 점, 선, 면을 수학적 방정식으로 저장합니다.<br>
+                                        무한히 확대해도 <b>절대 깨지지 않습니다.</b>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- 오른쪽: 포스트잇 두 개 -->
+                            <div style="display:flex; gap:40px; align-items:flex-start; flex-shrink:0; padding:10px 10px 10px 50px;">
+                                <!-- 비트맵 포스트잇 -->
+                                <div style="width:190px; background:linear-gradient(160deg,#fff9c4 60%,#fff176); border-radius:4px 14px 14px 14px; padding:14px 14px 16px; box-shadow:3px 5px 14px rgba(9,132,227,0.13),0 1px 3px rgba(0,0,0,0.08); position:relative; font-family:'Pretendard','Inter',sans-serif; transform:rotate(1.5deg); border-top:4px solid #0984e3;">
+                                    <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);width:16px;height:16px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#74b9ff,#0984e3);box-shadow:0 2px 5px rgba(0,0,0,0.25);"></div>
+                                    <div style="font-size:0.78rem;font-weight:900;color:#0964b0;margin-bottom:8px;text-align:center;">🖼️ 비트맵 형식</div>
+                                    <div style="display:flex;flex-direction:column;gap:6px;">
+                                        <div style="background:rgba(9,132,227,0.08);border-radius:7px;padding:6px 9px;">
+                                            <div style="font-size:0.78rem;font-weight:900;color:#0984e3;">📄 BMP</div>
+                                            <div style="font-size:0.72rem;color:#555;margin-top:2px;line-height:1.4;">윈도 표준 비트맵 파일</div>
+                                        </div>
+                                        <div style="background:rgba(9,132,227,0.08);border-radius:7px;padding:6px 9px;">
+                                            <div style="font-size:0.78rem;font-weight:900;color:#0984e3;">📷 JPG</div>
+                                            <div style="font-size:0.72rem;color:#555;margin-top:2px;line-height:1.4;">사진을 주로 저장하며 고화질</div>
+                                        </div>
+                                        <div style="background:rgba(9,132,227,0.08);border-radius:7px;padding:6px 9px;">
+                                            <div style="font-size:0.78rem;font-weight:900;color:#0984e3;">🌐 PNG</div>
+                                            <div style="font-size:0.72rem;color:#555;margin-top:2px;line-height:1.4;">인터넷용 고화질 저용량</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- 벡터 포스트잇 -->
+                                <div style="width:190px; background:linear-gradient(160deg,#fff9c4 60%,#fff176); border-radius:4px 14px 14px 14px; padding:14px 14px 16px; box-shadow:3px 5px 14px rgba(0,184,148,0.13),0 1px 3px rgba(0,0,0,0.08); position:relative; font-family:'Pretendard','Inter',sans-serif; transform:rotate(-1.2deg); border-top:4px solid #00b894;">
+                                    <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);width:16px;height:16px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#55efc4,#00836b);box-shadow:0 2px 5px rgba(0,0,0,0.25);"></div>
+                                    <div style="font-size:0.78rem;font-weight:900;color:#00836b;margin-bottom:8px;text-align:center;">📈 벡터 형식</div>
+                                    <div style="display:flex;flex-direction:column;gap:6px;">
+                                        <div style="background:rgba(0,184,148,0.09);border-radius:7px;padding:6px 9px;">
+                                            <div style="font-size:0.78rem;font-weight:900;color:#00836b;">🌍 SVG</div>
+                                            <div style="font-size:0.72rem;color:#555;margin-top:2px;line-height:1.4;">웹에서 주로 사용하는 벡터 파일</div>
+                                        </div>
+                                        <div style="background:rgba(0,184,148,0.09);border-radius:7px;padding:6px 9px;">
+                                            <div style="font-size:0.78rem;font-weight:900;color:#00836b;">🎨 AI</div>
+                                            <div style="font-size:0.72rem;color:#555;margin-top:2px;line-height:1.4;">전문 그래픽 디자인용 원본 파일</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="concept-row">
+                            <div class="concept-icon">🎨</div>
+                            <div class="concept-text">
+                                <b>RGB 색상</b> : 빛의 삼원색(Red-8비트, Green-8비트, Blue-8비트)을 조합하여 색을 표현합니다.<br>
+                                하나의 픽셀 색상을 저장하는 데 보통 <button class="inline-reveal-btn green" onclick="revealInline(this, '24비트 (약 1600만 색)', '#2e7d32')">❔</button>를 사용합니다.
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="step-navigation">
+                        <div class="nav-arrow prev" onclick="goStep('step1-visual')">
+                            <svg viewBox="0 0 24 24"><path d="M14 7l-5 5 5 5V7z"/></svg>
+                            <div>디지털 이미지 체험</div>
+                        </div>
+                        <div class="nav-arrow next" onclick="goStep('step3-advanced')">
+                            <div>이미지 해상도</div>
+                            <svg viewBox="0 0 24 24"><path d="M10 17l5-5-5-5v10z"/></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="step3-advanced" class="step-container">
+                    <div style="font-size: 1.3rem; font-weight: 900; color: var(--multi-violet); margin-bottom: 5px; text-align:left;">🔥내가 그린 픽셀 아트, 해상도를 바꾸면 어떻게 될까? (해상도 분석기)</div>
+                    
+                    <p id="modeDescText" style="color: var(--text-sub); font-size: 0.95rem; margin-top: 5px; margin-bottom: 10px; font-weight: 600; text-align:left;">
+                        '내가 그린 픽셀 아트' 모드를 선택했습니다. 캔버스에 직접 그림을 그리고 우측 슬라이더로 해상도를 조절해 보세요.
+                    </p>
+                    
+                    <div style="width: 100%; text-align: left; margin-bottom: 20px;">
+                        <div class="mode-selector">
+                            <button class="mode-btn active" id="modeCustom" onclick="switchMode('custom')">✏️ 픽셀 아트 창작</button>
+                            <button class="mode-btn" id="modeHD" onclick="switchMode('hd')">✨ 비트맵 계단 현상 관찰</button>
+                            <button class="mode-btn" id="modePhoto" onclick="switchMode('photo')">📸  내 사진 업로드 분석</button>
+                        </div>
+                    </div>
+
+                    <div class="pixel-workspace">
+                        <div class="panel">
+                            <div class="panel-title">1. 입력 데이터 (원본)</div>
+                            
+                            <div class="panel-top-controls left">
+                                <div id="customSettings" class="canvas-setup">
+                                    가로 <input type="number" id="cWidth" class="input-num" value="16" min="4" max="50"> × 
+                                    세로 <input type="number" id="cHeight" class="input-num" value="16" min="4" max="50"> 픽셀
+                                    <button class="action-btn" onclick="makeGrid()">생성</button>
+                                </div>
+                                <div id="hdSettings" style="display: none; width: 100%;">
+                                    <h3 style="margin: 0 0 5px 0; color: var(--text-main); font-size: 1.05rem;">고해상도 비트맵 원본 모드</h3>
+                                    <p style="margin: 0; font-size: 0.85rem; color: #666; font-weight: 600;">슬라이더로 픽셀 수를 줄이면 계단 현상(깨짐)이 발생합니다.<br>※ 벡터 방식과의 차이는 5단계 실습에서 확인하세요!</p>
+                                </div>
+                            </div>
+
+                            <div id="customUI" style="width: 100%;">
+                                <div class="tool-area">
+                                    <div class="color-box">
+                                        <input type="color" id="colorPicker" class="color-picker" value="#6c5ce7" onchange="updateColorBin()">
+                                        <div style="font-size: 0.8rem; font-weight:800; color:#495057;">색상 선택</div>
+                                        <div class="bin-display" id="binDisplay">
+                                            <span style="color:#ff7675">R:<br>00000000</span><br>
+                                            <span style="color:#55efc4">G:<br>01110001</span><br>
+                                            <span style="color:#74b9ff">B:<br>11100011</span>
+                                        </div>
+                                    </div>
+                                    <div class="draw-grid-container" id="gridContainer">
+                                        <div id="drawGrid" class="draw-grid"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="hdUI" style="display: none; width: 100%; height: auto; flex-direction: column; align-items: center; justify-content: center; gap: 10px;">
+                                <div style="width:300px; height:300px; border:4px solid white; border-radius:8px; box-shadow:0 10px 20px rgba(0,0,0,0.05); background-color:#ffffff; background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20'%3E%3Cpath d='M 20 0 L 0 0 0 20' fill='none' stroke='%23d8d8e8' stroke-width='1'/%3E%3C/svg%3E&quot;); display:flex; align-items:center; justify-content:center; flex-shrink:0; overflow:hidden;">
+                                    <canvas id="leftHdCanvas" width="300" height="300" style="width:100%; height:100%;"></canvas>
+                                </div>
+                                <p style="color:#6c5ce7; font-size: 0.85rem; font-weight: 800; background:#f8f6ff; padding:8px 16px; border-radius:20px; border:1px solid rgba(108,92,231,0.2); margin:0; text-align:center; line-height:1.6;">📌 원본 (300 × 300 픽셀 비트맵)</p>
+                            </div>
+
+                            <!-- 📸 사진 업로드 UI -->
+                            <div id="photoUI" style="display: none; width: 100%; height: auto; flex-direction: column; align-items: center; justify-content: center; gap: 10px;">
+
+                                <!-- 업로드 전: 드롭존 -->
+                                <div id="photoDropZone" style="width:300px; height:220px; border:3px dashed #a29bfe; border-radius:16px; background:#f8f6ff; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; cursor:pointer !important; transition:0.2s;" onclick="document.getElementById('photoFileInput').click()" ondragover="event.preventDefault();this.style.borderColor='#6c5ce7';this.style.background='#ede7f6';" ondragleave="this.style.borderColor='#a29bfe';this.style.background='#f8f6ff';" ondrop="handlePhotoDrop(event)">
+                                    <div style="font-size:2.5rem;">🖼️</div>
+                                    <div style="font-size:0.9rem; font-weight:800; color:#6c5ce7; text-align:center; line-height:1.5;">사진을 클릭하거나 끌어다 놓으세요<br><span style="font-size:0.78rem; color:#a29bfe; font-weight:600;">JPG, PNG, GIF 지원</span></div>
+                                </div>
+
+                                <!-- 업로드 후: 원본 이미지 + 바꾸기 버튼 -->
+                                <div id="photoPreviewWrap" style="display:none; flex-direction:column; align-items:center; gap:8px; width:100%;">
+                                    <canvas id="leftPhotoCanvas" width="300" height="300" style="border-radius:10px; border:4px solid white; box-shadow:0 10px 24px rgba(108,92,231,0.18); max-width:300px; max-height:300px;"></canvas>
+                                    <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; justify-content:center;">
+                                        <p id="photoInfoLabel" style="color:#6c5ce7; font-size:0.82rem; font-weight:800; background:#f8f6ff; padding:6px 14px; border-radius:20px; border:1px solid rgba(108,92,231,0.2); margin:0; line-height:1.6;">📌 원본</p>
+                                        <button onclick="document.getElementById('photoFileInput').click()" style="font-size:0.82rem; font-weight:800; color:#fff; background:#6c5ce7; border:none; border-radius:20px; padding:6px 16px; cursor:pointer !important; box-shadow:0 3px 0 #4527a0; transition:0.15s;" onmouseenter="this.style.background='#7c6cf0'" onmouseleave="this.style.background='#6c5ce7'">🔄 이미지 바꾸기</button>
+                                    </div>
+                                </div>
+
+                                <input type="file" id="photoFileInput" accept="image/*" style="display:none;" onchange="handlePhotoUpload(event)">
+                            </div>
+                        </div>
+
+                        <div class="panel output-panel">
+                            <div class="panel-title">
+                                <span class="output-title-badge">📺 OUTPUT</span>
+                                2. 출력 결과 — 슬라이더로 해상도를 바꿔보세요!
+                            </div>
+
+                            <div class="slider-control-wrap">
+                                <div class="slider-label-row">
+                                    <span><span class="slider-icon">🎚️</span>해상도 조절 (픽셀 수)</span>
+                                    <span class="slider-value-chip" id="resValueDisplay">16 × 16 픽셀</span>
+                                </div>
+                                <input type="range" id="resSlider" min="4" max="50" value="16" oninput="updateResultCanvas()">
+                                <div style="display:flex; justify-content:space-between; font-size:0.72rem; font-weight:700; color:#b0a8d0; padding:0 2px;">
+                                    <span id="sliderMinLabel">4×4 픽셀 (저해상도)</span>
+                                    <span>← 슬라이더를 움직여 보세요! →</span>
+                                    <span id="sliderMaxLabel">50×50 픽셀 (고해상도)</span>
+                                </div>
+                            </div>
+
+                            <div class="result-canvas-wrapper" id="resultCanvasWrap">
+                                <canvas id="resultCanvas" width="300" height="300"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step-navigation">
+                        <div class="nav-arrow prev" onclick="goStep('step2-concept')">
+                            <svg viewBox="0 0 24 24"><path d="M14 7l-5 5 5 5V7z"/></svg>
+                            <div>이미지의 디지털 표현 원리</div>
+                        </div>
+                        <div class="nav-arrow next" onclick="goStep('step4-bitmap')">
+                            <div>비트 심도</div>
+                            <svg viewBox="0 0 24 24"><path d="M10 17l5-5-5-5v10z"/></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="step4-bitmap" class="step-container">
+                    <div style="font-size: 1.3rem; font-weight: 900; color: var(--multi-violet); margin-bottom: 5px; text-align:left;">🔥 색상 팔레트의 비밀, 비트 심도(Bit Depth) 분석기</div>
+                    <p style="color: var(--text-sub); font-size: 0.95rem; margin-top: 5px; margin-bottom: 15px; font-weight: 600; text-align:left;">
+                        컴퓨터가 이진수(0과 1)를 어떻게 색상으로 번역할까요? <br>
+                        비트 심도(Bit Depth)를 선택하고, 나만의 팔레트 규칙을 만들어 이진 코드를 그림으로 표현해 보세요!
+                    </p>
+
+                  <div class="panel" style="background:#fafafa;">
+                        <div class="panel-top-controls left" style="height: auto;">
+                            <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                                <button class="mode-btn active" id="btn1bit" onclick="setBitDepth(1)">⚫⚪ 1-Bit 모드 <span style="font-size:0.8em;opacity:0.75;">(2색)</span></button>
+
+                                <!-- N-Bit 버튼 + 비트수 선택기를 한 덩어리로 -->
+                                <div class="nbit-group">
+                                    <button class="mode-btn" id="btnNbit" onclick="activateNBit()">🎨 N-Bit 모드</button>
+                                    <div class="nbit-picker" id="nbitPicker">
+                                        <span class="nbit-label">비트 수:</span>
+                                        <button class="nbit-num" id="nbitBtn2" onclick="setNBit(2)">2</button>
+                                        <button class="nbit-num" id="nbitBtn3" onclick="setNBit(3)">3</button>
+                                        <button class="nbit-num" id="nbitBtn4" onclick="setNBit(4)">4</button>
+                                    </div>
+                                </div>
+
+                                <button class="mode-btn" id="btn8bit" onclick="showBitInfo()">💡 비트 심도와 RGB의 비밀</button>
+                            </div>
+                        </div>
+
+                       <div class="decoder-area" id="decoderMainArea">
+                            <div class="decoder-setup">
+                                <div class="palette-config" id="paletteArea">
+                                    <div style="font-size: 0.95rem; font-weight: 800; color: var(--multi-violet); margin-bottom: 5px;">🎨 팔레트 (규칙 설정)</div>
+                                </div>
+                                <div style="flex:1; display:flex; flex-direction:column;">
+                                    <div style="font-size: 0.95rem; font-weight: 800; color: #343a40; margin-bottom: 8px;">⌨️ 이진수 코드 입력 (10x10 픽셀 기준)<br>-코드를 수정해서 이미지를 창작해보세요.</div>
+                                    <textarea id="codeInput" class="code-input-area" oninput="renderDecoder()" spellcheck="false"></textarea>
+                                </div>
+                            </div>
+                            
+                            <div class="decoder-result output-panel" style="border-radius:16px;">
+                                <div style="display:flex; align-items:center; gap:8px; margin-bottom:15px;">
+                                    <span class="output-title-badge">📺 OUTPUT</span>
+                                    <span style="font-size: 1.05rem; font-weight: 900; color: var(--multi-violet);">해독된 이미지</span>
+                                </div>
+                                <div class="decoder-canvas-wrapper">
+                                    <canvas id="decoderCanvas" width="390" height="390"></canvas>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="bitInfoArea" style="display: none; width: 100%; background: white; border: 2px solid var(--multi-violet-light); border-radius: 16px; padding: 30px; margin-top: 15px; text-align: left; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+                            <h3 style="color: var(--multi-violet); margin-top: 0; font-size: 1.4rem;">🌈 비트가 커지면 어떻게 될까요?</h3>
+                            <p style="font-size: 1.05rem; line-height: 1.7; color: #2d3436;">
+                                <b>비트 심도(Bit Depth)</b>는 하나의 픽셀이 색상을 표현하기 위해 사용하는 데이터의 크기(비트 수)를 말합니다.<br>
+                                비트가 하나 늘어날 때마다 표현할 수 있는 색상의 수는 <b>2배씩</b> 늘어납니다!
+                            </p>
+                            <div style="display: flex; gap: 15px; margin: 20px 0; text-align: center;">
+                                <div style="flex: 1; background: #f8f6ff; padding: 15px; border-radius: 12px; border: 1px dashed var(--multi-violet-light);">
+                                    <b>1-Bit</b><br>
+                                    <button class="inline-reveal-btn violet" style="margin: 8px 0; font-size: 1.1rem; padding: 4px 15px;" onclick="revealInline(this, '<span style=\'font-size:1.4rem;\'>2색</span>', 'var(--multi-violet)')">❔</button>
+                                    <br><span style="font-size:0.85rem; color:#636e72;">(2¹)</span>
+                                </div>
+                                <div style="flex: 1; background: #f8f6ff; padding: 15px; border-radius: 12px; border: 1px dashed var(--multi-violet-light);">
+                                    <b>2-Bit</b><br>
+                                    <button class="inline-reveal-btn violet" style="margin: 8px 0; font-size: 1.1rem; padding: 4px 15px;" onclick="revealInline(this, '<span style=\'font-size:1.4rem;\'>4색</span>', 'var(--multi-violet)')">❔</button>
+                                    <br><span style="font-size:0.85rem; color:#636e72;">(2²)</span>
+                                </div>
+                                <div style="flex: 1; background: #f8f6ff; padding: 15px; border-radius: 12px; border: 1px dashed var(--multi-violet-light);">
+                                    <b>3-Bit</b><br>
+                                    <button class="inline-reveal-btn violet" style="margin: 8px 0; font-size: 1.1rem; padding: 4px 15px;" onclick="revealInline(this, '<span style=\'font-size:1.4rem;\'>8색</span>', 'var(--multi-violet)')">❔</button>
+                                    <br><span style="font-size:0.85rem; color:#636e72;">(2³)</span>
+                                </div>
+                                <div style="flex: 1; background: #fff0f5; padding: 15px; border-radius: 12px; border: 2px solid var((--multi-violet-light);">
+                                    <b>8-Bit</b><br>
+                                    <button class="inline-reveal-btn" style="background: var(--multi-violet); color: white; border: none; box-shadow: 0 4px 10px rgba(255, 45, 85, 0.3); margin: 8px 0; font-size: 1.1rem; padding: 4px 15px;" onclick="revealInline(this, '<span style=\'font-size:1.4rem;\'>256색</span>', 'var(--apple-red)')">❔</button>
+                                    <br><span style="font-size:0.85rem; color:#636e72;">(2⁸)</span>
+                                </div>
+                            </div>
+                            <h3 style="color: var(--accent-blue); margin-bottom: 5px; margin-top: 30px; font-size: 1.2rem;">🎨 그렇다면 우리가 보는 진짜 사진은? (24-Bit RGB 컬러)</h3>
+                            <p style="font-size: 1.05rem; line-height: 1.7; color: #2d3436; margin-top: 5px;">
+                                우리가 스마트폰이나 모니터에서 보는 고화질 이미지는 빛의 삼원색인 <b>R(빨강), G(초록), B(파랑)</b>를 섞어서 만듭니다. 이때 R, G, B 각각에 <b>8-Bit (256단계)</b>씩 데이터를 할당합니다.<br><br>
+                                💡 <b>계산해볼까요?</b><br>
+                                <span style="font-family:'Orbitron'; color:var(--apple-red); font-weight:900;">R(256)</span> × <span style="font-family:'Orbitron'; color:var(--success-green); font-weight:900;">G(256)</span> × <span style="font-family:'Orbitron'; color: #0984e3; font-weight:900;">B(256)</span> = <b style="font-size:1.3rem; color:var(--multi-violet);">약 1,677만 가지 색상!</b><br>
+                                이것을 <b>'24-Bit 트루 컬러(True Color)'</b>라고 부르며, 자연에 있는 거의 모든 색을 표현할 수 있답니다.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="step-navigation">
+                        <div class="nav-arrow prev" onclick="goStep('step3-advanced')">
+                            <svg viewBox="0 0 24 24"><path d="M14 7l-5 5 5 5V7z"/></svg>
+                            <div>이미지 해상도</div>
+                        </div>
+                        <div class="nav-arrow next" onclick="goStep('step5-vector')">
+                            <div>벡터 방식 이미지</div>
+                            <svg viewBox="0 0 24 24"><path d="M10 17l5-5-5-5v10z"/></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="step5-vector" class="step-container">
+                    <div style="font-size: 1.3rem; font-weight: 900; color: var(--multi-violet); margin-bottom: 5px; text-align:left;">📐 수학으로 그리는 그림, 벡터(Vector)</div>
+                    <p style="color: var(--text-sub); font-size: 0.95rem; margin-top: 5px; margin-bottom: 15px; font-weight: 600; text-align:left;">
+                        벡터 방식은 픽셀이 아니라 점과 선의 <b>좌표와 방정식</b>으로 이미지를 저장합니다.<br>
+                        명령어(코드)의 숫자를 조절하여 원을 이동시키고, 무한히 확대해도 절대 깨지지 않는 마법을 확인해 보세요!
+                    </p>
+
+                    <div class="pixel-workspace">
+                        <div class="panel">
+                            <div class="panel-title">1. 수학 코드(명령어) 조절</div>
+                            <div style="width:100%; display:flex; flex-direction:column; gap:15px; padding: 10px;">
+                                <div class="vector-control-row">
+                                    가로 위치 (X좌표): <input type="range" id="vecX" min="20" max="180" value="100" oninput="updateVector()">
+                                </div>
+                                <div class="vector-control-row">
+                                    세로 위치 (Y좌표): <input type="range" id="vecY" min="20" max="180" value="100" oninput="updateVector()">
+                                </div>
+                                <div class="vector-control-row">
+                                    도형 반지름 (R): <input type="range" id="vecR" min="10" max="90" value="40" oninput="updateVector()">
+                                </div>
+                                <div class="vector-control-row" style="justify-content: flex-start; gap: 20px;">
+                                    채우기 색상(클릭): <input type="color" id="vecColor" value="#ff7675" style="width: 50px; height: 30px; border:none; cursor:pointer;" onchange="updateVector()">
+                                </div>
+                            </div>
+                            
+                            <div class="bin-display" style="margin-top:20px; font-size:1rem; padding:15px;" id="vecCode">
+                                </div>
+                        </div>
+
+                        <div class="panel output-panel">
+                            <div class="panel-title">
+                                <span class="output-title-badge">📺 OUTPUT</span>
+                                2. 벡터 렌더링 &amp; 무한 확대경
+                            </div>
+
+                            <div class="slider-control-wrap">
+                                <div class="slider-label-row">
+                                    <span><span class="slider-icon">🔍</span>확대 배율 조절</span>
+                                    <span class="slider-value-chip" id="vecZoomText">현재 확대 배율: 1x</span>
+                                </div>
+                                <input type="range" id="vecZoom" min="1" max="20" value="1" oninput="updateVectorZoom()">
+                                <div style="display:flex; justify-content:space-between; font-size:0.72rem; font-weight:700; color:#b0a8d0; padding:0 2px;">
+                                    <span>1x (원본)</span>
+                                    <span>← 슬라이더를 움직여 보세요! →</span>
+                                    <span>20x (최대 확대)</span>
+                                </div>
+                            </div>
+
+                            <div class="result-canvas-wrapper">
+                                <svg id="vectorSvg" width="300" height="300" viewBox="0 0 200 200" style="display:block;">
+                                    <circle id="vCircle" cx="100" cy="100" r="40" fill="#ff7675" stroke="#2d3436" stroke-width="4" />
+                                </svg>
+                            </div>
+                            <p style="font-size: 0.85rem; color: var(--multi-pink); font-weight: 800; margin-top: 15px;">🔍 확대 배율을 높여 가장자리를 확인해 보세요!</p>
+                        </div>
+                    </div>
+
+                    <div class="step-navigation">
+                        <div class="nav-arrow prev" onclick="goStep('step4-bitmap')">
+                            <svg viewBox="0 0 24 24"><path d="M14 7l-5 5 5 5V7z"/></svg>
+                            <div>비트 심도</div>
+                        </div>
+                        <div class="nav-arrow next" onclick="goStep('step6-quiz')">
+                            <div>개념 확인 (최종 퀴즈)</div>
+                            <svg viewBox="0 0 24 24"><path d="M10 17l5-5-5-5v10z"/></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="step6-quiz" class="step-container">
+                    <div style="font-size: 1.3rem; font-weight: 900; color: var(--apple-red); margin-bottom: 25px;">🎯 최종 퀴즈: 이미지의 디지털 표현 마스터하기!</div>
+
+                    <div class="quiz-controls-row">
+                        <div class="inline-tip" onclick="openTipPopup()">
+                            <svg viewBox="0 0 24 24" fill="currentColor" style="width:18px; height:18px;"><path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7zm2.85 11.1l-.85.6V16h-4v-2.3l-.85-.6C7.8 12.16 7 10.63 7 9c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.63-.8 3.16-2.15 4.1z"/></svg>
+                            미션 가이드
+                        </div>
+                        <div style="display: flex; gap: 15px; align-items: center;">
+                            <div id="quizTimer" class="quiz-timer">⏱️ 00:00</div>
+                            <button id="startQuizBtn" class="start-quiz-btn" onclick="startQuizTimer()">▶️ 퀴즈 시작</button>
+                            <button id="resetTimerBtn" class="reset-timer-btn" onclick="resetQuiz()">🔄 타이머 초기화</button>
+                        </div>
+                    </div>
+
+                    <div class="word-score-container" id="wordBankWrap">
+                        <div class="word-bank" id="wordBank" style="opacity: 0.4; pointer-events: none;">
+                            <div class="word-item" draggable="true" ondragstart="drag(event)">픽셀</div>
+                            <div class="word-item" draggable="true" ondragstart="drag(event)">비트맵</div>
+                            <div class="word-item" draggable="true" ondragstart="drag(event)">벡터</div>
+                            <div class="word-item" draggable="true" ondragstart="drag(event)">해상도</div>
+                            <div class="word-item" draggable="true" ondragstart="drag(event)">계단 현상</div>
+                            <div class="word-item" draggable="true" ondragstart="drag(event)">RGB</div>
+                        </div>
+                    </div>
+
+                    <div id="quizForm">
+                        <div class="quiz-box">1. 디지털 화면을 구성하는 가장 작은 사각형 점 단위를 <input type="text" class="blank" data-answer="픽셀" data-score="15" oninput="check(this)" ondrop="drop(event)" ondragover="allowDrop(event)" autocomplete="off" disabled> (이)라고 합니다. <span style="color:var(--apple-red); font-weight:900;">[15점]</span></div>
+                        <div class="quiz-box">2. 픽셀들을 격자 모양으로 나열하여 이미지를 표현하는 방식을 <input type="text" class="blank" data-answer="비트맵" data-score="15" oninput="check(this)" ondrop="drop(event)" ondragover="allowDrop(event)" autocomplete="off" disabled> (이)라고 합니다. <span style="color:var(--apple-red); font-weight:900;">[15점]</span></div>
+                        <div class="quiz-box">3. 비트맵 방식을 무리하게 확대했을 때 모서리가 울퉁불퉁하게 깨져 보이는 것을 <input type="text" class="blank" data-answer="계단 현상" data-score="15" oninput="check(this)" ondrop="drop(event)" ondragover="allowDrop(event)" autocomplete="off" disabled> (이)라고 합니다. <span style="color:var(--apple-red); font-weight:900;">[15점]</span></div>
+                        <div class="quiz-box">4. 수학적 좌표와 방정식으로 그려져 아무리 확대해도 선이 절대 깨지지 않는 방식은 <input type="text" class="blank" data-answer="벡터" data-score="15" oninput="check(this)" ondrop="drop(event)" ondragover="allowDrop(event)" autocomplete="off" disabled> 입니다. <span style="color:var(--apple-red); font-weight:900;">[15점]</span></div>
+                        <div class="quiz-box">5. 하나의 이미지가 얼마나 많은 픽셀로 이루어져 있는지를 나타내는 정밀도를 <input type="text" class="blank" data-answer="해상도" data-score="20" oninput="check(this)" ondrop="drop(event)" ondragover="allowDrop(event)" autocomplete="off" disabled> (이)라고 합니다. <span style="color:var(--apple-red); font-weight:900;">[20점]</span></div>
+                        <div class="quiz-box" style="margin-bottom:0;">6. 컴퓨터는 빛의 삼원색인 <input type="text" class="blank" data-answer="RGB" data-score="20" oninput="check(this)" ondrop="drop(event)" ondragover="allowDrop(event)" autocomplete="off" disabled> (Red, Green, Blue)를 조합하여 수백만 가지의 색을 만들어냅니다. <span style="color:var(--apple-red); font-weight:900;">[20점]</span></div>
+                    </div>
+
+                    <div style="text-align: center; display: none;" id="submitQuizBtnWrap">
+                        <button class="submit-quiz-btn" onclick="submitQuiz()">✏️ 채점하기</button>
+                    </div>
+
+                    <div class="step-navigation">
+                        <div class="nav-arrow prev" onclick="goStep('step5-vector')">
+                            <svg viewBox="0 0 24 24"><path d="M14 7l-5 5 5 5V7z"/></svg>
+                            <div>벡터 방식 이미지</div>
+                        </div>
+                        
+                        <div style="display: flex; gap: 10px; margin-left: auto;">
+                            <div class="nav-arrow report-btn" onclick="downloadReportTXT()">
+                                <div>📄 텍스트 저장</div>
+                            </div>
+                            <div class="nav-arrow img-report-btn" onclick="downloadReportImageOffline()">
+                                <div>🖼️ 이미지(PNG) 저장</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <aside class="sidebar-right">
+            <div class="memo-section">
+                <div style="font-weight:900; color:#1e1e2f; margin-bottom:12px; font-size:1.05rem;">📌 배움 노트</div>
+                <textarea id="memoInput" class="memo-area" placeholder="중요한 내용을 기록하세요. 궁금한 사항은 기록하고 질문하세요."></textarea>
+            </div>
+            <div class="reflection-section">
+                <div style="font-weight:900; color:#1e1e2f; margin-bottom:12px; font-size:1.05rem;">🌿 배움 활동 소감</div>
+                <textarea id="reflectionInput" class="reflection-area" placeholder="새롭게 알게된 사실과 느낀점을 기록하세요."></textarea>
+                <div class="capture-tip">📸 캡처: Win+Shift+S | Mac: Cmd+Shift+4</div>
+            </div>
+            <div class="erase-section">
+                <button class="erase-btn" onclick="eraseStepContent()">
+                    🗑️ 현재 단원 학습 내용 지우기<br>
+                    <span style="font-size:0.68rem; font-weight:600; opacity:0.7;">(배움노트·소감·퀴즈 기록)</span>
+                </button>
+            </div>
+        </aside>
+
+    </main>
+
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-content" id="modalContent"></div>
+    </div>
+    
+    <div class="modal-overlay" id="customAlertModal" style="z-index: 9999;">
+        <div class="alert-box" style="transition: border-color 0.3s, box-shadow 0.3s;">
+            <div id="alertIcon" style="font-size: 3rem; margin-bottom: 10px;">🚫</div>
+            <h3 id="alertTitle" style="color: var(--apple-red); font-size: 1.5rem; margin-top: 0; margin-bottom: 15px; font-weight: 900;">접근 거부!</h3>
+            <div id="alertMessage" class="alert-message" style="font-size: 1.05rem; font-weight: 600; color: var(--text-main); margin-bottom: 25px; white-space: pre-line; word-break: keep-all;">메시지가 이곳에 표시됩니다.</div>
+            <button id="alertBtn" onclick="closeCustomAlert()" style="width: 100%; padding: 12px; background: var(--apple-red); color: white; border: none; border-radius: 12px; font-weight: 900; font-size: 1.1rem; cursor: pointer; transition: 0.3s;">확인</button>
+        </div>
+    </div>
+    
+    <footer>
+        <div style="font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 4px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                <line x1="12" y1="22.08" x2="12" y2="12"></line>
+            </svg>
+            데이터 비트박스
+        </div>
+        <div style="color: var(--apple-gray);">&copy; 중학교 정보 - 데이터 표현</div>
+    </footer>
+
+    <script src="./js/image_concept.js"></script>
+
+    <!-- ── AI 가이드 캐릭터 (비트봇) v10 — 5단원: 이미지의 디지털 표현 ── -->
+    <style>
+        #bb-backdrop {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.65);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            z-index: 8400;
+        }
+        .sidebar-right { z-index: 8500 !important; position: relative !important; }
+        #bb-scene {
+            position: fixed; top: 50%; left: 50%;
+            transform: translate(-62%, -50%);
+            display: flex; align-items: flex-end; gap: 24px;
+            z-index: 8600;
+            animation: bbIn 0.5s cubic-bezier(0.16,1,0.3,1) forwards;
+        }
+        @keyframes bbIn { from{opacity:0;transform:translate(-62%,-46%)} to{opacity:1;transform:translate(-62%,-50%)} }
+        @keyframes bbOut { from{opacity:1} to{opacity:0;transform:translate(-62%,-46%)} }
+        .bb-scene-exit { animation: bbOut 0.3s ease-in forwards !important; }
+
+        /* 봇 — 보라색 테마 입체 그림자 */
+        #bb-bot {
+            width: 200px; flex-shrink: 0;
+            animation: bbBob 2.6s ease-in-out infinite;
+            filter:
+                drop-shadow(4px 4px 0px rgba(162,155,254,0.55))
+                drop-shadow(8px 8px 0px rgba(0,0,0,0.35));
+        }
+        @keyframes bbBob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+        @keyframes bbEye { 0%,88%,100%{opacity:1} 93%{opacity:0.05} }
+        .bb-eye { animation: bbEye 3.5s infinite; }
+
+        /* 말풍선 — 보라색 테마 */
+        #bb-bubble {
+            background: #ffffff;
+            border-radius: 20px 20px 20px 4px;
+            padding: 26px 32px 22px;
+            box-shadow:
+                2px 2px 0 rgba(108,92,231,0.18),
+                4px 4px 0 rgba(108,92,231,0.12),
+                6px 6px 0 rgba(108,92,231,0.07),
+                0 20px 50px rgba(0,0,0,0.3);
+            border: 1.5px solid rgba(108,92,231,0.18);
+            position: relative; width: 570px; margin-bottom: 16px;
+        }
+        #bb-bubble::after {
+            content: ''; position: absolute; bottom: -13px; left: 32px;
+            border: 13px solid transparent; border-top-color: #ffffff;
+        }
+        #bb-topic {
+            font-size: 18px; font-weight: 900; color: #4527a0;
+            white-space: nowrap; margin-bottom: 16px; padding-bottom: 14px;
+            border-bottom: 2px solid rgba(108,92,231,0.12);
+            font-family: 'Apple SD Gothic Neo','Malgun Gothic','Nanum Gothic','Noto Sans KR',sans-serif;
+            letter-spacing: -0.02em;
+        }
+        #bb-story {
+            font-size: 16px; font-weight: 700; color: #1a1a1a;
+            line-height: 2.1; word-break: keep-all; white-space: nowrap;
+            min-height: 108px;
+            font-family: 'Apple SD Gothic Neo','Malgun Gothic','Nanum Gothic','Noto Sans KR',sans-serif;
+        }
+        #bb-story em { color: #6c5ce7; font-style: normal; font-weight: 900; }
+        #bb-story strong { color: #d97706; font-style: normal; font-weight: 900; }
+        .bb-cursor {
+            display: inline-block; width: 2px; height: 0.88em;
+            background: #6c5ce7; margin-left: 2px;
+            vertical-align: middle; animation: bbBlink 0.65s infinite;
+        }
+        @keyframes bbBlink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+        #bb-btns { display: flex; gap: 10px; width: 530px; justify-content: flex-end; }
+        #bb-btn-start {
+            font-size: 15px !important; font-weight: 900 !important;
+            padding: 13px 28px !important; border-radius: 12px !important;
+            border: none !important; cursor: pointer !important;
+            background: #6c5ce7 !important; color: #fff !important;
+            box-shadow: 0 5px 0 #4527a0 !important;
+            font-family: 'Apple SD Gothic Neo','Malgun Gothic','Nanum Gothic',sans-serif !important;
+            letter-spacing: -0.01em !important;
+        }
+        #bb-btn-skip {
+            font-size: 14px !important; font-weight: 700 !important;
+            padding: 13px 20px !important; border-radius: 12px !important;
+            border: 2px solid rgba(255,255,255,0.25) !important; cursor: pointer !important;
+            background: rgba(255,255,255,0.08) !important; color: rgba(255,255,255,0.7) !important;
+            font-family: 'Apple SD Gothic Neo','Malgun Gothic','Nanum Gothic',sans-serif !important;
+        }
+    </style>
+
+    <div id="bb-backdrop"></div>
+
+    <div id="bb-scene">
+        <div id="bb-bot">
+            <svg viewBox="0 0 90 115" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <!-- 보라색 테마 그라데이션 -->
+                    <linearGradient id="bbG" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#a29bfe"/><stop offset="100%" stop-color="#6c5ce7"/></linearGradient>
+                    <linearGradient id="bbGd" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#6c5ce7"/><stop offset="100%" stop-color="#4527a0"/></linearGradient>
+                    <linearGradient id="bbSG" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#0d0621"/><stop offset="100%" stop-color="#1a0a3d"/></linearGradient>
+                </defs>
+                <rect x="26" y="92" width="14" height="18" rx="5" fill="url(#bbGd)"/>
+                <rect x="50" y="92" width="14" height="18" rx="5" fill="url(#bbGd)"/>
+                <rect x="23" y="104" width="18" height="8" rx="4" fill="#4527a0"/>
+                <rect x="49" y="104" width="18" height="8" rx="4" fill="#4527a0"/>
+                <rect x="16" y="50" width="58" height="46" rx="13" fill="url(#bbG)"/>
+                <rect x="3" y="55" width="13" height="9" rx="4.5" fill="#a29bfe"/>
+                <rect x="74" y="55" width="13" height="9" rx="4.5" fill="#a29bfe"/>
+                <circle cx="3" cy="59" r="4" fill="#6c5ce7"/>
+                <circle cx="87" cy="59" r="4" fill="#6c5ce7"/>
+                <rect x="24" y="57" width="42" height="28" rx="7" fill="url(#bbSG)"/>
+                <text x="45" y="70" text-anchor="middle" font-size="5.5" fill="#a29bfe" font-family="monospace" font-weight="700">RGB PIXEL</text>
+                <text x="45" y="78" text-anchor="middle" font-size="5" fill="#fbbf24" font-family="monospace">255 128 0</text>
+                <rect x="16" y="86" width="58" height="5" rx="2" fill="#4527a0"/>
+                <rect x="18" y="8" width="54" height="46" rx="15" fill="url(#bbG)"/>
+                <line x1="45" y1="8" x2="45" y2="0" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round"/>
+                <circle cx="45" cy="0" r="3.5" fill="#fbbf24"/>
+                <circle cx="45" cy="0" r="5.5" fill="rgba(251,191,36,0.25)"/>
+                <rect x="22" y="20" width="18" height="13" rx="5" fill="url(#bbSG)"/>
+                <rect x="50" y="20" width="18" height="13" rx="5" fill="url(#bbSG)"/>
+                <rect class="bb-eye" x="25" y="23" width="5" height="7" rx="1.5" fill="#a29bfe"/>
+                <rect class="bb-eye" x="32" y="23" width="5" height="7" rx="1.5" fill="#fbbf24" style="animation-delay:.15s"/>
+                <rect class="bb-eye" x="53" y="23" width="5" height="7" rx="1.5" fill="#a29bfe" style="animation-delay:.08s"/>
+                <rect class="bb-eye" x="60" y="23" width="5" height="7" rx="1.5" fill="#fbbf24" style="animation-delay:.2s"/>
+                <rect x="26" y="37" width="38" height="11" rx="4" fill="url(#bbSG)"/>
+                <text x="45" y="46" text-anchor="middle" font-size="6" fill="#a29bfe" font-family="monospace" font-weight="700">R G B</text>
+                <circle cx="18" cy="28" r="4" fill="#4527a0"/><circle cx="18" cy="28" r="2" fill="#0d0621"/>
+                <circle cx="72" cy="28" r="4" fill="#4527a0"/><circle cx="72" cy="28" r="2" fill="#0d0621"/>
+            </svg>
+        </div>
+
+        <div style="display:flex;flex-direction:column;align-items:flex-start;">
+            <div id="bb-bubble">
+                <div id="bb-topic">📌 이미지가 컴퓨터 속에서 어떻게 표현될까?</div>
+                <div id="bb-story"><span class="bb-cursor"></span></div>
+            </div>
+            <div id="bb-btns">
+                <button id="bb-btn-skip" onclick="bbClose()">건너뛰기</button>
+                <button id="bb-btn-start" onclick="bbClose()">학습 시작 ▶</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const bbLines = [
+            { plain:'▪디지털 이미지는 아주 작은 점, 픽셀(Pixel)로 이루어져 있어.', html:'▪디지털 이미지는 아주 작은 점, <em>픽셀(Pixel)</em>로 이루어져 있어.' },
+            { plain:'▪각 픽셀은 빨강·초록·파랑(RGB) 세 가지 빛의 조합으로 색을 만들어.', html:'▪각 픽셀은 <em>빨강·초록·파랑(RGB)</em> 세 가지 빛의 조합으로 색을 만들어.' },
+            { plain:'▪픽셀이 많을수록 해상도가 높아져서 더 선명한 이미지가 돼.', html:'▪픽셀이 많을수록 <em>해상도</em>가 높아져서 더 선명한 이미지가 돼.<br>' },
+           { plain:'➤ 그럼 직접 이미지가 디지털로 변환되는 원리를 탐구해볼까?', html:'<em>➤ 그럼 직접 이미지가 디지털로 변환되는 원리를 탐구해볼까?</em>' },
+
+        ];
+        let bbLi=0, bbCi=0, bbTm=null;
+        const bbEl=document.getElementById('bb-story');
+
+        function bbType(){
+            const cur=bbLines[bbLi];
+            if(bbCi<cur.plain.length){
+                const done=bbLines.slice(0,bbLi).map(l=>l.html).join('<br>');
+                bbEl.innerHTML=(done?done+'<br>':'')+cur.plain.slice(0,bbCi+1)+'<span class="bb-cursor"></span>';
+                bbCi++; bbTm=setTimeout(bbType,26);
+            } else {
+                bbLi++; bbCi=0;
+                if(bbLi<bbLines.length) bbTm=setTimeout(bbType,320);
+                else bbEl.innerHTML=bbLines.map(l=>l.html).join('<br>');
+            }
+        }
+
+        function bbClose(){
+            if(bbTm)clearTimeout(bbTm);
+            const s=document.getElementById('bb-scene');
+            const b=document.getElementById('bb-backdrop');
+            s.classList.add('bb-scene-exit');
+            setTimeout(()=>{s.style.display='none';b.style.display='none';},300);
+        }
+
+        const btnS=document.getElementById('bb-btn-start');
+        const btnSk=document.getElementById('bb-btn-skip');
+        btnS.addEventListener('mouseenter',()=>{btnS.style.setProperty('background','#7c6cf0','important');btnS.style.setProperty('transform','translateY(-2px)','important');btnS.style.setProperty('box-shadow','0 7px 0 #4527a0','important');});
+        btnS.addEventListener('mouseleave',()=>{btnS.style.setProperty('background','#6c5ce7','important');btnS.style.setProperty('transform','translateY(0)','important');btnS.style.setProperty('box-shadow','0 5px 0 #4527a0','important');});
+        btnS.addEventListener('mousedown',()=>{btnS.style.setProperty('transform','translateY(4px)','important');btnS.style.setProperty('box-shadow','0 1px 0 #4527a0','important');});
+        btnS.addEventListener('mouseup',()=>{btnS.style.setProperty('transform','translateY(-2px)','important');btnS.style.setProperty('box-shadow','0 7px 0 #4527a0','important');});
+        btnSk.addEventListener('mouseenter',()=>{btnSk.style.setProperty('background','rgba(255,255,255,0.18)','important');btnSk.style.setProperty('color','rgba(255,255,255,0.95)','important');});
+        btnSk.addEventListener('mouseleave',()=>{btnSk.style.setProperty('background','rgba(255,255,255,0.08)','important');btnSk.style.setProperty('color','rgba(255,255,255,0.7)','important');});
+
+        window.addEventListener('load',()=>setTimeout(bbType,600));
+    </script>
+<script src="./js/search_data.js"></script> 
+<script src="./js/concept_common.js"></script>
+</body>
+</html>

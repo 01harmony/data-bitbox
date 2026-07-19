@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>비트의 원리 - 개념 탐구</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&family=JetBrains+Mono:wght@700;900&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
+<link rel="stylesheet" href="./css/bit_concept.css">
+</head>
+<body>
+
+    <header>
+        <div class="header-top">
+            <div class="header-left">
+                <span class="target-badge">대상: 중학교 1~3학년</span>
+                <h1 class="main-title" onclick="location.href='index.html'">데이터 비트박스</h1>
+            </div>
+            <div class="status-controller">
+                <button class="status-btn" onclick="setStatus('normal')">🔄 초기화</button>
+                <button class="status-btn btn-help" onclick="setStatus('help')">🙋‍♂️ SOS 요청</button>
+                <button class="status-btn btn-done" onclick="setStatus('done')">✅ 미션 완료</button>
+            </div>
+        </div>
+
+         <nav>
+            <div class="menu-item">
+                <span class="menu-link">디지털 데이터의 가치</span>
+                <ul class="dropdown">
+                    <li><a href="01_value.html">📖 개념 탐구</a></li>
+                    <li><a href="01_value_play.html">🛠️ 활용 실습</a></li>
+                </ul>
+            </div>
+            <div class="menu-item"><span class="menu-link active">비트란?</span><ul class="dropdown"><li><a href="02_bit.html">📖 개념 탐구</a></li><li><a href="02_bit_play.html">🛠️ 활용 실습</a></li></ul></div>
+            <div class="menu-item"><span class="menu-link">숫자의 디지털 표현</span><ul class="dropdown"><li><a href="03_number.html">📖 개념 탐구</a></li><li><a href="03_number_play.html">🛠️ 활용 실습</a></li></ul></div>
+            <div class="menu-item"><span class="menu-link">문자의 디지털 표현</span><ul class="dropdown"><li><a href="04_text.html">📖 개념 탐구</a></li><li><a href="04_text_play.html">🛠️ 활용 실습</a></li></ul></div>
+            <div class="menu-item"><span class="menu-link">이미지의 디지털 표현</span><ul class="dropdown"><li><a href="05_image.html">📖 개념 탐구</a></li><li><a href="05_image_play.html">🛠️ 활용 실습</a></li></ul></div>
+            <div class="menu-item"><span class="menu-link">소리의 디지털 표현</span><ul class="dropdown"><li><a href="06_sound.html">📖 개념 탐구</a></li><li><a href="06_sound_play.html">🛠️ 활용 실습</a></li></ul></div>
+            <div class="menu-item"><span class="menu-link">동영상의 디지털 표현</span><ul class="dropdown"><li><a href="07_video.html">📖 개념 탐구</a></li><li><a href="07_video_play.html">🛠️ 활용 실습</a></li></ul></div>
+        </nav>
+
+    </header>
+
+    <main>
+        <div class="content-container">
+            <div class="content-card">
+
+                <div class="progress">
+                    <div class="prog-dot cur" id="dot0"></div>
+                    <div class="prog-dot" id="dot1"></div>
+                    <div class="prog-dot" id="dot2"></div>
+                    <div class="prog-dot" id="dot3"></div>
+                </div>
+
+                <div id="step1-visual" class="step-container active">
+                    <div style="font-size:1.3rem;font-weight:900;color:var(--teal-main);margin-bottom:18px;text-align:center;">💡 찌릿찌릿! 전기가 데이터로 변하는 순간, 비트(Bit)</div>
+
+                    <div class="bit-journey">
+
+                        <!-- 흐름 단계 레이블 행 -->
+                        <div class="bj-labels">
+                            <div class="bj-label">① 스위치</div>
+                            <div class="bj-label-arrow"></div>
+                            <div class="bj-label">② CPU</div>
+                            <div class="bj-label-arrow"></div>
+                            <div class="bj-label">③ 비트값</div>
+                        </div>
+
+                        <!-- 메인 시각화 행 -->
+                        <div class="bj-main" id="switchParent">
+
+                            <!-- ① 스위치 + 전구 -->
+                            <div class="bj-block bj-switch-block">
+                                <div class="bulb-container" style="margin-bottom:8px;">
+                                    <svg id="bulbOff" class="bulb-svg off" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"></path><path d="M10 22h4"></path><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1.53.64 2.88 1.5 3.5.76.76 1.23 1.52 1.41 2.5"></path></svg>
+                                    <svg id="bulbOn"  class="bulb-svg on"  viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"></path><path d="M10 22h4"></path><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1.53.64 2.88 1.5 3.5.76.76 1.23 1.52 1.41 2.5"></path></svg>
+                                </div>
+                                <div class="click-switch" id="bitSwitch" onclick="toggleBit()">
+                                    <div class="switch-knob" id="knobText"></div>
+                                </div>
+                                <div class="bj-state-wrap">
+                                    <span id="offText" class="bj-state off-state active">전기 차단 OFF</span>
+                                    <span id="onText"  class="bj-state on-state">전기 흐름 ON</span>
+                                </div>
+                                <div class="bj-click-hint">👆 클릭!</div>
+                            </div>
+
+                            <!-- 도선 -->
+                            <div class="bj-wire-wrap">
+                                <div class="bj-wire" id="bjWire1">
+                                    <div class="bj-signal" id="bjSig1"></div>
+                                </div>
+                            </div>
+
+                            <!-- ③ CPU 칩 -->
+                            <div class="bj-block bj-cpu-block" id="cpuBlock">
+                                <div class="bj-cpu-chip">
+                                    <div class="bj-cpu-top-pins">
+                                        <div class="bj-pin" id="pin0"></div><div class="bj-pin" id="pin1"></div>
+                                        <div class="bj-pin" id="pin2"></div><div class="bj-pin" id="pin3"></div>
+                                    </div>
+                                    <div class="bj-cpu-body">
+                                        <div class="bj-cpu-name">CPU</div>
+                                        <div class="bj-cpu-grid">
+                                            <div class="bj-cpu-cell" id="cc0"></div>
+                                            <div class="bj-cpu-cell" id="cc1"></div>
+                                            <div class="bj-cpu-cell" id="cc2"></div>
+                                            <div class="bj-cpu-cell" id="cc3"></div>
+                                        </div>
+                                    </div>
+                                    <div class="bj-cpu-bot-pins">
+                                        <div class="bj-pin" id="pin4"></div><div class="bj-pin" id="pin5"></div>
+                                        <div class="bj-pin" id="pin6"></div><div class="bj-pin" id="pin7"></div>
+                                    </div>
+                                </div>
+                                <div class="bj-cpu-state" id="cpuState">✔️ 0인식</div>
+                            </div>
+
+                            <!-- 도선 3 -->
+                            <div class="bj-wire-wrap">
+                                <div class="bj-wire" id="bjWire2">
+                                    <div class="bj-signal" id="bjSig2"></div>
+                                </div>
+                            </div>
+
+                            <!-- ④ 비트값 -->
+                            <div class="bj-block bj-result-block">
+                                <div class="bj-result-label">컴퓨터가<br>인식한 값</div>
+                                <div class="bit-result" id="resultBit">0</div>
+                                <div class="bj-result-sub" id="resultSub">전기 없음 → <b>0</b></div>
+                            </div>
+
+                        </div><!-- bj-main -->
+
+                        <!-- 하단 설명 흐름 -->
+                        <div class="bj-explain" id="bjExplain">
+                            <div class="bje-step bje-off" id="bjeOff">스위치 <b>OFF</b> → CPU에 신호 없음 → 비트 = <b style="color:#8e8e93">0</b></div>
+                            <div class="bje-step bje-on" id="bjeOn" style="display:none">스위치 <b>ON</b> → CPU에 신호 전달 → 비트 = <b style="color:var(--teal-main)">1</b></div>
+                        </div>
+
+                    </div><!-- bit-journey -->
+
+                    <p style="font-size:0.9rem;color:var(--text-sub);margin-top:10px;margin-bottom:15px;font-weight:700;text-align:center;">
+                        스위치를 <b>클릭</b>해서 전기 신호가 0과 1로 인식되는 과정을 확인하세요!
+                    </p>
+
+                    <div class="step-navigation">
+                        <div class="nav-arrow next" onclick="goToStep('step1-visual', 'step2-concept')">
+                            <div>비트 개념 탐구</div>
+                            <svg viewBox="0 0 24 24"><path d="M10 17l5-5-5-5v10z"/></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="step2-concept" class="step-container">
+                    <div class="concept-summary">
+                        <div class="summary-item">
+                            <div class="summary-title">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                                비트(Bit)란 무엇일까요?
+                            </div>
+                            <div class="summary-desc">
+                                컴퓨터가 데이터를 처리하고 저장하는 <button class="pill-btn" onclick="revealInline(this, '가장 작은 정보 단위', 'var(--teal-main)')">❔</button>입니다.<br>
+                                'Binary Digit(이진 숫자)'의 줄임말로, 위의 전구 스위치가 꺼지거나 켜지는 것처럼 <button class="pill-btn" onclick="revealInline(this, '0과 1, 단 두 가지 상태', 'var(--teal-main)')">❔</button> 중 하나만을 가집니다. <br>우리가 매일 스마트폰으로 보는 글자, 사진, 영상 등 <button class="pill-btn" onclick="revealInline(this, '모든 디지털 데이터', 'var(--teal-main)')">❔</button>는 이 작은 비트들이 모여서 만들어진 것이랍니다!
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="qna-bubble-container">
+                        <div class="qna-question">왜 컴퓨터는 우리가 평소에 쓰는 0부터 9까지 쓰지 않고, 굳이 0과 1만 쓸까?</div>
+                        <div class="qna-answer">전기 신호는 전기 회로나 케이블을 타고 이동하면서 점점 약해질 수 있어. <br>즉, '3만큼 전기가 들어왔다', '7만큼 전기가 들어왔다'처럼 애매한 숫자를 쓰면 전송 과정에서 오류가 발생하기 아주 쉽지.<br><br>그래서 차라리 아주 단순하게, <b>확실하게 전기가 들어왔다(1), 혹은 안 들어왔다(0) 두 가지만 구분</b>하는 것이 가장 안전하고 오류를 줄일 수 있는 완벽한 방법이기 때문이야!</div>
+                    </div>
+
+                    <div class="step-navigation">
+                        <div class="nav-arrow prev" onclick="goToStep('step2-concept', 'step1-visual')">
+                            <svg viewBox="0 0 24 24"><path d="M14 7l-5 5 5 5V7z"/></svg>
+                            <div>비트 신호 체험</div>
+                        </div>
+                        <div class="nav-arrow next" onclick="goToStep('step2-concept', 'step3-byte')">
+                            <div>용량 단위 탐구</div>
+                            <svg viewBox="0 0 24 24"><path d="M10 17l5-5-5-5v10z"/></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="step3-byte" class="step-container">
+                    <div style="font-size: 1.3rem; font-weight: 900; color: var(--teal-main); margin-bottom: 16px; text-align: center;">📦 비트가 모이면? </div>
+
+                    <!-- 개념 설명 -->
+                    <div class="concept-summary" style="margin-bottom: 16px;">
+                        <div class="summary-item">
+                            <div class="summary-title">
+                                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                                비트가 쌓이면 더 큰 단위가 돼요!
+                            </div>
+                            <div class="summary-desc">
+                                비트 1개는 0 또는 1만 표현할 수 있어서 정보를 담기엔 너무 작아요.<br>
+                                그래서 비트 여러 개를 묶어 <button class="pill-btn" onclick="revealInline(this, '더 큰 용량 단위', 'var(--teal-main)')">❔</button>를 만들었어요.
+                                <b>8비트 = 1바이트</b>이고, 바이트부터 실질적인 데이터 저장이 시작됩니다!
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 용량 단위 카드 — 한 줄 가로 배치 -->
+                    <div style="display:flex; align-items:center; justify-content:center; gap:6px; flex-nowrap; overflow-x:auto; padding:4px 0 12px; margin-bottom:12px;">
+
+                        <!-- bit -->
+                        <div onclick="showByteDetail('bit')" style="background:linear-gradient(135deg,#e0f7fa,#b2ebf2); border-radius:14px; padding:12px 14px; text-align:center; min-width:90px; border:2px solid var(--teal-main); cursor:pointer !important; flex-shrink:0; transition:transform 0.15s;" onmouseenter="this.style.transform='translateY(-3px)'" onmouseleave="this.style.transform='translateY(0)'">
+                            <div style="font-size:1.5rem; line-height:1;">🔵</div>
+                            <div style="font-size:1rem; font-weight:900; color:var(--teal-main); font-family:'맑은 고딕','Malgun Gothic','Apple SD Gothic Neo','Nanum Gothic',sans-serif; margin-top:4px;">1 bit</div>
+                            <div style="font-size:0.72rem; font-weight:700; color:#555; margin-top:3px; font-family:'맑은 고딕','Malgun Gothic','Apple SD Gothic Neo','Nanum Gothic',sans-serif;">0 또는 1</div>
+                            <div style="font-size:0.65rem; color:var(--teal-main); font-weight:800; margin-top:4px; font-family:'맑은 고딕','Malgun Gothic',sans-serif;">❓클릭</div>
+                        </div>
+
+                        <div style="font-size:1.1rem; font-weight:900; color:var(--teal-main); flex-shrink:0;">×8</div>
+
+                        <!-- Byte -->
+                        <div onclick="showByteDetail('byte')" style="background:linear-gradient(135deg,#e8f5e9,#c8e6c9); border-radius:14px; padding:12px 14px; text-align:center; min-width:90px; border:2px solid #43a047; cursor:pointer !important; flex-shrink:0; transition:transform 0.15s;" onmouseenter="this.style.transform='translateY(-3px)'" onmouseleave="this.style.transform='translateY(0)'">
+                            <div style="font-size:1.5rem; line-height:1;">🟢</div>
+                            <div style="font-size:1rem; font-weight:900; color:#2e7d32; font-family:'맑은 고딕','Malgun Gothic','Apple SD Gothic Neo','Nanum Gothic',sans-serif; margin-top:4px;">1 Byte</div>
+                            <div style="font-size:0.72rem; font-weight:700; color:#555; margin-top:3px; font-family:'맑은 고딕','Malgun Gothic','Apple SD Gothic Neo','Nanum Gothic',sans-serif;">= 8 bit</div>
+                            <div style="font-size:0.65rem; color:#43a047; font-weight:800; margin-top:4px; font-family:'맑은 고딕','Malgun Gothic',sans-serif;">❓클릭</div>
+                        </div>
+
+                        <div style="font-size:1.1rem; font-weight:900; color:#43a047; flex-shrink:0;">×1,024</div>
+
+                        <!-- KB -->
+                        <div onclick="showByteDetail('kb')" style="background:linear-gradient(135deg,#fff8e1,#ffecb3); border-radius:14px; padding:12px 14px; text-align:center; min-width:90px; border:2px solid #f9a825; cursor:pointer !important; flex-shrink:0; transition:transform 0.15s;" onmouseenter="this.style.transform='translateY(-3px)'" onmouseleave="this.style.transform='translateY(0)'">
+                            <div style="font-size:1.5rem; line-height:1;">🟡</div>
+                            <div style="font-size:1rem; font-weight:900; color:#f57f17; font-family:'맑은 고딕','Malgun Gothic','Apple SD Gothic Neo','Nanum Gothic',sans-serif; margin-top:4px;">1 KB</div>
+                            <div style="font-size:0.72rem; font-weight:700; color:#555; margin-top:3px; font-family:'맑은 고딕','Malgun Gothic','Apple SD Gothic Neo','Nanum Gothic',sans-serif;">= 1,024 Byte</div>
+                            <div style="font-size:0.65rem; color:#f9a825; font-weight:800; margin-top:4px; font-family:'맑은 고딕','Malgun Gothic',sans-serif;">❓클릭</div>
+                        </div>
+
+                        <div style="font-size:1.1rem; font-weight:900; color:#f9a825; flex-shrink:0;">×1,024</div>
+
+                        <!-- MB -->
+                        <div onclick="showByteDetail('mb')" style="background:linear-gradient(135deg,#fce4ec,#f8bbd0); border-radius:14px; padding:12px 14px; text-align:center; min-width:90px; border:2px solid #e91e63; cursor:pointer !important; flex-shrink:0; transition:transform 0.15s;" onmouseenter="this.style.transform='translateY(-3px)'" onmouseleave="this.style.transform='translateY(0)'">
+                            <div style="font-size:1.5rem; line-height:1;">🔴</div>
+                            <div style="font-size:1rem; font-weight:900; color:#c2185b; font-family:'맑은 고딕','Malgun Gothic','Apple SD Gothic Neo','Nanum Gothic',sans-serif; margin-top:4px;">1 MB</div>
+                            <div style="font-size:0.72rem; font-weight:700; color:#555; margin-top:3px; font-family:'맑은 고딕','Malgun Gothic','Apple SD Gothic Neo','Nanum Gothic',sans-serif;">= 1,024 KB</div>
+                            <div style="font-size:0.65rem; color:#e91e63; font-weight:800; margin-top:4px; font-family:'맑은 고딕','Malgun Gothic',sans-serif;">❓클릭</div>
+                        </div>
+
+                        <div style="font-size:1.1rem; font-weight:900; color:#e91e63; flex-shrink:0;">×1,024</div>
+
+                        <!-- GB -->
+                        <div onclick="showByteDetail('gb')" style="background:linear-gradient(135deg,#ede7f6,#d1c4e9); border-radius:14px; padding:12px 14px; text-align:center; min-width:90px; border:2px solid #7b1fa2; cursor:pointer !important; flex-shrink:0; transition:transform 0.15s;" onmouseenter="this.style.transform='translateY(-3px)'" onmouseleave="this.style.transform='translateY(0)'">
+                            <div style="font-size:1.5rem; line-height:1;">🟣</div>
+                            <div style="font-size:1rem; font-weight:900; color:#6a1b9a; font-family:'맑은 고딕','Malgun Gothic','Apple SD Gothic Neo','Nanum Gothic',sans-serif; margin-top:4px;">1 GB</div>
+                            <div style="font-size:0.72rem; font-weight:700; color:#555; margin-top:3px; font-family:'맑은 고딕','Malgun Gothic','Apple SD Gothic Neo','Nanum Gothic',sans-serif;">= 1,024 MB</div>
+                            <div style="font-size:0.65rem; color:#7b1fa2; font-weight:800; margin-top:4px; font-family:'맑은 고딕','Malgun Gothic',sans-serif;">❓클릭</div>
+                        </div>
+
+                        <div style="font-size:1.1rem; font-weight:900; color:#7b1fa2; flex-shrink:0;">×1,024</div>
+
+                        <!-- TB -->
+                        <div onclick="showByteDetail('tb')" style="background:linear-gradient(135deg,#e8eaf6,#c5cae9); border-radius:14px; padding:12px 14px; text-align:center; min-width:90px; border:2px solid #283593; cursor:pointer !important; flex-shrink:0; transition:transform 0.15s;" onmouseenter="this.style.transform='translateY(-3px)'" onmouseleave="this.style.transform='translateY(0)'">
+                            <div style="font-size:1.5rem; line-height:1;">🔷</div>
+                            <div style="font-size:1rem; font-weight:900; color:#1a237e; font-family:'맑은 고딕','Malgun Gothic','Apple SD Gothic Neo','Nanum Gothic',sans-serif; margin-top:4px;">1 TB</div>
+                            <div style="font-size:0.72rem; font-weight:700; color:#555; margin-top:3px; font-family:'맑은 고딕','Malgun Gothic','Apple SD Gothic Neo','Nanum Gothic',sans-serif;">= 1,024 GB</div>
+                            <div style="font-size:0.65rem; color:#283593; font-weight:800; margin-top:4px; font-family:'맑은 고딕','Malgun Gothic',sans-serif;">❓클릭</div>
+                        </div>
+
+                    </div>
+
+                    <!-- 클릭 시 상세 설명 박스 -->
+                    <div id="byteDetailBox" style="display:none; background:#f0fdfa; border:2px solid var(--teal-main); border-radius:14px; padding:16px 20px; margin-bottom:14px; font-family:'맑은 고딕','Malgun Gothic','Apple SD Gothic Neo','Nanum Gothic',sans-serif;">
+                        <div id="byteDetailContent" style="font-size:0.95rem; font-weight:700; color:#1d1d1f; line-height:1.8;"></div>
+                    </div>
+
+                    <!-- 요약 표 -->
+                    <div style="width:100%; overflow-x:auto; margin-bottom:14px;">
+                        <table style="width:100%; border-collapse:collapse; font-family:'맑은 고딕','Malgun Gothic','Apple SD Gothic Neo','Nanum Gothic',sans-serif; font-size:0.95rem;">
+                            <thead>
+                                <tr style="background:var(--teal-main); color:white; font-family:'맑은 고딕','Malgun Gothic','Apple SD Gothic Neo','Nanum Gothic',sans-serif;">
+                                    <th style="padding:11px 16px; text-align:left; font-weight:900; font-size:0.95rem;">단위</th>
+                                    <th style="padding:11px 16px; text-align:left; font-weight:900; font-size:0.95rem;">환산</th>
+                                    <th style="padding:11px 16px; text-align:left; font-weight:900; font-size:0.95rem;">비트 수</th>
+                                    <th style="padding:11px 16px; text-align:left; font-weight:900; font-size:0.95rem;">실생활 예시</th>
+                                </tr>
+                            </thead>
+                            <tbody style="font-family:'맑은 고딕','Malgun Gothic','Apple SD Gothic Neo','Nanum Gothic',sans-serif;">
+                                <tr style="background:#f0fdfa; border-bottom:1px solid #e0f2f1;">
+                                    <td style="padding:10px 16px; font-weight:900; color:var(--teal-main); font-size:1rem;">1 bit</td>
+                                    <td style="padding:10px 16px; font-size:0.95rem;">—</td>
+                                    <td style="padding:10px 16px; font-size:0.95rem; font-family:'Courier New',monospace;">1</td>
+                                    <td style="padding:10px 16px; font-size:0.95rem;">💡 전구 켜짐 / 꺼짐</td>
+                                </tr>
+                                <tr style="background:white; border-bottom:1px solid #e0f2f1;">
+                                    <td style="padding:10px 16px; font-weight:900; color:#2e7d32; font-size:1rem;">1 Byte</td>
+                                    <td style="padding:10px 16px; font-size:0.95rem;">= 8 bit</td>
+                                    <td style="padding:10px 16px; font-size:0.95rem; font-family:'Courier New',monospace;">8</td>
+                                    <td style="padding:10px 16px; font-size:0.95rem;">🔤 영문자 1글자 (예: 'A')</td>
+                                </tr>
+                                <tr style="background:#f0fdfa; border-bottom:1px solid #e0f2f1;">
+                                    <td style="padding:10px 16px; font-weight:900; color:#f57f17; font-size:1rem;">1 KB</td>
+                                    <td style="padding:10px 16px; font-size:0.95rem;">= 1,024 Byte</td>
+                                    <td style="padding:10px 16px; font-size:0.95rem; font-family:'Courier New',monospace;">8,192</td>
+                                    <td style="padding:10px 16px; font-size:0.95rem;">📝 짧은 메모 파일</td>
+                                </tr>
+                                <tr style="background:white; border-bottom:1px solid #e0f2f1;">
+                                    <td style="padding:10px 16px; font-weight:900; color:#c2185b; font-size:1rem;">1 MB</td>
+                                    <td style="padding:10px 16px; font-size:0.95rem;">= 1,024 KB</td>
+                                    <td style="padding:10px 16px; font-size:0.95rem; font-family:'Courier New',monospace;">약 820만</td>
+                                    <td style="padding:10px 16px; font-size:0.95rem;">📷 사진 1장</td>
+                                </tr>
+                                <tr style="background:#f0fdfa; border-bottom:1px solid #e0f2f1;">
+                                    <td style="padding:10px 16px; font-weight:900; color:#6a1b9a; font-size:1rem;">1 GB</td>
+                                    <td style="padding:10px 16px; font-size:0.95rem;">= 1,024 MB</td>
+                                    <td style="padding:10px 16px; font-size:0.95rem; font-family:'Courier New',monospace;">약 85억</td>
+                                    <td style="padding:10px 16px; font-size:0.95rem;">🎬 영화 1편</td>
+                                </tr>
+                                <tr style="background:white;">
+                                    <td style="padding:10px 16px; font-weight:900; color:#1a237e; font-size:1rem;">1 TB</td>
+                                    <td style="padding:10px 16px; font-size:0.95rem;">= 1,024 GB</td>
+                                    <td style="padding:10px 16px; font-size:0.95rem; font-family:'Courier New',monospace;">약 8.8조</td>
+                                    <td style="padding:10px 16px; font-size:0.95rem;">💾 외장하드 / 노트북 저장장치</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- 핵심 포인트 -->
+                    <div class="qna-bubble-container" style="margin-bottom:16px;">
+                        <div class="qna-question">왜 1,000이 아니라 1,024배씩 커질까?</div>
+                        <div class="qna-answer" style="font-family:'맑은 고딕','Malgun Gothic','Apple SD Gothic Neo','Nanum Gothic',sans-serif; font-size:0.95rem; line-height:1.8;">
+                            컴퓨터는 2진법(0과 1)을 사용하기 때문에, 단위가 2의 거듭제곱으로 늘어나요.<br>
+                            <b>2<sup>10</sup> = 1,024</b>이기 때문에, 1,024배씩 묶는 것이 컴퓨터 입장에서 가장 자연스러운 단위예요.<br>
+                            즉, <b>1 KB = 정확히 1,024 Byte</b>로, 우리가 흔히 쓰는 1,000과는 조금 달라요!
+                        </div>
+                    </div>
+
+                    <div class="step-navigation">
+                        <div class="nav-arrow prev" onclick="goToStep('step3-byte', 'step2-concept')">
+                            <svg viewBox="0 0 24 24"><path d="M14 7l-5 5 5 5V7z"/></svg>
+                            <div>비트 개념 탐구</div>
+                        </div>
+                        <div class="nav-arrow next" onclick="goToStep('step3-byte', 'step3-quiz')">
+                            <div>개념 확인 (최종 퀴즈)</div>
+                            <svg viewBox="0 0 24 24"><path d="M10 17l5-5-5-5v10z"/></svg>
+                        </div>
+                    </div>
+                </div>
+
+<div id="step3-quiz" class="step-container">
+                     <div style="font-size: 1.3rem; font-weight: 900; color: var(--apple-red); margin-bottom: 25px;">🎯 최종 퀴즈: 비트 개념 마스터하기!</div>
+
+                    <div class="quiz-controls-row">
+                        <div class="inline-tip" onclick="openTipPopup()">
+                            <svg viewBox="0 0 24 24" fill="currentColor" style="width:18px; height:18px;"><path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7zm2.85 11.1l-.85.6V16h-4v-2.3l-.85-.6C7.8 12.16 7 10.63 7 9c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.63-.8 3.16-2.15 4.1z"/></svg>
+                            미션 가이드
+                        </div>
+                        <div style="display: flex; gap: 15px; align-items: center;">
+                            <div id="quizTimer" class="quiz-timer">⏱️ 00:00</div>
+                            <button id="startQuizBtn" class="start-quiz-btn" onclick="startQuizTimer()">▶️ 퀴즈 시작</button>
+                            <button id="resetTimerBtn" class="reset-timer-btn" onclick="resetQuiz()">🔄 타이머 초기화</button>
+                        </div>
+                    </div>
+
+                    <div class="word-score-container" style="margin-bottom: 20px;">
+                        <div class="word-bank" id="wordBank" style="opacity: 0.4; pointer-events: none;">
+                            <div class="word-item" draggable="true" ondragstart="drag(event)">가장 작은</div>
+                            <div class="word-item" draggable="true" ondragstart="drag(event)">0</div>
+                            <div class="word-item" draggable="true" ondragstart="drag(event)">1</div>
+                            <div class="word-item" draggable="true" ondragstart="drag(event)">이진수</div>
+                            <div class="word-item" draggable="true" ondragstart="drag(event)">8</div>
+                            <div class="word-item" draggable="true" ondragstart="drag(event)">두</div>
+                        </div>
+                    </div>
+
+                    <div id="quizForm">
+                        <div class="quiz-box">1. 컴퓨터 정보 표현의 <input type="text" class="blank" data-answer="가장 작은" data-score="15" oninput="check(this)" ondrop="drop(event)" ondragover="allowDrop(event)" autocomplete="off" disabled> 단위를 비트(Bit)라고 합니다. <span style="color:var(--apple-red); font-weight:900;">[15점]</span></div>
+                        <div class="quiz-box">2. 1비트는 <input type="text" class="blank" data-answer="0" data-answer-alt="1" data-score="15" data-swap="true" oninput="check(this)" ondrop="drop(event)" ondragover="allowDrop(event)" autocomplete="off" disabled>과 <input type="text" class="blank" data-answer="1" data-answer-alt="0" data-score="15" data-swap="true" oninput="check(this)" ondrop="drop(event)" ondragover="allowDrop(event)" autocomplete="off" disabled>, 두 가지 상태를 표현합니다. <button class="hint-btn" onclick="toggleHint(this, '전구의 꺼짐과 켜짐 신호를 떠올려보세요.')">힌트 💡</button><span class="hint-display"></span> <span style="color:var(--apple-red); font-weight:900;">[30점]</span></div>
+                        <div class="quiz-box">3. 0과 1만을 사용하여 정보를 표현하는 체계를 <input type="text" class="blank" data-answer="이진수" data-score="20" oninput="check(this)" ondrop="drop(event)" ondragover="allowDrop(event)" autocomplete="off" disabled>라고 합니다. <span style="color:var(--apple-red); font-weight:900;">[20점]</span></div>
+                        <div class="quiz-box">4. 비트 1개는 서로 다른 <input type="text" class="blank" data-answer="두" data-score="15" oninput="check(this)" ondrop="drop(event)" ondragover="allowDrop(event)" autocomplete="off" disabled> 가지 상태를 표현할 수 있습니다. <span style="color:var(--apple-red); font-weight:900;">[15점]</span></div>
+                        <div class="quiz-box" style="margin-bottom:0;">5. 1비트가 <input type="text" class="blank" data-answer="8" data-score="20" oninput="check(this)" ondrop="drop(event)" ondragover="allowDrop(event)" autocomplete="off" disabled>개 모이면 1바이트(Byte)가 됩니다. <button class="hint-btn" onclick="toggleHint(this, '영문자 \'A\' 한 글자를 저장하는 데 필요한 비트 수를 떠올려보세요.')">힌트 💡</button><span class="hint-display"></span> <span style="color:var(--apple-red); font-weight:900;">[20점]</span></div>
+                    </div>
+
+                    <div style="text-align: center; display: none;" id="submitQuizBtnWrap">
+                        <button class="submit-quiz-btn" onclick="submitQuiz()">✏️ 채점하기</button>
+                    </div>
+
+                    <div class="step-navigation"> 
+                        <div class="nav-arrow prev" onclick="goToStep('step3-quiz', 'step3-byte')">
+                            <svg viewBox="0 0 24 24"><path d="M14 7l-5 5 5 5V7z"/></svg>
+                            <div>이전 (용량 단위)</div>
+                        </div>
+                        
+                        <div style="display: flex; gap: 10px; margin-left: auto;">
+                            <div class="nav-arrow report-btn" onclick="downloadReportTXT()">
+                                <div>📄 텍스트 저장</div>
+                            </div>
+                            <div class="nav-arrow img-report-btn" onclick="downloadReportImageOffline()">
+                                <div>🖼️ 이미지(PNG) 저장</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+         <aside class="sidebar-right">
+            <div class="memo-section">
+                <div class="sidebar-title">📌 배움 노트</div>
+                <textarea id="memoInput" class="memo-area" placeholder="중요한 내용을 기록하세요. 궁금한 사항은 기록하고 질문하세요."></textarea>
+            </div>
+            <div class="reflection-section">
+                <div class="sidebar-title">🌿 배움 활동 소감</div>
+                <textarea id="reflectionInput" class="reflection-area" placeholder="새롭게 알게된 사실과 느낀점을 기록하세요."></textarea>
+                <div class="capture-tip">📸 캡처: Win+Shift+S | Mac: Cmd+Shift+4</div>
+            </div>
+            <div class="erase-section">
+                <button class="erase-btn" onclick="eraseStepContent()">
+                    🗑️ 현재 단원 학습 내용 지우기<br>
+                    <span style="font-size:0.68rem; font-weight:600; opacity:0.7;">(배움노트·소감·퀴즈 기록)</span>
+                </button>
+            </div>
+        </aside>
+
+    </main>
+
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-content" id="modalContent"></div>
+    </div>
+    
+    <div class="modal-overlay" id="customAlertModal" style="z-index: 9999;">
+        <div class="alert-box">
+            <div style="font-size: 3rem; margin-bottom: 10px;">🚫</div>
+            <h3 id="alertTitle" style="color: var(--apple-red); font-size: 1.5rem; margin-top: 0; margin-bottom: 15px; font-weight: 900;">접근 거부!</h3>
+           <div id="alertMessage" class="alert-message"></div>
+            <button onclick="closeCustomAlert()" style="width: 100%; padding: 12px; background: var(--apple-red); color: white; border: none; border-radius: 12px; font-weight: 900; font-size: 1.1rem; cursor: pointer;">확인</button>
+        </div>
+    </div>
+
+     <footer>
+        <div style="font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 4px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                <line x1="12" y1="22.08" x2="12" y2="12"></line>
+            </svg>
+            데이터 비트박스
+        </div>
+        <div style="color: var(--apple-gray);">&copy; 중학교 정보 - 데이터 표현</div>
+    </footer>
+
+<script src="./js/bit_concept.js"></script>
+
+
+    <!-- ── AI 가이드 캐릭터 (비트봇) v10 — 2단원: 비트란? ── -->
+    <style>
+        #bb-backdrop {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.65);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            z-index: 8400;
+        }
+        .sidebar-right { z-index: 8500 !important; position: relative !important; }
+
+        #bb-scene {
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-62%, -50%);
+            display: flex; align-items: flex-end; gap: 24px;
+            z-index: 8600;
+            animation: bbIn 0.5s cubic-bezier(0.16,1,0.3,1) forwards;
+        }
+        @keyframes bbIn { from{opacity:0;transform:translate(-62%,-46%)} to{opacity:1;transform:translate(-62%,-50%)} }
+        @keyframes bbOut { from{opacity:1} to{opacity:0;transform:translate(-62%,-46%)} }
+        .bb-scene-exit { animation: bbOut 0.3s ease-in forwards !important; }
+
+        #bb-bot {
+            width: 200px; flex-shrink: 0;
+            animation: bbBob 2.6s ease-in-out infinite;
+            filter:
+                drop-shadow(4px 4px 0px rgba(0,245,196,0.5))
+                drop-shadow(8px 8px 0px rgba(0,0,0,0.35));
+        }
+        @keyframes bbBob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+        @keyframes bbEye { 0%,88%,100%{opacity:1} 93%{opacity:0.05} }
+        .bb-eye { animation: bbEye 3.5s infinite; }
+
+        #bb-bubble {
+            background: #ffffff;
+            border-radius: 20px 20px 20px 4px;
+            padding: 26px 32px 22px;
+            box-shadow:
+                2px 2px 0 rgba(15,118,110,0.15),
+                4px 4px 0 rgba(15,118,110,0.10),
+                6px 6px 0 rgba(15,118,110,0.06),
+                0 20px 50px rgba(0,0,0,0.3);
+            border: 1.5px solid rgba(15,118,110,0.15);
+            position: relative; width: 570px; margin-bottom: 16px;
+        }
+        #bb-bubble::after {
+            content: ''; position: absolute; bottom: -13px; left: 32px;
+            border: 13px solid transparent; border-top-color: #ffffff;
+        }
+
+        #bb-topic {
+            font-size: 18px; font-weight: 900; color: #0a5c56;
+            white-space: nowrap; margin-bottom: 16px; padding-bottom: 14px;
+            border-bottom: 2px solid rgba(15,118,110,0.1);
+            font-family: 'Apple SD Gothic Neo','Malgun Gothic','Nanum Gothic','Noto Sans KR',sans-serif;
+            letter-spacing: -0.02em;
+        }
+        #bb-topic span { color: #d97706; }
+
+        #bb-story {
+            font-size: 16px; font-weight: 700; color: #1a1a1a;
+            line-height: 2.1; word-break: keep-all; white-space: nowrap;
+            min-height: 108px;
+            font-family: 'Apple SD Gothic Neo','Malgun Gothic','Nanum Gothic','Noto Sans KR',sans-serif;
+        }
+        #bb-story em { color: #0f766e; font-style: normal; font-weight: 900; }
+        #bb-story strong { color: #d97706; font-style: normal; font-weight: 900; }
+        .bb-cursor {
+            display: inline-block; width: 2px; height: 0.88em;
+            background: #0f766e; margin-left: 2px;
+            vertical-align: middle; animation: bbBlink 0.65s infinite;
+        }
+        @keyframes bbBlink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+        #bb-btns { display: flex; gap: 10px; width: 480px; justify-content: flex-end; }
+        #bb-btn-start {
+            font-size: 15px !important; font-weight: 900 !important;
+            padding: 13px 28px !important; border-radius: 12px !important;
+            border: none !important; cursor: pointer !important;
+            background: #0f766e !important; color: #fff !important;
+            box-shadow: 0 5px 0 #0a5c56 !important;
+            font-family: 'Apple SD Gothic Neo','Malgun Gothic','Nanum Gothic',sans-serif !important;
+            letter-spacing: -0.01em !important;
+        }
+        #bb-btn-skip {
+            font-size: 14px !important; font-weight: 700 !important;
+            padding: 13px 20px !important; border-radius: 12px !important;
+            border: 2px solid rgba(255,255,255,0.25) !important; cursor: pointer !important;
+            background: rgba(255,255,255,0.08) !important; color: rgba(255,255,255,0.7) !important;
+            font-family: 'Apple SD Gothic Neo','Malgun Gothic','Nanum Gothic',sans-serif !important;
+        }
+    </style>
+
+    <div id="bb-backdrop"></div>
+
+    <div id="bb-scene">
+        <div id="bb-bot">
+            <svg viewBox="0 0 90 115" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="bbG" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#14b8a6"/><stop offset="100%" stop-color="#0f766e"/></linearGradient>
+                    <linearGradient id="bbGd" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#0f766e"/><stop offset="100%" stop-color="#0a5c56"/></linearGradient>
+                    <linearGradient id="bbSG" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#03050d"/><stop offset="100%" stop-color="#071a14"/></linearGradient>
+                </defs>
+                <rect x="26" y="92" width="14" height="18" rx="5" fill="url(#bbGd)"/>
+                <rect x="50" y="92" width="14" height="18" rx="5" fill="url(#bbGd)"/>
+                <rect x="23" y="104" width="18" height="8" rx="4" fill="#0a5c56"/>
+                <rect x="49" y="104" width="18" height="8" rx="4" fill="#0a5c56"/>
+                <rect x="16" y="50" width="58" height="46" rx="13" fill="url(#bbG)"/>
+                <rect x="3" y="55" width="13" height="9" rx="4.5" fill="#14b8a6"/>
+                <rect x="74" y="55" width="13" height="9" rx="4.5" fill="#14b8a6"/>
+                <circle cx="3" cy="59" r="4" fill="#0f766e"/>
+                <circle cx="87" cy="59" r="4" fill="#0f766e"/>
+                <rect x="24" y="57" width="42" height="28" rx="7" fill="url(#bbSG)"/>
+                <text x="45" y="70" text-anchor="middle" font-size="5.5" fill="#14b8a6" font-family="monospace" font-weight="700">0110 1001</text>
+                <text x="45" y="78" text-anchor="middle" font-size="5" fill="#fbbf24" font-family="monospace">DATA ACTIVE</text>
+                <rect x="16" y="86" width="58" height="5" rx="2" fill="#0a5c56"/>
+                <rect x="18" y="8" width="54" height="46" rx="15" fill="url(#bbG)"/>
+                <line x1="45" y1="8" x2="45" y2="0" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round"/>
+                <circle cx="45" cy="0" r="3.5" fill="#fbbf24"/>
+                <circle cx="45" cy="0" r="5.5" fill="rgba(251,191,36,0.25)"/>
+                <rect x="22" y="20" width="18" height="13" rx="5" fill="url(#bbSG)"/>
+                <rect x="50" y="20" width="18" height="13" rx="5" fill="url(#bbSG)"/>
+                <rect class="bb-eye" x="25" y="23" width="5" height="7" rx="1.5" fill="#00f5c4"/>
+                <rect class="bb-eye" x="32" y="23" width="5" height="7" rx="1.5" fill="#fbbf24" style="animation-delay:.15s"/>
+                <rect class="bb-eye" x="53" y="23" width="5" height="7" rx="1.5" fill="#00f5c4" style="animation-delay:.08s"/>
+                <rect class="bb-eye" x="60" y="23" width="5" height="7" rx="1.5" fill="#fbbf24" style="animation-delay:.2s"/>
+                <rect x="26" y="37" width="38" height="11" rx="4" fill="url(#bbSG)"/>
+                <text x="45" y="46" text-anchor="middle" font-size="6.5" fill="#14b8a6" font-family="monospace" font-weight="700">0 1 0 1</text>
+                <circle cx="18" cy="28" r="4" fill="#0a5c56"/><circle cx="18" cy="28" r="2" fill="#03050d"/>
+                <circle cx="72" cy="28" r="4" fill="#0a5c56"/><circle cx="72" cy="28" r="2" fill="#03050d"/>
+            </svg>
+        </div>
+
+        <div style="display:flex;flex-direction:column;align-items:flex-start;">
+            <div id="bb-bubble">
+                <div id="bb-topic">📌 비트(Bit)가 무엇인지 함께 알아볼까?</div>
+                <div id="bb-story"><span class="bb-cursor"></span></div>
+            </div>
+            <div id="bb-btns">
+                <button id="bb-btn-skip" onclick="bbClose()">건너뛰기</button>
+                <button id="bb-btn-start" onclick="bbClose()">학습 시작 ▶</button>
+            </div>
+        </div>
+    </div>
+
+<script src="./js/search_data.js"></script> 
+<script src="./js/concept_common.js"></script>
+
+</body>
+</html>

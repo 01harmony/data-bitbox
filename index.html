@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>데이터 비트박스 BITBOX - 메인</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Noto+Sans+KR:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="./css/common.css">
+</head>
+<body>
+
+<canvas id="starCanvas"></canvas>
+<canvas id="gridCanvas"></canvas>
+<canvas id="particleCanvas"></canvas>
+<div class="scanline"></div>
+
+<div id="app">
+    <header>
+        <div class="header-main">
+            <div class="header-left">
+                <span class="badge-target">중학교 1–3학년</span>
+                <h1 class="site-title">0과 1의 하모니 '데이터 <span>비트박스'</span></h1>
+            </div>
+            <button class="reset-btn" onclick="openResetModal()">⟳ 전체 초기화</button>
+        </div>
+        <div class="progress-strip">
+            <span class="prog-label">PROGRESS</span>
+            <div class="prog-segs" id="progSegs"></div>
+            <span class="prog-count" id="progCount">0 / 7</span>
+        </div>
+    </header>
+
+    <main>
+        <div class="hero">
+            <div class="hero-chip"> Data Literacy Course</div>
+            <h2 class="hero-title">
+                <span class="line1">컴퓨터는 세상을</span>
+                <span class="line2"><span id="typedText"></span><span class="typed-cursor"></span></span>
+            </h2>
+            <p class="hero-sub">올바른 디지털 시민으로 성장하기 위한 첫걸음,<br>현실의 정보가 디지털 코드로 변환되는 과정을 탐구하세요.</p>
+        </div>
+
+        <div class="pillars">
+            <div class="pillar p-mint">
+                <div class="pillar-eyebrow">PART 01 · FOUNDATION</div>
+                <div class="pillar-icon">🧱</div>
+                <div class="pillar-title">디지털 데이터와 비트</div>
+                <p class="pillar-desc">디지털 데이터의 가치, 비트의 원리를 탐구합니다.</p>
+                <ul class="step-list">
+                    <li>
+                        <a class="step-item" href="01_value.html" data-step="1">
+                            <div class="step-left">
+                                <span class="step-num">STEP 1</span>디지털 데이터의 가치<span class="done-badge">✓ DONE</span>
+                            </div>
+                            <span class="step-arrow">▶</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="step-item" href="02_bit.html" data-step="2">
+                            <div class="step-left">
+                                <span class="step-num">STEP 2</span>비트(Bit)란?<span class="done-badge">✓ DONE</span>
+                            </div>
+                            <span class="step-arrow">▶</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="pillar p-blue">
+                <div class="pillar-eyebrow">PART 02 · NUMBER &amp; TEXT</div>
+                <div class="pillar-icon">🔠</div>
+                <div class="pillar-title">숫자와 문자의 표현</div>
+                <p class="pillar-desc">숫자, 문자가 디지털 코드로 처리되는 원리를 탐구합니다.</p>
+                <ul class="step-list">
+                    <li>
+                        <a class="step-item" href="03_number.html" data-step="3">
+                            <div class="step-left">
+                                <span class="step-num">STEP 3</span>숫자의 디지털 표현<span class="done-badge">✓ DONE</span>
+                            </div>
+                            <span class="step-arrow">▶</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="step-item" href="04_text.html" data-step="4">
+                            <div class="step-left">
+                                <span class="step-num">STEP 4</span>문자의 디지털 표현<span class="done-badge">✓ DONE</span>
+                            </div>
+                            <span class="step-arrow">▶</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="pillar p-violet">
+                <div class="pillar-eyebrow">PART 03 · MULTIMEDIA</div>
+                <div class="pillar-icon">🎨</div>
+                <div class="pillar-title">멀티미디어의 표현</div>
+                <p class="pillar-desc">이미지, 소리, 동영상이 디지털 코드로 처리되는 원리를 탐구합니다.</p>
+                <ul class="step-list">
+                    <li>
+                        <a class="step-item" href="05_image.html" data-step="5">
+                            <div class="step-left">
+                                <span class="step-num">STEP 5</span>이미지의 디지털 표현<span class="done-badge">✓ DONE</span>
+                            </div>
+                            <span class="step-arrow">▶</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="step-item" href="06_sound.html" data-step="6">
+                            <div class="step-left">
+                                <span class="step-num">STEP 6</span>소리의 디지털 표현<span class="done-badge">✓ DONE</span>
+                            </div>
+                            <span class="step-arrow">▶</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="step-item navy-step" href="07_video.html" data-step="7">
+                            <div class="step-left">
+                                <span class="step-num">STEP 7</span>동영상의 디지털 표현<span class="done-badge">✓ DONE</span>
+                            </div>
+                            <span class="step-arrow">▶</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </main>
+</div>
+
+<a href="#" class="copy-btn" id="copyBtn" title="저작권 안내">ⓒ</a>
+
+<div id="tb-overlay">
+    <div id="tb-box">
+        <div class="tb-ray" style="transform:rotate(-60deg);"></div>
+        <div class="tb-ray" style="transform:rotate(-30deg);animation-delay:0.05s;"></div>
+        <div class="tb-ray" style="transform:rotate(0deg);animation-delay:0.02s;"></div>
+        <div class="tb-ray" style="transform:rotate(30deg);animation-delay:0.07s;"></div>
+        <div class="tb-ray" style="transform:rotate(60deg);animation-delay:0.04s;"></div>
+        <div id="tb-glow"></div>
+        <div class="tb-star" style="--tb-fly:translate(-120px,-160px);background:#ffd700;"></div>
+        <div class="tb-star" style="--tb-fly:translate(-70px,-200px);background:#fff;animation-delay:0.05s;"></div>
+        <div class="tb-star" style="--tb-fly:translate(0px,-190px);background:#ffd700;animation-delay:0.03s;"></div>
+        <div class="tb-star" style="--tb-fly:translate(80px,-170px);background:#ff8c00;animation-delay:0.07s;"></div>
+        <div class="tb-star" style="--tb-fly:translate(130px,-140px);background:#fff;animation-delay:0.04s;"></div>
+        <div class="tb-star" style="--tb-fly:translate(-100px,-80px);background:#ff8c00;animation-delay:0.08s;width:6px;height:6px;"></div>
+        <div class="tb-star" style="--tb-fly:translate(110px,-90px);background:#ffd700;animation-delay:0.06s;width:6px;height:6px;"></div>
+        <div class="tb-star" style="--tb-fly:translate(-150px,-40px);background:#fff;animation-delay:0.02s;width:5px;height:5px;"></div>
+        <div class="tb-star" style="--tb-fly:translate(160px,-50px);background:#ffd700;animation-delay:0.09s;width:5px;height:5px;"></div>
+        <div id="tb-lid"></div>
+        <div id="tb-body"><div id="tb-lock">🔒</div></div>
+        <div id="tb-label">⬡ BITBOX ⬡</div>
+    </div>
+</div>
+<div id="tb-flash"></div>
+
+<div id="modal" class="modal-overlay" role="dialog" aria-modal="true">
+    <div class="modal-box">
+        <div class="modal-icon" id="mIcon"></div>
+        <h3 class="modal-title" id="mTitle"></h3>
+        <p class="modal-desc" id="mDesc"></p>
+        <div class="modal-btns" id="mBtns"></div>
+    </div>
+</div>
+
+<script src="./js/canvas.js"></script>
+<script src="./js/progress.js"></script>
+<script src="./js/transition.js"></script>
+
+
+</body>
+</html>

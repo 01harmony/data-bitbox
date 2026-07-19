@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>문자의 디지털 표현 - 개념 탐구</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&family=JetBrains+Mono:wght@700;900&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
+    <link rel="stylesheet" href="./css/text_concept.css">
+</head>
+<body>
+
+    <header>
+        <div class="header-top">
+            <div class="header-left">
+                <span class="target-badge">대상: 중학교 1~3학년</span>
+                <h1 class="main-title" onclick="location.href='index.html'">데이터 비트박스</h1>
+            </div>
+            <div class="status-controller">
+                <button class="status-btn" onclick="setStatus('normal')">🔄 초기화</button>
+                <button class="status-btn btn-help" onclick="setStatus('help')">🙋‍♂️ SOS 요청</button>
+                <button class="status-btn btn-done" onclick="setStatus('done')">✅ 미션 완료</button>
+            </div>
+        </div>
+
+         <nav>
+            <div class="menu-item">
+                <span class="menu-link">디지털 데이터의 가치</span>
+                <ul class="dropdown">
+                    <li><a href="01_value.html">📖 개념 탐구</a></li>
+                    <li><a href="01_value_play.html">🛠️ 활용 실습</a></li>
+                </ul>
+            </div>
+            <div class="menu-item"><span class="menu-link">비트란?</span><ul class="dropdown"><li><a href="02_bit.html">📖 개념 탐구</a></li><li><a href="02_bit_play.html">🛠️ 활용 실습</a></li></ul></div>
+            <div class="menu-item"><span class="menu-link">숫자의 디지털 표현</span><ul class="dropdown"><li><a href="03_number.html">📖 개념 탐구</a></li><li><a href="03_number_play.html">🛠️ 활용 실습</a></li></ul></div>
+            <div class="menu-item"><span class="menu-link active">문자의 디지털 표현</span><ul class="dropdown"><li><a href="04_text.html">📖 개념 탐구</a></li><li><a href="04_text_play.html">🛠️ 활용 실습</a></li></ul></div>
+            <div class="menu-item"><span class="menu-link">이미지의 디지털 표현</span><ul class="dropdown"><li><a href="05_image.html">📖 개념 탐구</a></li><li><a href="05_image_play.html">🛠️ 활용 실습</a></li></ul></div>
+            <div class="menu-item"><span class="menu-link">소리의 디지털 표현</span><ul class="dropdown"><li><a href="06_sound.html">📖 개념 탐구</a></li><li><a href="06_sound_play.html">🛠️ 활용 실습</a></li></ul></div>
+            <div class="menu-item"><span class="menu-link">동영상의 디지털 표현</span><ul class="dropdown"><li><a href="07_video.html">📖 개념 탐구</a></li><li><a href="07_video_play.html">🛠️ 활용 실습</a></li></ul></div>
+        </nav>
+
+    </header>
+
+    <main>
+        <div class="content-container">
+            <div class="content-card">
+
+                <div class="progress">
+                    <div class="prog-dot cur" id="dot0"></div>
+                    <div class="prog-dot" id="dot1"></div>
+                    <div class="prog-dot" id="dot2"></div>
+                    <div class="prog-dot" id="dot3"></div>
+                    <div class="prog-dot" id="dot4"></div>
+                    <div class="prog-dot" id="dot5"></div>
+                </div>
+
+                <div id="step1-visual" class="step-container active">
+                    <div class="slide-section">
+                        <div class="visual-title">💡 문자는 컴퓨터에서 어떻게 기억될까?</div>
+                        <div style="font-size:0.95rem; color:var(--text-sub); font-weight: 700;">아래 문자 버튼을 Click해 문자가 0과 1로 변하는 과정을 확인하세요!</div>
+                        
+                        <div class="converter-container">
+                            <div class="keyboard-area">
+                                <div class="key-btn" onclick="typeChar(this, 'A', '65', '01000001', 'ASCII')">A</div>
+                                <div class="key-btn" onclick="typeChar(this, 'a', '97', '01100001', 'ASCII')">a</div>
+                                <div class="key-btn" onclick="typeChar(this, '1', '49', '00110001', 'ASCII')" title="숫자가 아닌 '문자' 1">1</div>
+                                <div class="key-btn" onclick="typeChar(this, '!', '33', '00100001', 'ASCII')">!</div>
+                                <div class="key-btn korean" onclick="typeChar(this, '정', 'U+C815', '11101100 10100000 10010101', 'Unicode')">정</div>
+                                <div class="key-btn korean" onclick="typeChar(this, '보', 'U+BCF4', '11101011 10110011 10110100', 'Unicode')">보</div>
+                            </div>
+
+                            <div class="process-arrow">➔</div>
+
+                            <div class="process-box">
+                                <div class="process-label">입력된 문자</div>
+                                <div class="process-value" id="dispChar">-</div>
+                            </div>
+
+                            <div class="process-arrow">➔</div>
+
+                            <div class="process-box">
+                                <div class="process-label" id="codeStandardLabel" style="transition: color 0.3s;">약속된 번호표</div>
+                                <div class="process-value" id="dispDec" style="transition: color 0.3s;">-</div>
+                            </div>
+
+                            <div class="process-arrow">➔</div>
+
+                            <div class="process-box" style="flex: 2;">
+                                <div class="process-label">컴퓨터가 기억하는 이진수</div>
+                                <div class="process-value bin-value" id="dispBin">-</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step-navigation">
+                        <div class="nav-arrow next" onclick="goToStep('step1-visual', 'step2-concept')">
+                            <div>문자 코드</div>
+                            <svg viewBox="0 0 24 24"><path d="M10 17l5-5-5-5v10z"/></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="step2-concept" class="step-container">
+                    <div class="concept-box">
+                        <div class="concept-box-title">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                            전 세계의 문자는 어떻게 약속될까?
+                        </div>
+                        <p style="margin:0;">
+    <strong>✅ 아스키코드 (ASCII):</strong> <button class="inline-reveal-btn" onclick="revealInline(this, '영어 대소문자, 숫자, 특수문자', '#0284c7', '#e0f2fe')">?</button>를 표현하기 위해 만든 미국의 표준 약속입니다.<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;<span style="font-size: 0.9em; color:var(--text-sub); font-weight: 500;">(글자당 1바이트 사용 / 7비트 표준 128개, 8비트 확장 256개 문자 표현 가능)</span><br><br>
+    
+    <strong>✅ 유니코드 (Unicode):</strong> <button class="inline-reveal-btn" onclick="revealInline(this, '전 세계 모든 언어와 기호(이모지 등)', '#0284c7', '#e0f2fe')">❔</button>에 <b>고유한 일련번호</b>를 매겨 놓은 국제 표준 사전입니다.<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;<span style="font-size: 0.9em; color:var(--text-sub); font-weight: 500;">(16비트로 각 문자마다 고유의 주소값을 가짐. 예: '가' = U+AC00)</span><br><br>
+
+    <strong>✅ UTF-8:</strong> 유니코드 번호를 컴퓨터가 실제로 저장할 수 있는 <button class="inline-reveal-btn" onclick="revealInline(this, '이진수로 변환(인코딩)', '#0284c7', '#e0f2fe')">❔</button>하는 가장 대표적인 방식입니다. <br>
+    &nbsp;&nbsp;&nbsp;&nbsp;글자의 종류에 따라 <b>1바이트에서 최대 <button class="inline-reveal-btn" onclick="revealInline(this, '4바이트(32비트)', '#0284c7', '#e0f2fe')">❔</button>까지 고무줄처럼 용량을 늘려 쓰기 때문에</b> 전 세계 표준으로 쓰입니다.<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;<span style="font-size: 0.9em; color:var(--text-sub); font-weight: 500;">(영어는 1바이트, 한글은 3바이트(24비트), 이모지는 4바이트)</span>
+</p>
+</div>
+
+<div class="tip-box-blue" style="background: var(--lavender-tip-bg); border-color: rgba(0, 113, 227, 0.3);">
+<div class="tip-box-title" style="color: var(--ocean-blue);">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2-2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+    한글을 컴퓨터에 저장하는 두 가지 방법!
+</div>
+<p style="margin:0;">
+    <strong>🎨 <button class="inline-reveal-btn purple" onclick="revealInline(this, '완성형', '#6366f1', '#e0e7ff')">❔</button> 코드:</strong> '가', '각', '간' 처럼 <b>이미 완성된 글자 하나하나에 고유한 번호를 붙이는 방식</b>입니다.<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;<span style="font-size: 0.9em; color:var(--text-sub); font-weight: 500;">(비유: 자주 쓰는 글자만 하나씩 '도장'으로 파놓은 것)</span><br><br>
+    <strong>🧩 <button class="inline-reveal-btn purple" onclick="revealInline(this, '조합형', '#6366f1', '#e0e7ff')">❔</button> 코드:</strong> 초성(ㄱ), 중성(ㅏ), 종성(ㄱ) <b>각각에 번호를 부여하고, 이를 조립해서 글자를 만드는 방식</b>입니다.<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;<span style="font-size: 0.9em; color:var(--text-sub); font-weight: 500;">(비유: '레고 블록'처럼 부품을 결합해 모든 글자 조립 가능)</span>
+</p>
+</div>
+
+                    <div class="step-navigation">
+                        <div class="nav-arrow prev" onclick="goToStep('step2-concept', 'step1-visual')">
+                            <svg viewBox="0 0 24 24"><path d="M14 7l-5 5 5 5V7z"/></svg>
+                            <div>문자 변환기</div>
+                        </div>
+                        <div class="nav-arrow next" onclick="goToStep('step2-concept', 'step3-ascii')">
+                            <div>아스키코드</div>
+                            <svg viewBox="0 0 24 24"><path d="M10 17l5-5-5-5v10z"/></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="step3-ascii" class="step-container">
+                    <div style="font-size: 1.3rem; font-weight: 900; color: var(--apple-blue); margin-bottom: 10px; text-align: left; padding-left: 10px;">🔥심화 탐구: 전체 아스키코드표 엿보기!</div>
+                    <p style="text-align: left; padding-left: 10px; font-size: 0.95rem; color: var(--text-sub); margin-bottom: 20px; font-weight: 600;">
+                        우리가 자주 쓰는 영어 문자와 기호는 어떤 번호를 가지고 있을까요? '❓' 버튼을 마우스로 클릭해서 숨겨진 코드를 찾아보세요!
+                    </p>
+
+                    <div class="tip-box-blue" style="margin-bottom: 25px; background: #fafafa; border-color: rgba(0,0,0,0.1);">
+                        <div class="tip-box-title" style="color: var(--text-main);">🇺🇸 전체 아스키코드표 (출력 가능 문자: 32번 ~ 126번)</div>
+                        <p style="font-size:0.85rem; margin-top:0; color: var(--text-sub); font-weight: 700;">* 0번~31번은 눈에 보이지 않는 제어 문자(엔터, 탭, 백스페이스 등)입니다.</p>
+                        <div class="ascii-container">
+                            <div class="ascii-grid" id="ascii-table"></div>
+                        </div>
+                    </div>
+
+                    <div class="step-navigation">
+                        <div class="nav-arrow prev" onclick="goToStep('step3-ascii', 'step2-concept')">
+                            <svg viewBox="0 0 24 24"><path d="M14 7l-5 5 5 5V7z"/></svg>
+                            <div>문자 코드</div>
+                        </div>
+                        <div class="nav-arrow next" onclick="goToStep('step3-ascii', 'step4-unicode')">
+                            <div>유니코드</div>
+                            <svg viewBox="0 0 24 24"><path d="M10 17l5-5-5-5v10z"/></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="step4-unicode" class="step-container">
+                    <div style="font-size: 1.3rem; font-weight: 900; color: var(--apple-blue); margin-bottom: 10px; text-align: left; padding-left: 10px;">🌍 심화 탐구: 유니코드 (Unicode) 맛보기</div>
+                    <p style="text-align: left; padding-left: 10px; font-size: 0.95rem; color: var(--text-sub); margin-bottom: 20px; font-weight: 600;">
+                        유니코드는 전 세계의 모든 언어와 이모지를 담기 위해 1바이트를 넘어서는 훨씬 큰 번호 체계를 사용합니다. 보통 'U+' 기호가 붙은 16진수 번호로 표기합니다.
+                    </p>
+
+                    <div class="tip-box-blue" style="background: #f0f9ff; border-color: rgba(14, 165, 233, 0.3);">
+                        <div class="tip-box-title" style="color: var(--apple-blue);">✨ 유니코드 카드 뒤집기</div>
+                        <div class="code-grid">
+                            <div class="code-card"><div class="code-char-uni">가</div><div class="code-val" style="color: var(--apple-blue);">U+AC00</div></div>
+                            <div class="code-card"><div class="code-char-uni">한</div><div class="code-val"><button class="reveal-btn green" onclick="revealCode(this, 'U+D55C', '', '#0071e3')">❔</button></div></div>
+                            <div class="code-card"><div class="code-char-uni">🚀</div><div class="code-val" style="color: var(--apple-blue);">U+1F680</div></div>
+                            <div class="code-card"><div class="code-char-uni">💡</div><div class="code-val"><button class="reveal-btn green" onclick="revealCode(this, 'U+1F4A1', '', '#0071e3')">❔</button></div></div>
+                            <div class="code-card"><div class="code-char-uni">あ</div><div class="code-val" style="color: var(--apple-blue);">U+3042</div></div>
+                            <div class="code-card"><div class="code-char-uni">中</div><div class="code-val"><button class="reveal-btn green" onclick="revealCode(this, 'U+4E2D', '', '#0071e3')">❔</button></div></div>
+                            <div class="code-card"><div class="code-char-uni">A</div><div class="code-val" style="color: var(--apple-blue);">U+0041</div></div>
+                            <div class="code-card"><div class="code-char-uni">🎵</div><div class="code-val"><button class="reveal-btn green" onclick="revealCode(this, 'U+1F3B5', '', '#0071e3')">❔</button></div></div>
+                        </div>
+                    </div>
+
+                    <div class="step-navigation">
+                        <div class="nav-arrow prev" onclick="goToStep('step4-unicode', 'step3-ascii')">
+                            <svg viewBox="0 0 24 24"><path d="M14 7l-5 5 5 5V7z"/></svg>
+                            <div>아스키코드</div>
+                        </div>
+                        <div class="nav-arrow next" onclick="goToStep('step4-unicode', 'step5-utf8')">
+                            <div>UTF-8 인코딩</div>
+                            <svg viewBox="0 0 24 24"><path d="M10 17l5-5-5-5v10z"/></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="step5-utf8" class="step-container">
+                    <div style="font-size: 1.3rem; font-weight: 900; color: var(--apple-blue); margin-bottom: 10px; text-align: left; padding-left: 10px;">📦 특별 탐구: UTF-8 이진코드</div>
+                    <p style="text-align: left; padding-left: 10px; font-size: 0.95rem; color: var(--text-sub); margin-bottom: 20px; font-weight: 600;">
+                        UTF-8은 글자의 종류에 따라 <b>1바이트에서 4바이트</b>까지 용량을 자유자재로 변경하여 저장합니다.<br>
+                        입력창에 <b>영문자, 숫자, 기호, 한글, 이모지</b>를 각각 하나씩 입력해 보고 비트가 몇 개씩 나오는지 실험해 보세요!
+                    </p>
+
+                    <div class="utf8-lab">
+                        <div class="utf8-input-box">
+                            <input type="text" id="utf8Input" class="utf8-input" maxlength="2" placeholder="A" value="가">
+                            <button class="utf8-btn" onclick="executeUTF8()">UTF-8 변환하기 🪄</button>
+                        </div>
+                        <div id="byteDisplay" class="byte-container">
+                            <div class="byte-box">11101010</div>
+                            <div class="byte-box" style="animation-delay:0.1s">10110000</div>
+                            <div class="byte-box" style="animation-delay:0.2s">10000000</div>
+                        </div>
+                        <div id="byteInfoText" class="byte-label" style="display: block;">한글은 3바이트(24비트)를 사용합니다!</div>
+                    </div>
+
+                    <div class="step-navigation">
+                        <div class="nav-arrow prev" onclick="goToStep('step5-utf8', 'step4-unicode')">
+                            <svg viewBox="0 0 24 24"><path d="M14 7l-5 5 5 5V7z"/></svg>
+                            <div>유니코드</div>
+                        </div>
+                        <div class="nav-arrow next" onclick="goToStep('step5-utf8', 'step6-quiz')">
+                            <div>개념 확인 (최종 퀴즈)</div>
+                            <svg viewBox="0 0 24 24"><path d="M10 17l5-5-5-5v10z"/></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="step6-quiz" class="step-container">
+                    <div style="font-size: 1.3rem; font-weight: 900; color: var(--apple-red); margin-bottom: 25px;">🎯 최종 퀴즈: 문자의 디지털 표현 마스터하기!</div>
+
+                    <div class="quiz-controls-row">
+                        <div class="inline-tip" onclick="openTipPopup()">
+                            <svg viewBox="0 0 24 24" fill="currentColor" style="width:18px; height:18px;"><path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7zm2.85 11.1l-.85.6V16h-4v-2.3l-.85-.6C7.8 12.16 7 10.63 7 9c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.63-.8 3.16-2.15 4.1z"/></svg>
+                            미션 가이드
+                        </div>
+                        <div style="display: flex; gap: 15px; align-items: center;">
+                            <div id="quizTimer" class="quiz-timer">⏱️ 00:00</div>
+                            <button id="startQuizBtn" class="start-quiz-btn" onclick="startQuizTimer()">▶️ 퀴즈 시작</button>
+                            <button id="resetTimerBtn" class="reset-timer-btn" onclick="resetQuiz()">🔄 타이머 초기화</button>
+                        </div>
+                    </div>
+
+                    <div class="word-score-container" id="wordBankWrap">
+                        <div class="word-bank" id="wordBank" style="opacity: 0.4; pointer-events: none;">
+                            <div class="word-item" draggable="true" ondragstart="drag(event)">0</div>
+                            <div class="word-item" draggable="true" ondragstart="drag(event)">1</div>
+                            <div class="word-item" draggable="true" ondragstart="drag(event)">약속</div>
+                            <div class="word-item" draggable="true" ondragstart="drag(event)">아스키코드</div>
+                            <div class="word-item" draggable="true" ondragstart="drag(event)">유니코드</div>
+                            <div class="word-item" draggable="true" ondragstart="drag(event)">UTF-8</div>
+                            <div class="word-item" draggable="true" ondragstart="drag(event)">완성형</div>
+                            <div class="word-item" draggable="true" ondragstart="drag(event)">조합형</div>
+                        </div>
+                    </div>
+
+                    <div id="quizForm">
+                        <div class="quiz-box">1. 컴퓨터는 문자를 있는 그대로 기억하지 못하고 오직 <input type="text" class="blank" data-answer="0" data-score="5" data-swap="true" oninput="check(this)" ondrop="drop(event)" ondragover="allowDrop(event)" autocomplete="off" disabled> 과(와) <input type="text" class="blank" data-answer="1" data-score="5" data-swap="true" oninput="check(this)" ondrop="drop(event)" ondragover="allowDrop(event)" autocomplete="off" disabled> 로만 저장하므로, 숫자로 바꾸기 위한 <input type="text" class="blank" data-answer="약속" data-score="5" oninput="check(this)" ondrop="drop(event)" ondragover="allowDrop(event)" autocomplete="off" disabled> 이(가) 필요합니다. <span style="color:var(--apple-red); font-weight:900;">[15점]</span></div>
+                        <div class="quiz-box">2. 영어 대소문자, 숫자, 기본 특수문자를 십진수 번호와 매칭시켜 놓은 미국의 기초 표준 코드를 <input type="text" class="blank" data-answer="아스키코드" data-score="15" oninput="check(this)" ondrop="drop(event)" ondragover="allowDrop(event)" autocomplete="off" disabled> (이)라고 부릅니다. <span style="color:var(--apple-red); font-weight:900;">[15점]</span></div>
+                        <div class="quiz-box">3. 전 세계의 다양한 언어와 이모지(😊)까지 모두 표현하기 위해 훨씬 큰 고유 번호를 부여한 국제 표준 코드표를 <input type="text" class="blank" data-answer="유니코드" data-score="15" oninput="check(this)" ondrop="drop(event)" ondragover="allowDrop(event)" autocomplete="off" disabled> (이)라고 합니다. <span style="color:var(--apple-red); font-weight:900;">[15점]</span></div>
+                        <div class="quiz-box">4. [신규] 유니코드 번호를 컴퓨터에 저장하기 위해 글자에 따라 용량을 고무줄처럼 1~4바이트로 조절하여 이진수로 변환(인코딩)하는 방식을 <input type="text" class="blank" data-answer="UTF-8" data-score="15" oninput="check(this)" ondrop="drop(event)" ondragover="allowDrop(event)" autocomplete="off" disabled> (이)라고 합니다. <span style="color:var(--apple-red); font-weight:900;">[15점]</span></div>
+                        <div class="quiz-box">5. 한글을 표현할 때, '가', '각' 처럼 글자 하나하나에 고유 번호를 도장 찍듯 부여하는 방식을 <input type="text" class="blank" data-answer="완성형" data-score="20" oninput="check(this)" ondrop="drop(event)" ondragover="allowDrop(event)" autocomplete="off" disabled> (이)라고 합니다. <span style="color:var(--apple-red); font-weight:900;">[20점]</span></div>
+                        <div class="quiz-box" style="margin-bottom:0;">6. 반면, 한글의 초성/중성/종성에 각각 번호를 부여하고 이를 레고 블록처럼 결합해서 글자를 만드는 방식을 <input type="text" class="blank" data-answer="조합형" data-score="20" oninput="check(this)" ondrop="drop(event)" ondragover="allowDrop(event)" autocomplete="off" disabled> (이)라고 합니다. <span style="color:var(--apple-red); font-weight:900;">[20점]</span></div>
+                    </div>
+
+                    <div style="text-align: center; display: none;" id="submitQuizBtnWrap">
+                        <button class="submit-quiz-btn" onclick="submitQuiz()">✏️ 채점하기</button>
+                    </div>
+
+                    <div class="step-navigation">
+                        <div class="nav-arrow prev" onclick="goToStep('step6-quiz', 'step5-utf8')">
+                            <svg viewBox="0 0 24 24"><path d="M14 7l-5 5 5 5V7z"/></svg>
+                            <div>이전 (UTF-8 인코딩)</div>
+                        </div>
+                        <div style="display: flex; gap: 10px; margin-left: auto;">
+                            <div class="nav-arrow report-btn" onclick="downloadReportTXT()">
+                                <div>📄 텍스트 저장</div>
+                            </div>
+                            <div class="nav-arrow img-report-btn" onclick="downloadReportImageOffline()">
+                                <div>🖼️ 이미지(PNG) 저장</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <aside class="sidebar-right">
+            <div class="memo-section">
+                <div class="sidebar-title">📌 배움 노트</div>
+                <textarea id="memoInput" class="memo-area" placeholder="중요한 내용을 기록하세요. 궁금한 사항은 기록하고 질문하세요."></textarea>
+            </div>
+            <div class="reflection-section">
+                <div class="sidebar-title">🌿 배움 활동 소감</div>
+                <textarea id="reflectionInput" class="reflection-area" placeholder="새롭게 알게된 사실과 느낀점을 기록하세요."></textarea>
+                <div class="capture-tip">📸 캡처: Win+Shift+S | Mac: Cmd+Shift+4</div>
+            </div>
+            <div class="erase-section">
+                <button class="erase-btn" onclick="eraseStepContent()">
+                    🗑️ 현재 단원 학습 내용 지우기<br>
+                    <span style="font-size:0.68rem; font-weight:600; opacity:0.7;">(배움노트·소감·퀴즈 기록)</span>
+                </button>
+            </div>
+        </aside>
+    </main>
+
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-content" id="modalContent"></div>
+    </div>
+    
+    <div class="modal-overlay" id="customAlertModal" style="z-index: 9999;">
+        <div class="alert-box">
+            <div style="font-size: 3rem; margin-bottom: 10px;">🚫</div>
+            <h3 id="alertTitle" style="color: var(--apple-red); font-size: 1.5rem; margin-top: 0; margin-bottom: 15px; font-weight: 900;">접근 거부!</h3>
+            <div id="alertMessage" class="alert-message" style="font-size: 1.05rem; font-weight: 600; color: var(--text-main); margin-bottom: 25px; white-space: pre-line; word-break: keep-all;">메시지가 이곳에 표시됩니다.</div>
+            <button onclick="closeCustomAlert()" style="width: 100%; padding: 12px; background: var(--apple-red); color: white; border: none; border-radius: 12px; font-weight: 900; font-size: 1.1rem; cursor: pointer;">확인</button>
+        </div>
+    </div>
+
+    <footer>
+        <div style="font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 4px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                <line x1="12" y1="22.08" x2="12" y2="12"></line>
+            </svg>
+            데이터 비트박스
+        </div>
+        <div style="color: var(--apple-gray);">&copy; 중학교 정보 - 데이터 표현</div>
+    </footer>
+
+    <script src="./js/text_concept.js"></script>
+
+    <style>
+        #bb-backdrop {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.65);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            z-index: 8400;
+        }
+        .sidebar-right { z-index: 8500 !important; position: relative !important; }
+        #bb-scene {
+            position: fixed; top: 50%; left: 50%;
+            transform: translate(-62%, -50%);
+            display: flex; align-items: flex-end; gap: 24px;
+            z-index: 8600;
+            animation: bbIn 0.5s cubic-bezier(0.16,1,0.3,1) forwards;
+        }
+        @keyframes bbIn { from{opacity:0;transform:translate(-62%,-46%)} to{opacity:1;transform:translate(-62%,-50%)} }
+        @keyframes bbOut { from{opacity:1} to{opacity:0;transform:translate(-62%,-46%)} }
+        .bb-scene-exit { animation: bbOut 0.3s ease-in forwards !important; }
+
+        #bb-bot {
+            width: 200px; flex-shrink: 0;
+            animation: bbBob 2.6s ease-in-out infinite;
+            filter:
+                drop-shadow(4px 4px 0px rgba(56,189,248,0.5))
+                drop-shadow(8px 8px 0px rgba(0,0,0,0.35));
+        }
+        @keyframes bbBob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+        @keyframes bbEye { 0%,88%,100%{opacity:1} 93%{opacity:0.05} }
+        .bb-eye { animation: bbEye 3.5s infinite; }
+
+        #bb-bubble {
+            background: #ffffff;
+            border-radius: 20px 20px 20px 4px;
+            padding: 26px 32px 22px;
+            box-shadow:
+                2px 2px 0 rgba(0,113,227,0.15),
+                4px 4px 0 rgba(0,113,227,0.10),
+                6px 6px 0 rgba(0,113,227,0.06),
+                0 20px 50px rgba(0,0,0,0.3);
+            border: 1.5px solid rgba(0,113,227,0.15);
+            position: relative; width: 530px; margin-bottom: 16px;
+        }
+        #bb-bubble::after {
+            content: ''; position: absolute; bottom: -13px; left: 32px;
+            border: 13px solid transparent; border-top-color: #ffffff;
+        }
+        #bb-topic {
+            font-size: 18px; font-weight: 900; color: #0050b3;
+            white-space: nowrap; margin-bottom: 16px; padding-bottom: 14px;
+            border-bottom: 2px solid rgba(0,113,227,0.1);
+            font-family: 'Apple SD Gothic Neo','Malgun Gothic','Nanum Gothic','Noto Sans KR',sans-serif;
+            letter-spacing: -0.02em;
+        }
+        #bb-topic span { color: #d97706; }
+        #bb-story {
+            font-size: 16px; font-weight: 700; color: #1a1a1a;
+            line-height: 2.1; word-break: keep-all; white-space: nowrap;
+            min-height: 108px;
+            font-family: 'Apple SD Gothic Neo','Malgun Gothic','Nanum Gothic','Noto Sans KR',sans-serif;
+        }
+        #bb-story em { color: #0071e3; font-style: normal; font-weight: 900; }
+        #bb-story strong { color: #d97706; font-style: normal; font-weight: 900; }
+        .bb-cursor {
+            display: inline-block; width: 2px; height: 0.88em;
+            background: #0071e3; margin-left: 2px;
+            vertical-align: middle; animation: bbBlink 0.65s infinite;
+        }
+        @keyframes bbBlink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+        #bb-btns { display: flex; gap: 10px; width: 530px; justify-content: flex-end; }
+        #bb-btn-start {
+            font-size: 15px !important; font-weight: 900 !important;
+            padding: 13px 28px !important; border-radius: 12px !important;
+            border: none !important; cursor: pointer !important;
+            background: #0071e3 !important; color: #fff !important;
+            box-shadow: 0 5px 0 #0050b3 !important;
+            font-family: 'Apple SD Gothic Neo','Malgun Gothic','Nanum Gothic',sans-serif !important;
+            letter-spacing: -0.01em !important;
+        }
+        #bb-btn-skip {
+            font-size: 14px !important; font-weight: 700 !important;
+            padding: 13px 20px !important; border-radius: 12px !important;
+            border: 2px solid rgba(255,255,255,0.25) !important; cursor: pointer !important;
+            background: rgba(255,255,255,0.08) !important; color: rgba(255,255,255,0.7) !important;
+            font-family: 'Apple SD Gothic Neo','Malgun Gothic','Nanum Gothic',sans-serif !important;
+        }
+    </style>
+
+    <div id="bb-backdrop"></div>
+
+    <div id="bb-scene">
+        <div id="bb-bot">
+            <svg viewBox="0 0 90 115" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="bbG" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#38bdf8"/><stop offset="100%" stop-color="#0071e3"/></linearGradient>
+                    <linearGradient id="bbGd" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#0071e3"/><stop offset="100%" stop-color="#0050b3"/></linearGradient>
+                    <linearGradient id="bbSG" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#03050d"/><stop offset="100%" stop-color="#071428"/></linearGradient>
+                </defs>
+                <rect x="26" y="92" width="14" height="18" rx="5" fill="url(#bbGd)"/>
+                <rect x="50" y="92" width="14" height="18" rx="5" fill="url(#bbGd)"/>
+                <rect x="23" y="104" width="18" height="8" rx="4" fill="#0050b3"/>
+                <rect x="49" y="104" width="18" height="8" rx="4" fill="#0050b3"/>
+                <rect x="16" y="50" width="58" height="46" rx="13" fill="url(#bbG)"/>
+                <rect x="3" y="55" width="13" height="9" rx="4.5" fill="#38bdf8"/>
+                <rect x="74" y="55" width="13" height="9" rx="4.5" fill="#38bdf8"/>
+                <circle cx="3" cy="59" r="4" fill="#0071e3"/>
+                <circle cx="87" cy="59" r="4" fill="#0071e3"/>
+                <rect x="24" y="57" width="42" height="28" rx="7" fill="url(#bbSG)"/>
+                <text x="45" y="70" text-anchor="middle" font-size="5.5" fill="#38bdf8" font-family="monospace" font-weight="700">A = 65</text>
+                <text x="45" y="78" text-anchor="middle" font-size="5" fill="#fbbf24" font-family="monospace">ASCII CODE</text>
+                <rect x="16" y="86" width="58" height="5" rx="2" fill="#0050b3"/>
+                <rect x="18" y="8" width="54" height="46" rx="15" fill="url(#bbG)"/>
+                <line x1="45" y1="8" x2="45" y2="0" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round"/>
+                <circle cx="45" cy="0" r="3.5" fill="#fbbf24"/>
+                <circle cx="45" cy="0" r="5.5" fill="rgba(251,191,36,0.25)"/>
+                <rect x="22" y="20" width="18" height="13" rx="5" fill="url(#bbSG)"/>
+                <rect x="50" y="20" width="18" height="13" rx="5" fill="url(#bbSG)"/>
+                <rect class="bb-eye" x="25" y="23" width="5" height="7" rx="1.5" fill="#38bdf8"/>
+                <rect class="bb-eye" x="32" y="23" width="5" height="7" rx="1.5" fill="#fbbf24" style="animation-delay:.15s"/>
+                <rect class="bb-eye" x="53" y="23" width="5" height="7" rx="1.5" fill="#38bdf8" style="animation-delay:.08s"/>
+                <rect class="bb-eye" x="60" y="23" width="5" height="7" rx="1.5" fill="#fbbf24" style="animation-delay:.2s"/>
+                <rect x="26" y="37" width="38" height="11" rx="4" fill="url(#bbSG)"/>
+                <text x="45" y="46" text-anchor="middle" font-size="6.5" fill="#38bdf8" font-family="monospace" font-weight="700">A B C</text>
+                <circle cx="18" cy="28" r="4" fill="#0050b3"/><circle cx="18" cy="28" r="2" fill="#03050d"/>
+                <circle cx="72" cy="28" r="4" fill="#0050b3"/><circle cx="72" cy="28" r="2" fill="#03050d"/>
+            </svg>
+        </div>
+
+        <div style="display:flex;flex-direction:column;align-items:flex-start;">
+            <div id="bb-bubble">
+                <div id="bb-topic">📌 문자는 컴퓨터 속에서 어떻게 저장될까?</div>
+                <div id="bb-story"><span class="bb-cursor"></span></div>
+            </div>
+            <div id="bb-btns">
+                <button id="bb-btn-skip" onclick="bbClose()">건너뛰기</button>
+                <button id="bb-btn-start" onclick="bbClose()">학습 시작 ▶</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const bbLines = [
+            { plain:'▪컴퓨터는 문자도 숫자처럼 0과 1로 저장해.', html:'▪컴퓨터는 문자도 숫자처럼 <em>0과 1</em>로 저장해.' },
+            { plain:'▪각 문자에 고유한 번호를 붙인 약속이 바로 문자 코드야.', html:'▪각 문자에 고유한 번호를 붙인 약속이 바로 <em>문자 코드</em>야.' },
+            { plain:'▪예를 들어 아스키(ASCII) 코드에서 A는 숫자 65번이야.', html:'▪예를 들어 <em>아스키(ASCII) 코드</em>에서 A는 숫자 <strong>65번</strong>이야.' },
+            { plain:'▪전 세계 문자를 담으려고 만든 더 큰 약속은 유니코드야.', html:'▪전 세계 문자를 담으려고 만든 더 큰 약속은 <em>유니코드</em>야.<br>' },
+            { plain:'➤ 그럼 직접 문자가 디지털로 변환되는 원리를 탐구해볼까?', html:'<em>➤ 그럼 직접 문자가 디지털로 변환되는 원리를 탐구해볼까?</em>' },
+        ];
+        let bbLi=0, bbCi=0, bbTm=null;
+        const bbEl=document.getElementById('bb-story');
+
+        function bbType(){
+            const cur=bbLines[bbLi];
+            if(bbCi<cur.plain.length){
+                const done=bbLines.slice(0,bbLi).map(l=>l.html).join('<br>');
+                bbEl.innerHTML=(done?done+'<br>':'')+cur.plain.slice(0,bbCi+1)+'<span class="bb-cursor"></span>';
+                bbCi++; bbTm=setTimeout(bbType,26);
+            } else {
+                bbLi++; bbCi=0;
+                if(bbLi<bbLines.length) bbTm=setTimeout(bbType,320);
+                else bbEl.innerHTML=bbLines.map(l=>l.html).join('<br>');
+            }
+        }
+
+        function bbClose(){
+            if(bbTm)clearTimeout(bbTm);
+            const s=document.getElementById('bb-scene');
+            const b=document.getElementById('bb-backdrop');
+            s.classList.add('bb-scene-exit');
+            setTimeout(()=>{s.style.display='none';b.style.display='none';},300);
+        }
+
+        const btnS=document.getElementById('bb-btn-start');
+        const btnSk=document.getElementById('bb-btn-skip');
+        btnS.addEventListener('mouseenter',()=>{btnS.style.setProperty('background','#0080ff','important');btnS.style.setProperty('transform','translateY(-2px)','important');btnS.style.setProperty('box-shadow','0 7px 0 #0050b3','important');});
+        btnS.addEventListener('mouseleave',()=>{btnS.style.setProperty('background','#0071e3','important');btnS.style.setProperty('transform','translateY(0)','important');btnS.style.setProperty('box-shadow','0 5px 0 #0050b3','important');});
+        btnS.addEventListener('mousedown',()=>{btnS.style.setProperty('transform','translateY(4px)','important');btnS.style.setProperty('box-shadow','0 1px 0 #0050b3','important');});
+        btnS.addEventListener('mouseup',()=>{btnS.style.setProperty('transform','translateY(-2px)','important');btnS.style.setProperty('box-shadow','0 7px 0 #0050b3','important');});
+        btnSk.addEventListener('mouseenter',()=>{btnSk.style.setProperty('background','rgba(255,255,255,0.18)','important');btnSk.style.setProperty('color','rgba(255,255,255,0.95)','important');});
+        btnSk.addEventListener('mouseleave',()=>{btnSk.style.setProperty('background','rgba(255,255,255,0.08)','important');btnSk.style.setProperty('color','rgba(255,255,255,0.7)','important');});
+
+        window.addEventListener('load',()=>setTimeout(bbType,600));
+    </script>
+<script src="./js/search_data.js"></script> 
+<script src="./js/concept_common.js"></script>
+</body>
+</html>

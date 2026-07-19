@@ -1,0 +1,1415 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1920">
+    <title>DIGITAL AUDIO STUDIO: PCM & MIDI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Pretendard:wght@400;600;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./css/sound_play_concept.css">
+</head>
+<body>
+
+    <div id="dbb-topnav">
+        <div style="display:flex;gap:9px;align-items:center;">
+            <a class="dbb-btn" href="index.html">← 메인으로</a>
+            <a class="dbb-btn" href="06_sound.html">📖 개념으로</a>
+            <button class="dbb-btn" id="btn-mode-select" onclick="showMainMenu()" style="display:none;">🎮 모드 선택</button>
+        </div>
+        <span class="dbb-title">🎮 소리의 디지털 표현 · 활용 실습</span>
+        <div style="width:200px;"></div>
+    </div>
+
+
+    <div id="main-menu">
+        <div class="gate" id="gate-pcm" onclick="openMode('pcm')">
+            <div class="gate-content">
+                <div class="gate-title">PCM MODE</div>
+                <div class="gate-desc">
+                    <span style="color:#d946ef;">소리 변환기</span><br>
+                    아날로그 파동을 디지털로 변환하라!<br>
+                    [표본화 ➡️ 양자화 ➡️ 부호화 3단계 변환 실습]
+                </div>
+            </div>
+        </div>
+        <div class="gate" id="gate-midi" onclick="openMode('midi')">
+            <div class="gate-content">
+                <div class="gate-title">MIDI MODE</div>
+                <div class="gate-desc">
+                    <span style="color:var(--cyber-magenta);">6-BIT SOUND BITBOX</span><br>
+                    컴퓨터의 이진수 명령어로 동작하는 전자 악기(피아노)<br>
+                    [이진수 피아노 재생 실습]
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="pcm-mode" class="fullscreen-mode">
+        
+        <div id="pcm-container">
+            <div id="pcm-header">
+                <h1 class="pcm-title">소리 변환기</h1>
+                
+                <div class="pcm-toolbar">
+                    <div class="timer-box">⏱️ <span id="pcm-timer-txt">00:00</span></div>
+                    <button id="pcm-pause-btn" class="pcm-control-btn" onclick="togglePausePcm()">⏸️ 일시 정지</button>
+                    <button class="pcm-control-btn" onclick="restartPcmGame()">🔄 새로 시작</button>
+                    <div style="margin-left:auto; font-weight:bold; color:var(--music-accent-main); font-size:1.1rem;">
+                        목표: <span id="pcm-score-txt" style="color:var(--music-accent-sub); font-size:1.4rem;">0</span> / 7
+                    </div>
+                </div>
+            </div>
+            
+            <div id="pcm-status-bar">
+                <div id="ph-1" class="phase-indicator">1. 표본화 (SAMPLING)</div>
+                <div id="ph-2" class="phase-indicator">2. 양자화 (QUANTIZATION)</div>
+                <div id="ph-3" class="phase-indicator">3. 부호화 (ENCODING)</div>
+            </div>
+
+            <div id="pcm-instruction">지시사항 대기중...</div>
+
+            <div id="pcm-canvas-wrapper">
+                <canvas id="pcmCanvas"></canvas>
+                
+                <div id="pcm-intro" class="pcm-overlay">
+                    <h2>디지털 소리 변환기</h2>
+                    <p>
+                        아날로그 소리를 컴퓨터 데이터로 변환하는 3단계 변환기입니다.<br><br>
+                        1. <b>[표본화]</b> 스캐너가 기둥(일정한 시간 간격)에 닿을 때마다 <span class="instr-highlight">[스페이스바]</span>를 눌러 그 순간의 소리 크기를 기록하세요.<br>
+                        2. <b>[양자화]</b> 기록된 점들을 <span class="instr-highlight">[마우스 드래그]</span>하여 가장 가까운 정수 값으로 반올림하세요.<br>
+                        3. <b>[부호화]</b> 정수 값을 3자리 이진수(0과 1)로 <span class="instr-highlight">[입력]</span> 하세요!
+                    </p>
+                    <button class="pcm-btn" onclick="startPcmGame()">변환기 동작 시작</button>
+                </div>
+
+                <div id="pcm-result" class="pcm-overlay hidden">
+                    <h2 style="color:var(--music-accent-success); font-family:'Orbitron';">DATA CONVERSION COMPLETE!</h2>
+                    
+                    <div style="display:flex; width: 90%; max-width: 1050px; gap: 30px; align-items: stretch; justify-content: center; background: #fff; padding: 30px; border-radius: 16px; border: 2px solid #e9d5ff; box-shadow: 0 15px 30px rgba(139,92,246,0.1); text-align:left;">
+                        
+                        <div style="flex:1.4; border-right: 2px dashed #cbd5e1; padding-right: 30px; display:flex; flex-direction:column; justify-content:center;">
+                            <h3 style="color:var(--music-accent-main); margin-top:0; font-size:1.4rem;">📡 최종 변환된 디지털 파형</h3>
+                            <div style="background:#0f172a; padding:15px; border-radius:12px; border:2px solid #a855f7; box-shadow: 0 0 15px rgba(168,85,247,0.2);">
+                                <canvas id="digitalResultCanvas" width="500" height="200" style="width:100%; height:auto; display:block;"></canvas>
+                            </div>
+                            <div style="margin-top:15px; background:#f8fafc; padding:10px; border-radius:8px; text-align:center;">
+                                <span style="font-size:0.9rem; color:#64748b; font-weight:bold; display:block; margin-bottom:5px;">[ 3-Bit PCM 이진 데이터 ]</span>
+                                <div id="final-binary-text" style="font-family:'Orbitron'; font-size:1.5rem; font-weight:bold; color:var(--music-accent-main); letter-spacing:2px; white-space:nowrap;"></div>
+                            </div>
+                        </div>
+                        
+                        <div style="flex:0.6; display:flex; flex-direction:column; justify-content:center; padding-left:10px;">
+                            <h3 style="color:var(--music-text); margin-top:0; font-size:1.4rem;">📊 작전 결과 분석</h3>
+                            <div style="font-size: 1.2rem; margin: 15px 0; color: #475569;">
+                                완벽 채집: <span id="result-score" style="color:var(--music-accent-success); font-size:2rem; font-weight:900;">0</span> <span style="font-size:1.2rem; color:#94a3b8; font-weight:bold;">/ 7</span>
+                            </div>
+                            <div style="font-size: 1.2rem; margin: 15px 0; color: #475569;">
+                                소요 시간: <b id="final-time-txt" style="color:var(--music-accent-main); font-size:1.8rem; font-family:'Orbitron';">00:00</b>
+                            </div>
+                            <div style="font-size: 1rem; color:#64748b; margin: 10px 0; line-height:1.6; font-weight:600;">
+                                표본화 ➡️ 양자화 ➡️ 부호화<br>디지털 소리 변환의 3단계를 완벽하게 마스터했습니다!
+                            </div>
+
+                            <!-- ✅ 4단계: 복원(재생) 추가 -->
+                            <div style="background:#f0fdf4; border:2px solid #86efac; border-radius:12px; padding:14px; margin:10px 0;">
+                                <div style="font-size:0.95rem; font-weight:900; color:#166534; margin-bottom:8px;">
+                                    🔊 4단계: 복원 (D/A 변환)
+                                </div>
+                                <div style="font-size:0.82rem; color:#4b5563; line-height:1.6; margin-bottom:10px;">
+                                    저장된 이진수를 다시 <b>진폭값 → 소리</b>로 복원합니다.<br>
+                                    PCM의 핵심: 디지털 → 아날로그 재변환
+                                </div>
+                                <button id="btn-playback" onclick="playPcmResult()"
+                                    style="width:100%; padding:10px; background:linear-gradient(135deg,#10b981,#14b8a6); color:white; border:none; border-radius:10px; font-weight:900; font-size:1rem; cursor:pointer; transition:0.2s;">
+                                    ▶ 복원된 소리 듣기
+                                </button>
+                                <div id="playback-status" style="font-size:0.8rem; color:#059669; font-weight:700; text-align:center; margin-top:6px; min-height:18px;"></div>
+                            </div>
+
+                            <button class="pcm-btn" style="margin-top: auto; padding: 12px 20px; font-size:1rem; width:100%;" onclick="showMainMenu()">메인 메뉴로 복귀</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="midi-mode" class="fullscreen-mode">
+        
+        <div class="dashboard">
+            <div class="midi-header">
+                <div class="title-box">
+                    <h1 class="title cyber-font">🎹 6-BIT SUOND BITBOX</h1>
+                    <div class="subtitle" style="color:#E0F2FE; margin-top:5px; font-weight:600;">0과 1의 하모니로 연주하는 디지털 피아노</div>
+                    <div class="ergonomic-badge">🤚 왼손: C3~B3 (하단) &nbsp;&nbsp;|&nbsp;&nbsp; 🖐 오른손: C4~B5 (상단/우측)</div>
+                </div>
+                <div class="cyber-font midi-protocol">6-BIT MEMORY</div>
+            </div>
+
+            <div class="lcd-panel">
+                <div class="lcd-item">
+                    <div class="lcd-label">입력 키</div>
+                    <div class="lcd-value" id="lcd-key">[ - ]</div>
+                </div>
+                <div class="lcd-item">
+                    <div class="lcd-label">음계</div>
+                    <div class="lcd-value highlight" id="lcd-note" style="color:var(--cyber-yellow)">--</div>
+                </div>
+                <div class="lcd-item" style="width: 30%;">
+                    <div class="lcd-label">이진수 주소 (6-BIT)</div>
+                    <div class="lcd-value binary" id="lcd-bin">------</div>
+                </div>
+                <div class="lcd-item">
+                    <div class="lcd-label">십진수 값</div>
+                    <div class="lcd-value" id="lcd-dec">--</div>
+                </div>
+            </div>
+
+            <div class="piano-wrapper">
+                <div id="piano"></div>
+            </div>
+
+            <div class="terminal">
+                <div class="terminal-header cyber-font" style="color:#FFF;"><span>🎼 이진수 작곡기</span> <span id="terminal-status" style="color:var(--cyber-magenta)">🎹 연주 준비 완료</span></div>
+                <textarea id="binaryInput" class="code-input cyber-font" placeholder="🎹 건반을 눌러 작곡하거나, 이진수를 직접 입력하거나, 예제를 로드하세요..."></textarea>
+                
+                <div class="controls">
+                    <div class="tempo-box">
+                        <span class="cyber-font" style="font-size: 0.7rem; color: var(--cyber-yellow);">속도(ms)</span>
+                        <input type="range" id="tempoSlider" min="40" max="600" value="133" step="1" oninput="updateTempo(this.value)">
+                        <span id="tempoValue" class="cyber-font" style="color: var(--cyber-cyan); font-size: 0.9rem; min-width: 70px;">133 BPM</span>
+                    </div>
+
+                    <button class="btn" id="btnRecord" onclick="toggleRecord()"
+                        style="border-color:var(--cyber-green); color:var(--cyber-green);">
+                        🎹 건반 녹음 ON
+                    </button>
+                    <button class="btn" style="border-color:var(--cyber-magenta); color:var(--cyber-magenta);" onclick="loadSong('bitbox')">🔥 AI창작곡</button>
+                    <button class="btn" onclick="loadSong('beethoven')">환희의 송가</button>
+                    <button class="btn" onclick="loadSong('star')">작은 별</button>
+                    <button class="btn" style="border-color:#64748B; color:#94A3B8;" onclick="clearInput()">🗑️ 전체 지우기</button>
+                    <button class="btn play-btn" id="btnPlay" onclick="togglePlay()">▶ 연주 시작</button>
+                    <button class="btn" id="btnWav" onclick="saveWAV()"
+                        style="border-color:var(--cyber-cyan); color:var(--cyber-cyan);">
+                        💾 WAV 저장
+                    </button>
+                    <button class="btn" id="btnMid" onclick="saveMID()"
+                        style="border-color:var(--cyber-yellow); color:var(--cyber-yellow);">
+                        🎼 MID 저장
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* ==========================================================
+           GLOBAL & MENU LOGIC
+           ========================================================== */
+        let currentMode = null;
+
+        function openMode(mode) {
+            document.getElementById('main-menu').style.display = 'none';
+            // 모드 진입 시 모드 선택 버튼 보이기
+            document.getElementById('btn-mode-select').style.display = 'inline-flex';
+            
+            if (mode === 'pcm') {
+                document.getElementById('pcm-mode').style.display = 'flex';
+                currentMode = 'pcm';
+                initPcmGame();
+            } else if (mode === 'midi') {
+                document.getElementById('midi-mode').style.display = 'flex';
+                currentMode = 'midi';
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+            }
+        }
+
+        function showMainMenu() {
+            document.getElementById('pcm-mode').style.display = 'none';
+            document.getElementById('midi-mode').style.display = 'none';
+            document.getElementById('main-menu').style.display = 'flex';
+            // 메인 메뉴로 돌아오면 모드 선택 버튼 감추기
+            document.getElementById('btn-mode-select').style.display = 'none';
+            currentMode = null;
+            
+            isPcmRunning = false;
+            clearInterval(pcmTimerInterval);
+            cancelAnimationFrame(pcmAnimId);
+            stopSequence();
+        }
+
+        /* ==========================================================
+           4단계: 복원(D/A 변환) 재생 함수
+           ========================================================== */
+        function playPcmResult() {
+            if (!dots || dots.length === 0) return;
+
+            const btn    = document.getElementById('btn-playback');
+            const status = document.getElementById('playback-status');
+            btn.disabled = true;
+            btn.style.opacity = '0.6';
+            status.innerText = '🔊 복원 중...';
+
+            const sampleRate   = audioCtx.sampleRate;
+            const noteDuration = 0.15; // 표본당 재생 시간(초)
+            const totalSamples = Math.floor(sampleRate * noteDuration * dots.length);
+            const buffer       = audioCtx.createBuffer(1, totalSamples, sampleRate);
+            const data         = buffer.getChannelData(0);
+            const samplesPerDot = Math.floor(sampleRate * noteDuration);
+
+            dots.forEach((dot, dIdx) => {
+                // 이진수 → 10진수 → 진폭값(-1~1) 복원
+                const amplitude = (dot.val / 7) * 2 - 1;
+                const freq      = 220 + dot.val * 40; // 진폭에 비례한 주파수
+                const start     = dIdx * samplesPerDot;
+                for (let s = 0; s < samplesPerDot; s++) {
+                    const t        = s / sampleRate;
+                    const envelope = Math.min(1, Math.min(s / 200, (samplesPerDot - s) / 200));
+                    data[start + s] = amplitude * Math.sin(2 * Math.PI * freq * t) * envelope;
+                }
+            });
+
+            const source = audioCtx.createBufferSource();
+            source.buffer = buffer;
+            source.connect(audioCtx.destination);
+            source.start();
+
+            source.onended = () => {
+                btn.disabled      = false;
+                btn.style.opacity = '1';
+                status.innerText  = '✅ 복원 완료! 이진수가 소리로 바뀌었습니다.';
+            };
+
+            // 진행 표시
+            let elapsed = 0;
+            const iv = setInterval(() => {
+                elapsed++;
+                status.innerText = `🔊 복원 중... ${Math.min(elapsed, dots.length)}/${dots.length} 표본`;
+                if (elapsed >= dots.length) clearInterval(iv);
+            }, noteDuration * 1000);
+        }
+
+        /* ==========================================================
+           PCM GAME LOGIC (WAVE HACKER 1.0)
+           ========================================================== */
+        const pCanvas = document.getElementById('pcmCanvas');
+        const pCtx = pCanvas.getContext('2d');
+        
+        let pcmAnimId;
+        let isPcmRunning = false;
+        let isPcmPaused = false;
+        
+        // Timer Logic
+        let pcmTimerInterval = null;
+        let pcmSeconds = 0;
+
+        let pPhase = 0; // 1: Sample, 2: Quantize, 3: Encode
+        
+        let canvasW, canvasH, gridBtm, gridTop, levelH;
+        let scannerX = 0;
+        
+        const targetXList = [150, 300, 450, 600, 750, 900, 1050]; 
+        let dots = []; // {x, analogY, currentY, val, snapped, typed, encoded, bin}
+        
+        let draggedDot = null;
+        let activeEncodeDotIndex = 0;
+        
+        // 플로팅 텍스트
+        let floatTexts = []; 
+
+        // ✅ 파형 무작위 생성을 위한 변수
+        let wAmp1 = 2.5, wFreq1 = 0.01, wPhase1 = 0, wAmp2 = 1.0, wFreq2 = 0.025;
+
+        // ✅ 무작위 파형 생성 함수
+       function generateRandomWave() {
+            wAmp1 = 1.0 + Math.random() * 1.2;      // 진폭1 낮춤 (1.0 ~ 2.2)
+            wFreq1 = 0.005 + Math.random() * 0.015; // 주기1
+            wPhase1 = Math.random() * Math.PI * 2;  // 위상
+            wAmp2 = 0.3 + Math.random() * 0.7;      // 진폭2 낮춤 (0.3 ~ 1.0)
+            wFreq2 = 0.015 + Math.random() * 0.02;  // 주기2
+            // 진폭의 합이 최대 3.2이므로, 중심선(3.5)을 기준으로 0.3 ~ 6.7 사이에서만 부드럽게 굽이칩니다!
+        }
+
+        // 게임 UI 보이기/숨기기 토글 함수
+        function togglePcmGameUI(show) {
+            document.getElementById('pcm-header').style.display = show ? 'flex' : 'none';
+            document.getElementById('pcm-status-bar').style.display = show ? 'flex' : 'none';
+            document.getElementById('pcm-instruction').style.display = show ? 'inline-block' : 'none';
+
+            const wrapper = document.getElementById('pcm-canvas-wrapper');
+            const canvas = document.getElementById('pcmCanvas');
+
+            if (show) {
+                canvas.style.display = 'block';
+                wrapper.style.background = 'var(--music-panel)';
+                wrapper.style.border = '4px solid #d8b4fe';
+                wrapper.style.boxShadow = '0 15px 30px rgba(139, 92, 246, 0.1)';
+            } else {
+                canvas.style.display = 'none';
+                wrapper.style.background = 'transparent';
+                wrapper.style.border = 'none';
+                wrapper.style.boxShadow = 'none';
+            }
+        }
+
+        function initPcmGame() {
+            togglePcmGameUI(true);
+            const rect = document.getElementById('pcm-canvas-wrapper').getBoundingClientRect();
+            canvasW = rect.width;
+            canvasH = rect.height;
+            pCanvas.width = canvasW;
+            pCanvas.height = canvasH;
+            
+            gridBtm = canvasH - 70; 
+            gridTop = 80;
+            levelH = (gridBtm - gridTop) / 7;
+
+            document.getElementById('pcm-intro').classList.remove('hidden');
+            document.getElementById('pcm-result').classList.add('hidden');
+            
+            isPcmPaused = false;
+            document.getElementById('pcm-pause-btn').innerHTML = "⏸️ 일시 정지";
+            
+            updatePcmPhase(0);
+            updatePcmInstr("지시사항 대기중...");
+            
+            pcmSeconds = 0;
+            document.getElementById('pcm-timer-txt').innerText = "00:00";
+            document.getElementById('pcm-score-txt').innerText = "0";
+            clearInterval(pcmTimerInterval);
+        }
+
+        function startPcmGame() {
+            document.getElementById('pcm-intro').classList.add('hidden');
+            togglePcmGameUI(true); 
+
+            generateRandomWave();
+
+            dots = [];
+            scannerX = 0;
+            draggedDot = null;
+            activeEncodeDotIndex = 0;
+            floatTexts = [];
+            document.getElementById('pcm-score-txt').innerText = "0";
+            
+            isPcmRunning = true;
+            isPcmPaused = false;
+            document.getElementById('pcm-pause-btn').innerHTML = "⏸️ 일시 정지";
+
+            // 타이머 시작
+            pcmSeconds = 0;
+            clearInterval(pcmTimerInterval);
+            pcmTimerInterval = setInterval(() => {
+                if(!isPcmRunning || isPcmPaused) return;
+                pcmSeconds++;
+                let m = String(Math.floor(pcmSeconds / 60)).padStart(2, '0');
+                let s = String(pcmSeconds % 60).padStart(2, '0');
+                document.getElementById('pcm-timer-txt').innerText = `${m}:${s}`;
+            }, 1000);
+
+            setPhase1();
+            
+            // ✅ [수정] 중복 루프(스캐너 빨라짐 현상) 방지
+            if (pcmAnimId) cancelAnimationFrame(pcmAnimId); 
+            pcmLoop();
+        }
+
+        function restartPcmGame() {
+            startPcmGame();
+        }
+
+        function togglePausePcm() {
+            if(!isPcmRunning) return;
+            isPcmPaused = !isPcmPaused;
+            const btn = document.getElementById('pcm-pause-btn');
+            btn.innerHTML = isPcmPaused ? "▶️ 계속 하기" : "⏸️ 일시 정지";
+            
+            if(isPcmPaused) {
+                addFloatText("PAUSED", "#8b5cf6", canvasW/2, canvasH/2);
+            }
+        }
+
+        function updatePcmPhase(phase) {
+            pPhase = phase;
+            document.querySelectorAll('.phase-indicator').forEach(el => el.classList.remove('active'));
+            if(phase > 0) document.getElementById(`ph-${phase}`).classList.add('active');
+        }
+
+        function updatePcmInstr(htmlStr) {
+            document.getElementById('pcm-instruction').innerHTML = htmlStr;
+        }
+
+        // 파형 함수 
+      function getWaveY(x) {
+            let val = 3.5 + wAmp1 * Math.sin(x * wFreq1 + wPhase1) + wAmp2 * Math.cos(x * wFreq2);
+            // 🚨 6.8에서 강제로 평평하게 자르던 코드 제거! 자연스러운 곡선 유지
+            if (val < 0) val = 0; 
+            if (val > 7) val = 7;
+            return gridBtm - (val * levelH);
+        }
+        function yToVal(y) { return (gridBtm - y) / levelH; }
+        function valToY(val) { return gridBtm - (val * levelH); }
+
+        function setPhase1() {
+            updatePcmPhase(1);
+            updatePcmInstr("레이저가 기둥을 지날 때 <span class='instr-highlight'>[SPACE]</span>를 눌러 점(표본)을 추출하세요!");
+            scannerX = 0;
+            dots = [];
+        }
+
+        function setPhase2() {
+            updatePcmPhase(2);
+            updatePcmInstr("마우스로 점을 <span class='instr-highlight'>[드래그]</span>하여 가장 가까운 정수 눈금(0~7)으로 맞추세요!");
+        }
+
+        function setPhase3() {
+            updatePcmPhase(3);
+            activeEncodeDotIndex = 0;
+            updatePcmInstr("눈금의 숫자(10진수)를 보고 3자리 <span class='instr-highlight'>[이진수]</span>를 타이핑하세요!");
+        }
+
+        function addFloatText(text, color, x, y) {
+            floatTexts.push({text: text, color: color, x: x, y: y, life: 60});
+        }
+
+        function drawFinalDigitalSignal() {
+            const rc = document.getElementById('digitalResultCanvas');
+            const rctx = rc.getContext('2d');
+            rctx.clearRect(0,0,rc.width,rc.height);
+
+            // 1. 그리드 (0~7)
+            rctx.strokeStyle = "rgba(139, 92, 246, 0.2)";
+            rctx.lineWidth = 1;
+            for(let i=0; i<=7; i++) {
+                let y = 200 - (i * 25) - 12.5; 
+                rctx.beginPath(); rctx.moveTo(0, y); rctx.lineTo(rc.width, y); rctx.stroke();
+            }
+
+            // 2. 디지털 계단 파형
+            rctx.strokeStyle = "#14b8a6"; // Teal
+            rctx.lineWidth = 3;
+            rctx.beginPath();
+            let segW = rc.width / 7;
+            dots.forEach((d, i) => {
+                let q = d.val;
+                let y = 200 - (q * 25) - 12.5;
+                let x1 = i * segW;
+                let x2 = (i+1) * segW;
+                if (i===0) {
+                    rctx.moveTo(x1, y);
+                } else {
+                    let prevQ = dots[i-1].val;
+                    let prevY = 200 - (prevQ * 25) - 12.5;
+                    rctx.lineTo(x1, prevY);
+                    rctx.lineTo(x1, y);
+                }
+                rctx.lineTo(x2, y);
+            });
+            rctx.stroke();
+
+            // 3. 파형 아래 색상 채우기
+            rctx.lineTo(rc.width, 200);
+            rctx.lineTo(0, 200);
+            rctx.fillStyle = "rgba(20, 184, 166, 0.15)";
+            rctx.fill();
+
+            // 4. 이진수 텍스트 업데이트
+            let binStr = dots.map(d => d.bin).join(' ');
+            document.getElementById('final-binary-text').innerText = binStr;
+        }
+
+        function pcmLoop() {
+            if (!isPcmRunning) return;
+            
+            // === [업데이트 로직] ===
+            if (!isPcmPaused) {
+                if (pPhase === 1) {
+                    scannerX += 4; 
+                    if (scannerX > canvasW) scannerX = 0; 
+                }
+
+                for(let i = floatTexts.length-1; i>=0; i--) {
+                    floatTexts[i].y -= 1;
+                    floatTexts[i].life -= 1;
+                    if(floatTexts[i].life <= 0) floatTexts.splice(i, 1);
+                }
+            }
+
+            // === [그리기 로직] ===
+            pCtx.clearRect(0, 0, canvasW, canvasH);
+            
+            // 1. 배경 가로 그리드 (0~7 눈금)
+            pCtx.lineWidth = 1;
+            pCtx.font = "bold 16px Pretendard";
+            pCtx.textAlign = "right";
+            pCtx.textBaseline = "middle";
+            for(let i=0; i<=7; i++) {
+                let y = valToY(i);
+                if (pPhase === 2 || pPhase === 3) {
+                    pCtx.strokeStyle = "rgba(71, 85, 105, 0.2)"; 
+                    pCtx.fillStyle = "#475569";
+                } else {
+                    pCtx.strokeStyle = "rgba(71, 85, 105, 0.05)";
+                    pCtx.fillStyle = "rgba(71, 85, 105, 0.4)";
+                }
+                pCtx.beginPath(); pCtx.moveTo(50, y); pCtx.lineTo(canvasW, y); pCtx.stroke();
+                pCtx.fillText(i, 40, y);
+            }
+
+            // 2. 기둥(타겟 구간) 그리기
+            targetXList.forEach(tx => {
+                pCtx.fillStyle = "rgba(236, 72, 153, 0.15)";
+                pCtx.fillRect(tx - 15, gridTop - 20, 30, gridBtm - gridTop + 40);
+                pCtx.strokeStyle = "rgba(236, 72, 153, 0.4)";
+                pCtx.setLineDash([5, 5]);
+                pCtx.beginPath(); pCtx.moveTo(tx, gridTop - 20); pCtx.lineTo(tx, gridBtm + 20); pCtx.stroke();
+                pCtx.setLineDash([]);
+            });
+
+            // 3. 아날로그 파형 그리기 (✅ 매끄러운 곡선)
+            if (pPhase === 1 || pPhase === 2) {
+                pCtx.strokeStyle = pPhase === 1 ? "#8b5cf6" : "rgba(139, 92, 246, 0.3)";
+                pCtx.lineWidth = 4;
+                pCtx.lineJoin = 'round';
+                pCtx.lineCap = 'round';
+                pCtx.beginPath();
+                for(let x=0; x<=canvasW; x+=1) {
+                    let y = getWaveY(x);
+                    if(x===0) pCtx.moveTo(x,y); else pCtx.lineTo(x,y);
+                }
+                pCtx.stroke();
+            }
+
+            // 4. 점(표본) 그리기
+            dots.forEach((dot, idx) => {
+                // 선 그리기
+                pCtx.strokeStyle = "rgba(71, 85, 105, 0.2)";
+                pCtx.lineWidth = 2;
+                pCtx.beginPath(); pCtx.moveTo(dot.x, gridBtm); pCtx.lineTo(dot.x, dot.currentY); pCtx.stroke();
+
+                // 점 그리기
+                pCtx.beginPath();
+                pCtx.arc(dot.x, dot.currentY, 12, 0, Math.PI*2);
+                
+                if (pPhase === 1) {
+                    pCtx.fillStyle = "#facc15"; 
+                } else if (pPhase === 2) {
+                    pCtx.fillStyle = dot.snapped ? "#14b8a6" : "#facc15"; 
+                    if (draggedDot === dot) pCtx.fillStyle = "#FFF";
+                } else if (pPhase === 3) {
+                    pCtx.fillStyle = dot.encoded ? "#8b5cf6" : (idx === activeEncodeDotIndex ? "#ec4899" : "rgba(71,85,105,0.3)");
+                }
+                pCtx.fill();
+                pCtx.strokeStyle = "#1e1b4b";
+                pCtx.lineWidth = 2;
+                pCtx.stroke();
+
+                // 텍스트 정보
+                if (pPhase === 2) {
+                    if (dot.snapped) {
+                        pCtx.fillStyle = "#14b8a6";
+                        pCtx.font = "bold 16px Pretendard";
+                        pCtx.textAlign = "center";
+                        pCtx.fillText(`정수 ${dot.val}`, dot.x, dot.currentY - 25);
+                    }
+                } else if (pPhase === 3) {
+                    pCtx.font = "bold 18px Orbitron";
+                    pCtx.textAlign = "center";
+                    if (dot.encoded) {
+                        pCtx.fillStyle = "#4c1d95"; 
+                        pCtx.fillText(dot.bin, dot.x, dot.currentY - 25);
+                        pCtx.fillStyle = "#1e1b4b"; 
+                        pCtx.font = "24px sans-serif";
+                        pCtx.fillText("💾", dot.x, dot.currentY + 30);
+                    } else if (idx === activeEncodeDotIndex) {
+                        pCtx.fillStyle = "#1e1b4b"; 
+                        pCtx.fillText(`[ ${dot.val} ]`, dot.x, dot.currentY - 45);
+                        
+                        let displayStr = dot.typed.padEnd(3, '_').split('').join(' ');
+                        pCtx.fillStyle = "#000000"; 
+                        pCtx.fillText(displayStr, dot.x, dot.currentY - 20);
+                    }
+                }
+            });
+
+            // 5. 스캐너 그리기
+            if (pPhase === 1) {
+                pCtx.fillStyle = "rgba(139, 92, 246, 0.5)"; 
+                pCtx.fillRect(scannerX - 2, 0, 4, canvasH);
+                pCtx.fillStyle = "#ec4899"; 
+                pCtx.beginPath(); pCtx.arc(scannerX, getWaveY(scannerX), 6, 0, Math.PI*2); pCtx.fill();
+            }
+
+            // 6. 플로팅 텍스트 그리기
+            floatTexts.forEach(ft => {
+                pCtx.globalAlpha = ft.life / 60;
+                pCtx.fillStyle = ft.color;
+                pCtx.font = "900 24px Orbitron";
+                pCtx.textAlign = "center";
+                pCtx.fillText(ft.text, ft.x, ft.y);
+                pCtx.globalAlpha = 1;
+            });
+
+            // 일시정지 오버레이
+            if (isPcmPaused) {
+                pCtx.fillStyle = "rgba(255,255,255,0.5)";
+                pCtx.fillRect(0, 0, canvasW, canvasH);
+            }
+
+            pcmAnimId = requestAnimationFrame(pcmLoop);
+        }
+
+        // --- PCM 키보드 & 마우스 이벤트 ---
+        window.addEventListener('keydown', (e) => {
+            if (currentMode !== 'pcm' || isPcmPaused) return;
+            
+            if (pPhase === 1 && e.code === 'Space') {
+                e.preventDefault();
+                let closestTarget = null;
+                let minDiff = 1000;
+                targetXList.forEach(tx => {
+                    let diff = Math.abs(scannerX - tx);
+                    if (diff < minDiff) { minDiff = diff; closestTarget = tx; }
+                });
+
+                if (minDiff <= 30) {
+                    if (!dots.find(d => d.x === closestTarget)) {
+                        if (minDiff < 10) addFloatText("PERFECT!", "#14b8a6", closestTarget, 100);
+                        else addFloatText("GOOD!", "#ec4899", closestTarget, 100);
+                        
+                        let y = getWaveY(closestTarget);
+                        dots.push({
+                            x: closestTarget,
+                            analogY: y,
+                            currentY: y, 
+                            val: Math.round(yToVal(y)), 
+                            snapped: false,
+                            typed: "",
+                            bin: Math.round(yToVal(y)).toString(2).padStart(3, '0'),
+                            encoded: false
+                        });
+                        
+                        if (dots.length === 7) setTimeout(setPhase2, 500);
+                    }
+                } else {
+                    addFloatText("MISS!", "#ec4899", scannerX, 100);
+                }
+            }
+            else if (pPhase === 3) {
+                if (e.key === '0' || e.key === '1') {
+                    let dot = dots[activeEncodeDotIndex];
+                    if (!dot) return;
+
+                    dot.typed += e.key;
+                    if (dot.typed.length === 3) {
+                        if (dot.typed === dot.bin) {
+                            dot.encoded = true;
+                            addFloatText("SUCCESS!", "#8b5cf6", dot.x, dot.currentY-50);
+                            document.getElementById('pcm-score-txt').innerText = activeEncodeDotIndex + 1;
+                            activeEncodeDotIndex++;
+                            
+                            if (activeEncodeDotIndex >= 7) {
+                                clearInterval(pcmTimerInterval); // 게임 끝
+                                
+                                document.getElementById('final-time-txt').innerText = document.getElementById('pcm-timer-txt').innerText;
+                                document.getElementById('result-score').innerText = activeEncodeDotIndex;
+                                
+                                drawFinalDigitalSignal();
+
+                                setTimeout(() => {
+                                    isPcmRunning = false;
+                                    togglePcmGameUI(false);
+                                    document.getElementById('pcm-result').classList.remove('hidden');
+                                }, 800);
+                            }
+                        } else {
+                            addFloatText("오타 발생!", "#ec4899", dot.x, dot.currentY-50);
+                            dot.typed = ""; // 리셋
+                        }
+                    }
+                } else if (e.code === 'Backspace') {
+                    let dot = dots[activeEncodeDotIndex];
+                    if (dot && dot.typed.length > 0) dot.typed = dot.typed.slice(0, -1);
+                }
+            }
+        });
+
+        // Phase 2: 드래그 앤 드롭
+        function getMousePos(evt) {
+            const rect = pCanvas.getBoundingClientRect();
+            let clientX = evt.clientX; let clientY = evt.clientY;
+            if (evt.touches) { clientX = evt.touches[0].clientX; clientY = evt.touches[0].clientY; }
+            return {
+                x: (clientX - rect.left) * (canvasW / rect.width),
+                y: (clientY - rect.top) * (canvasH / rect.height)
+            };
+        }
+
+        function onDown(e) {
+            if (pPhase !== 2 || isPcmPaused) return;
+            e.preventDefault();
+            let pos = getMousePos(e);
+            draggedDot = dots.find(d => !d.snapped && Math.hypot(d.x - pos.x, d.currentY - pos.y) < 30);
+        }
+
+        function onMove(e) {
+            if (pPhase !== 2 || !draggedDot || isPcmPaused) return;
+            e.preventDefault();
+            let pos = getMousePos(e);
+            draggedDot.currentY = pos.y;
+        }
+
+        function onUp(e) {
+            if (pPhase !== 2 || !draggedDot || isPcmPaused) return;
+            e.preventDefault();
+            
+            let nearestInt = Math.round(yToVal(draggedDot.currentY));
+            if (nearestInt < 0) nearestInt = 0;
+            if (nearestInt > 7) nearestInt = 7;
+            
+            if (nearestInt === draggedDot.val) {
+                draggedDot.currentY = valToY(draggedDot.val);
+                draggedDot.snapped = true;
+                addFloatText("눈금 일치! ✅", "#14b8a6", draggedDot.x, draggedDot.currentY-30);
+            } else {
+                draggedDot.currentY = draggedDot.analogY;
+            }
+            draggedDot = null;
+
+            if (dots.every(d => d.snapped)) setTimeout(setPhase3, 800);
+        }
+
+        pCanvas.addEventListener('mousedown', onDown);
+        window.addEventListener('mousemove', onMove);
+        window.addEventListener('mouseup', onUp);
+        
+        pCanvas.addEventListener('touchstart', onDown, {passive: false});
+        window.addEventListener('touchmove', onMove, {passive: false});
+        window.addEventListener('touchend', onUp, {passive: false});
+
+
+        /* ==========================================================
+           MIDI STUDIO LOGIC (개선판)
+           ① 피아노 음색 (sine + 하모닉스)
+           ② Note ON/OFF 분리 → 폴리포니(④)
+           ③ 시퀀서 음표 길이 구분
+           ⑤ 내장곡 이진수 교정
+           ========================================================== */
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const TOTAL_WHITE_KEYS = 21;
+        let isMidiPlaying = false;
+        let playTimeoutIds = [];
+        let currentTempo = 400; // BPM 기준 4분음표 길이(ms)
+
+        const keyLabels = ['Z','S','X','D','C','V','G','B','H','N','J','M','Q','2','W','3','E','R','5','T','6','Y','7','U','I','9','O','0','P','[','-',']','=','\\','←','↵'];
+        const keyCodes  = ['z','s','x','d','c','v','g','b','h','n','j','m','q','2','w','3','e','r','5','t','6','y','7','u','i','9','o','0','p','[','-',']','=','\\','backspace','enter'];
+
+        const notes = [];
+        const noteNames = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+        const isBlack   = [false,true,false,true,false,false,true,false,true,false,true,false];
+        let whiteIndex  = 0;
+
+        // ⑤ C3(index=0)부터 B5(index=35) — 12평균율 주파수 (C3=130.81Hz)
+        for (let i = 0; i < 36; i++) {
+            const noteIdx = i % 12;
+            const octave  = 3 + Math.floor(i / 12);
+            const freq    = 130.81 * Math.pow(2, i / 12);
+            notes.push({
+                dec: i,
+                bin: i.toString(2).padStart(6, '0'),
+                name: noteNames[noteIdx] + octave,
+                freq: freq,
+                isBlack: isBlack[noteIdx],
+                whiteIdx: isBlack[noteIdx] ? whiteIndex : whiteIndex++,
+                keyCode: keyCodes[i]
+            });
+        }
+
+        // ② 폴리포니: 각 음마다 독립 노드 유지
+        // activeNodes[index] = { osc1, osc2, osc3, gainNode }
+        const activeNodes = {};
+
+        const piano      = document.getElementById('piano');
+        const keyElements = [];
+        const wWidth     = 100 / TOTAL_WHITE_KEYS;
+        const bWidth     = wWidth * 0.65;
+
+        notes.forEach((n, index) => {
+            const key = document.createElement('div');
+            key.className  = n.isBlack ? 'black-key' : 'white-key';
+            key.style.width = (n.isBlack ? bWidth : wWidth) + '%';
+            key.style.left  = n.isBlack
+                ? (n.whiteIdx * wWidth - bWidth / 2) + '%'
+                : (n.whiteIdx * wWidth) + '%';
+            const cBadge = (!n.isBlack && n.name.startsWith('C'))
+                ? `<div class="c-badge">${n.name}</div>` : '';
+            key.innerHTML = `${cBadge}<div class="bin-label">${n.bin}</div><div class="keycap">${keyLabels[index]}</div>`;
+
+            // ② Note ON
+            key.addEventListener('mousedown', () => { if (currentMode === 'midi') noteOn(index); });
+            // ② Note OFF
+            key.addEventListener('mouseup',    () => { if (currentMode === 'midi') noteOff(index); });
+            key.addEventListener('mouseleave', () => { if (currentMode === 'midi') noteOff(index); });
+            key.addEventListener('touchstart', (e) => {
+                if (currentMode !== 'midi') return;
+                e.preventDefault(); noteOn(index);
+            }, { passive: false });
+            key.addEventListener('touchend', (e) => {
+                if (currentMode !== 'midi') return;
+                e.preventDefault(); noteOff(index);
+            }, { passive: false });
+
+            piano.appendChild(key);
+            keyElements.push(key);
+        });
+
+        // ① 피아노 음색: Note ON — sine 기본파 + 2배음 + 3배음으로 자연스러운 음색 구현
+        // fromSequencer: true면 시퀀서 재생 → 녹음 기록 건너뜀
+        function noteOn(index, fromSequencer = false) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            if (activeNodes[index]) return; // 이미 눌린 음 중복 방지
+
+            const n   = notes[index];
+            const now = audioCtx.currentTime;
+
+            // LCD 업데이트
+            document.getElementById('lcd-key').innerText  = `[ ${keyLabels[index]} ]`;
+            document.getElementById('lcd-note').innerText = n.name;
+            document.getElementById('lcd-dec').innerText  = n.dec;
+            document.getElementById('lcd-bin').innerText  = n.bin;
+
+            // 마스터 gain (전체 음량)
+            const masterGain = audioCtx.createGain();
+            masterGain.gain.setValueAtTime(0, now);
+            masterGain.gain.linearRampToValueAtTime(0.25, now + 0.01); // Attack
+            masterGain.connect(audioCtx.destination);
+
+            // ① 하모닉스: 기본파(1배음) + 2배음 + 3배음
+            const harmonics = [
+                { mult: 1,   gain: 0.6  }, // 기본파
+                { mult: 2,   gain: 0.25 }, // 2배음
+                { mult: 3,   gain: 0.1  }, // 3배음
+                { mult: 4,   gain: 0.05 }, // 4배음
+            ];
+
+            const oscs = harmonics.map(h => {
+                const osc  = audioCtx.createOscillator();
+                const hGain = audioCtx.createGain();
+                osc.type           = 'sine';
+                osc.frequency.value = n.freq * h.mult;
+                hGain.gain.value    = h.gain;
+                osc.connect(hGain);
+                hGain.connect(masterGain);
+                osc.start(now);
+                return osc;
+            });
+
+            activeNodes[index] = { oscs, masterGain };
+            keyElements[index].classList.add('active');
+
+            // 🎹 건반 직접 연주 시 이진수를 입력창에 항상 표시 (시퀀서 재생 시 제외)
+            if (!fromSequencer) {
+                const ta  = document.getElementById('binaryInput');
+                const cur = ta.value.trim();
+                ta.value  = cur ? cur + ' ' + n.bin : n.bin;
+                ta.scrollTop = ta.scrollHeight;
+            }
+
+            // 🎹 녹음 모드: 박자(타이밍) 기록 (시퀀서 재생 시 제외)
+            if (isRecording && !fromSequencer) {
+                const pressTime = performance.now() - recordStartTime; // 녹음 시작부터 경과 시간(ms)
+                recordedNotes.push({ bin: n.bin, noteIndex: index, pressTime });
+                document.getElementById('terminal-status').innerText =
+                    '🔴 녹음 중 — ' + recordedNotes.length + '음 기록됨';
+            }
+        }
+
+        // ② Note OFF — 자연스러운 Release 감쇄 후 정지
+        function noteOff(index) {
+            if (!activeNodes[index]) return;
+            const { oscs, masterGain } = activeNodes[index];
+            const now = audioCtx.currentTime;
+
+            // 녹음 중: 마지막으로 눌린 해당 음의 durationMs 기록
+            if (isRecording) {
+                const releaseTime = performance.now() - recordStartTime;
+                // recordedNotes 중 noteIndex가 일치하고 아직 duration 없는 것
+                for (let i = recordedNotes.length - 1; i >= 0; i--) {
+                    if (recordedNotes[i].noteIndex === index && !recordedNotes[i].durationMs) {
+                        recordedNotes[i].durationMs = releaseTime - recordedNotes[i].pressTime;
+                        break;
+                    }
+                }
+            }
+
+            masterGain.gain.cancelScheduledValues(now);
+            masterGain.gain.setValueAtTime(masterGain.gain.value, now);
+            masterGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.8);
+
+            oscs.forEach(osc => {
+                try { osc.stop(now + 0.8); } catch(e) {}
+            });
+
+            // 녹음 중: 해당 음의 durationMs 기록
+            if (isRecording) {
+                const releaseTime = performance.now() - recordStartTime;
+                for (let i = recordedNotes.length - 1; i >= 0; i--) {
+                    if (recordedNotes[i].noteIndex === index && !recordedNotes[i].durationMs) {
+                        recordedNotes[i].durationMs = releaseTime - recordedNotes[i].pressTime;
+                        break;
+                    }
+                }
+            }
+
+            delete activeNodes[index];
+            keyElements[index].classList.remove('active');
+        }
+
+        // ① 시퀀서용 단발 재생 (Note ON → 일정 시간 후 자동 OFF)
+        // fromSequencer=true 전달 → noteOn 내부 녹음 기록 건너뜀
+        function playSound(index, durationMs) {
+            noteOn(index, true);
+            setTimeout(() => noteOff(index), durationMs * 0.85);
+        }
+
+        // ⑤ 내장곡 — 실제 음계에 맞게 이진수 교정
+        // 형식: "이진수:박자배율" — 박자배율 1=4분음표, 0.5=8분음표, 2=2분음표
+        // 쉼표: "000000:x" (C3 대신 rest 플래그로 처리)
+        // 음 대응: C3=0(000000) D3=2(000010) E3=4(000100) F3=5(000101)
+        //          G3=7(000111) A3=9(001001) B3=11(001011)
+        //          C4=12(001100) D4=14(001110) E4=16(010000) F4=17(010001)
+        //          G4=19(010011) A4=21(010101) B4=23(010111) C5=24(011000)
+        const songs = {
+            // ⑤ 작은 별: 도도솔솔라라솔 / 파파미미레레도
+            star: {
+                notes: [
+                    {b:'001100',d:1},{b:'001100',d:1},{b:'010011',d:1},{b:'010011',d:1},
+                    {b:'010101',d:1},{b:'010101',d:1},{b:'010011',d:2},
+                    {b:'010001',d:1},{b:'010001',d:1},{b:'010000',d:1},{b:'010000',d:1},
+                    {b:'001110',d:1},{b:'001110',d:1},{b:'001100',d:2},
+                    {b:'010011',d:1},{b:'010011',d:1},{b:'010001',d:1},{b:'010001',d:1},
+                    {b:'010000',d:1},{b:'010000',d:1},{b:'001110',d:2},
+                    {b:'010011',d:1},{b:'010011',d:1},{b:'010001',d:1},{b:'010001',d:1},
+                    {b:'010000',d:1},{b:'010000',d:1},{b:'001110',d:2},
+                    {b:'001100',d:1},{b:'001100',d:1},{b:'010011',d:1},{b:'010011',d:1},
+                    {b:'010101',d:1},{b:'010101',d:1},{b:'010011',d:2},
+                    {b:'010001',d:1},{b:'010001',d:1},{b:'010000',d:1},{b:'010000',d:1},
+                    {b:'001110',d:1},{b:'001110',d:1},{b:'001100',d:2}
+                ],
+                bpm: 120
+            },
+            // ⑤ 환희의 송가: 미미파솔솔파미레도도레미미레레
+            beethoven: {
+                notes: [
+                    {b:'010000',d:1},{b:'010000',d:1},{b:'010001',d:1},{b:'010011',d:1},
+                    {b:'010011',d:1},{b:'010001',d:1},{b:'010000',d:1},{b:'001110',d:1},
+                    {b:'001100',d:1},{b:'001100',d:1},{b:'001110',d:1},{b:'010000',d:1},
+                    {b:'010000',d:1.5},{b:'001110',d:0.5},{b:'001110',d:2},
+                    {b:'010000',d:1},{b:'010000',d:1},{b:'010001',d:1},{b:'010011',d:1},
+                    {b:'010011',d:1},{b:'010001',d:1},{b:'010000',d:1},{b:'001110',d:1},
+                    {b:'001100',d:1},{b:'001100',d:1},{b:'001110',d:1},{b:'010000',d:1},
+                    {b:'001110',d:1.5},{b:'001100',d:0.5},{b:'001100',d:2}
+                ],
+                bpm: 100
+            },
+            // 비트박스 테마 (간단한 멜로디)
+            bitbox: {
+                notes: [
+                    {b:'011000',d:0.5},{b:'010111',d:0.5},{b:'011000',d:1},{b:'010011',d:1},
+                    {b:'010000',d:0.5},{b:'010011',d:0.5},{b:'010111',d:2},
+                    {b:'011000',d:0.5},{b:'010111',d:0.5},{b:'011000',d:1},{b:'010011',d:1},
+                    {b:'010000',d:0.5},{b:'001110',d:0.5},{b:'010000',d:2},
+                    {b:'010001',d:0.5},{b:'010011',d:0.5},{b:'010101',d:1},{b:'010011',d:1},
+                    {b:'010001',d:0.5},{b:'010000',d:0.5},{b:'001110',d:2},
+                    {b:'011000',d:0.5},{b:'010111',d:0.5},{b:'011000',d:1},{b:'010011',d:1},
+                    {b:'010000',d:0.5},{b:'001100',d:0.5},{b:'001100',d:2}
+                ],
+                bpm: 130
+            }
+        };
+
+        // ③ 시퀀서용 bpm → ms 변환 + 텍스트박스 이진수 동기화
+        function songToText(songKey) {
+            return songs[songKey].notes.map(n => n.b).join(' ');
+        }
+
+        function updateTempo(val) {
+            const bpm = parseInt(val);
+            currentTempo = Math.round(60000 / bpm); // BPM → ms 변환
+            document.getElementById('tempoValue').innerText = bpm + " BPM";
+        }
+
+        function loadSong(s) {
+            stopSequence();
+            const song = songs[s];
+            // ③ bpm → 4분음표 ms
+            const beatMs = Math.round(60000 / song.bpm);
+            document.getElementById('binaryInput').value = songToText(s);
+            document.getElementById('tempoSlider').value = song.bpm; // BPM 직접 설정
+            updateTempo(song.bpm);
+            const label = {'bitbox':'비트박스','beethoven':'환희의 송가','star':'작은 별'};
+            document.getElementById('terminal-status').innerText = '🎵 ' + (label[s] || s) + ' 불러옴  (빠르기: ' + song.bpm + ')';
+            currentSongKey = s;
+        }
+
+        let currentSongKey = null;
+        let isRecording    = false;
+        let recordedNotes  = []; // 박자 포함 녹음 데이터: [{bin, noteIndex, pressTime}]
+        let recordStartTime = 0; // 녹음 시작 시각(ms)
+
+        function toggleRecord() {
+            isRecording = !isRecording;
+            const btn = document.getElementById('btnRecord');
+            const ta  = document.getElementById('binaryInput');
+            if (isRecording) {
+                currentSongKey  = null;
+                recordedNotes   = [];         // 이전 녹음 초기화
+                recordStartTime = performance.now(); // 녹음 시작 시각
+                btn.innerText = '⏹ 녹음 중지';
+                btn.style.background = 'rgba(0,255,102,0.15)';
+                document.getElementById('terminal-status').innerText = '🔴 녹음 중 — 건반을 눌러 작곡하세요';
+                ta.readOnly = true;
+            } else {
+                btn.innerText = '🎹 건반 녹음 ON';
+                btn.style.background = '';
+                document.getElementById('terminal-status').innerText = '🎹 연주 준비 완료';
+                ta.readOnly = true;
+            }
+        }
+
+        function clearInput() {
+            stopSequence();
+            currentSongKey = null;
+            recordedNotes  = [];
+            document.getElementById('binaryInput').value = '';
+            document.getElementById('terminal-status').innerText = '🗑️ 모두 지웠습니다';
+        }
+
+        function togglePlay() {
+            if (isMidiPlaying) stopSequence();
+            else playSequence();
+        }
+
+        // ③ 시퀀서: 녹음 박자 > 내장곡 박자 > 균등 박자 순으로 적용
+        async function playSequence() {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const inputTxt = document.getElementById('binaryInput').value;
+            const codes = inputTxt.trim().split(/\s+/).filter(c => /^[01]{6}$/.test(c));
+            if (codes.length === 0) return;
+
+            isMidiPlaying = true;
+            document.getElementById('btnPlay').innerHTML = '■ 연주 중단';
+            document.getElementById('btnPlay').className = 'btn stop-btn';
+            document.getElementById('terminal-status').innerText = '▶ 연주 중...';
+
+            // 박자 결정 우선순위:
+            // 1순위: 건반 녹음 데이터 (실제 타이밍)
+            // 2순위: 내장곡 악보 박자
+            // 3순위: 템포 슬라이더 균등 박자
+            const useRecorded = recordedNotes.length === codes.length;
+            const useSong     = !useRecorded && currentSongKey && songs[currentSongKey];
+            const durations   = useSong
+                ? songs[currentSongKey].notes.map(n => n.d)
+                : codes.map(() => 1);
+
+            for (let i = 0; i < codes.length; i++) {
+                if (!isMidiPlaying) break;
+                const code = codes[i];
+                const idx  = notes.findIndex(n => n.bin === code);
+
+                // 음 길이와 다음 음까지 간격 계산
+                let noteDurMs, waitMs;
+                if (useRecorded) {
+                    const rn = recordedNotes[i];
+                    // 슬라이더 BPM 반영: 기준 400ms 대비 현재 tempo 비율로 스케일
+                    const speedRatio = currentTempo / 400;
+                    noteDurMs = Math.max(50, (rn.durationMs || 300) * speedRatio);
+                    waitMs = i + 1 < recordedNotes.length
+                        ? Math.max(40, (recordedNotes[i+1].pressTime - rn.pressTime) * speedRatio)
+                        : noteDurMs + 200;
+                } else {
+                    const beatMs  = currentTempo;
+                    const dur     = (durations[i] || 1) * beatMs;
+                    noteDurMs = dur * 0.85;
+                    waitMs    = dur;
+                }
+                const dur = waitMs;
+
+                if (idx !== -1) {
+                    playSound(idx, useRecorded ? noteDurMs : dur * 0.85);
+                } else {
+                    document.getElementById('lcd-note').innerText = 'REST';
+                }
+
+                await new Promise(resolve => {
+                    const id = setTimeout(() => {
+                        resolve();
+                        playTimeoutIds = playTimeoutIds.filter(t => t.id !== id);
+                    }, dur);
+                    playTimeoutIds.push({ id, resolve });
+                });
+            }
+            if (isMidiPlaying) stopSequence();
+        }
+
+        function stopSequence() {
+            isMidiPlaying = false;
+            playTimeoutIds.forEach(t => {
+                clearTimeout(t.id);
+                if (typeof t.resolve === 'function') t.resolve();
+            });
+            playTimeoutIds = [];
+            // 재생 중 눌린 모든 음 강제 OFF
+            Object.keys(activeNodes).forEach(idx => noteOff(parseInt(idx)));
+
+            document.getElementById('btnPlay').innerHTML  = '▶ 연주 시작';
+            document.getElementById('btnPlay').className  = 'btn play-btn';
+            document.getElementById('terminal-status').innerText = '🎹 연주 준비 완료';
+        }
+
+        async function saveWAV() {
+            const inputTxt = document.getElementById('binaryInput').value;
+            const codes = inputTxt.trim().split(/\s+/).filter(c => /^[01]{6}$/.test(c));
+            if (codes.length === 0) { document.getElementById('terminal-status').innerText = '⚠️ 저장할 음표가 없습니다'; return; }
+            const btn = document.getElementById('btnWav');
+            btn.innerText = '⏳ 소리 파일 만드는 중...'; btn.disabled = true;
+            document.getElementById('terminal-status').innerText = '⏳ 소리 파일 만드는 중...';
+
+            // 박자 결정: 녹음 데이터 있으면 실제 타이밍, 내장곡이면 악보 박자, 직접 입력이면 균등
+            let noteTimings = null;
+            if (recordedNotes.length === codes.length) {
+                // WAV 저장에도 BPM 슬라이더 속도 반영
+                const speedRatio = currentTempo / 400;
+                noteTimings = recordedNotes.map((rn, i) => ({
+                    startMs:    rn.pressTime * speedRatio,
+                    durationMs: Math.max(100, (rn.durationMs || 400) * speedRatio)
+                }));
+            }
+            const durations = (currentSongKey && songs[currentSongKey])
+                ? songs[currentSongKey].notes.map(n => n.d) : codes.map(() => 1);
+            const sampleRate = 44100;
+            // totalSec: 녹음 타이밍 있으면 실제 끝 시간 기준, 없으면 균등 박자 기준
+            let totalSec;
+            if (noteTimings && noteTimings.length > 0) {
+                const last = noteTimings[noteTimings.length - 1];
+                const lastEndMs = last.startMs + Math.max(300, last.durationMs || 400);
+                totalSec = lastEndMs / 1000 + 1.5; // 마지막 음 끝 + release 여유
+            } else {
+                totalSec = codes.reduce((acc,_,i) => acc+(durations[i]||1)*currentTempo/1000, 0)+1.5;
+            }
+            const offCtx = new OfflineAudioContext(1, Math.ceil(sampleRate*totalSec), sampleRate);
+            const harmonics = [{mult:1,gain:0.6},{mult:2,gain:0.25},{mult:3,gain:0.1},{mult:4,gain:0.05}];
+            let timeOffset = 0;
+            codes.forEach((code, i) => {
+                const idx = notes.findIndex(n => n.bin === code);
+                // 실제 타이밍 or 균등 박자
+                let startT, dur, noteDur;
+                if (noteTimings) {
+                    startT   = noteTimings[i].startMs / 1000;
+                    noteDur  = noteTimings[i].durationMs / 1000;
+                    dur      = i + 1 < noteTimings.length
+                        ? (noteTimings[i+1].startMs - noteTimings[i].startMs) / 1000
+                        : noteDur + 0.5;
+                } else {
+                    startT   = timeOffset;
+                    dur      = (durations[i]||1)*currentTempo/1000;
+                    noteDur  = dur*0.85;
+                }
+                const release = 0.8;
+                timeOffset += dur;
+                if (idx === -1) { return; }
+                const n = notes[idx];
+                const offT = startT + noteDur;
+                const mg = offCtx.createGain();
+                mg.gain.setValueAtTime(0,startT);
+                mg.gain.linearRampToValueAtTime(0.25,startT+0.01);
+                mg.gain.setValueAtTime(0.25,offT);
+                mg.gain.exponentialRampToValueAtTime(0.0001,offT+release);
+                mg.connect(offCtx.destination);
+                harmonics.forEach(h => {
+                    const osc=offCtx.createOscillator(); const hg=offCtx.createGain();
+                    osc.type='sine'; osc.frequency.value=n.freq*h.mult; hg.gain.value=h.gain;
+                    osc.connect(hg); hg.connect(mg);
+                    osc.start(startT); osc.stop(Math.min(offT+release, totalSec - 0.01));
+                });
+            });
+            const rendered = await offCtx.startRendering();
+            const blob = audioBufferToWav(rendered);
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = 'my_midi_music.wav'; a.click();
+            URL.revokeObjectURL(url);
+            btn.innerText = '💾 WAV 저장'; btn.disabled = false;
+            document.getElementById('terminal-status').innerText = '💾 소리 파일 저장 완료!';
+        }
+
+        // ── MID(MIDI) 파일 저장 ──────────────────────────────────────
+        // Standard MIDI File Format 0 (단일 트랙)
+        function saveMID() {
+            const inputTxt = document.getElementById('binaryInput').value;
+            const codes    = inputTxt.trim().split(/\s+/).filter(c => /^[01]{6}$/.test(c));
+            if (codes.length === 0) {
+                document.getElementById('terminal-status').innerText = '⚠️ 저장할 음표가 없습니다';
+                return;
+            }
+
+            // MIDI 음표 번호: C3(index 0) = MIDI 48번
+            const MIDI_BASE = 48;
+            const TICKS_PER_BEAT = 480;
+            // BPM 슬라이더 반영: currentTempo(ms/beat) → BPM
+            const BPM_ACTUAL = Math.round(60000 / currentTempo);
+            const BEAT_MS    = currentTempo;           // 슬라이더 BPM 기준 ms/beat
+            const TEMPO_US   = Math.round(60000000 / BPM_ACTUAL); // μs/beat
+
+            // 박자 결정
+            let noteDurations = []; // 각 음의 길이 (tick 단위)
+            let noteGaps      = []; // 음 사이 간격 (tick 단위, delta time)
+
+            if (recordedNotes.length === codes.length) {
+                // 실제 녹음 타이밍 + BPM 슬라이더 속도 반영
+                const speedRatio = currentTempo / 400;
+                codes.forEach((_, i) => {
+                    const rn    = recordedNotes[i];
+                    const durMs = Math.max(100, (rn.durationMs || 400) * speedRatio);
+                    let gapMs   = 0;
+                    if (i > 0) {
+                        const prev      = recordedNotes[i - 1];
+                        const prevDurMs = Math.max(100, (prev.durationMs || 400) * speedRatio);
+                        const prevOffMs = prev.pressTime * speedRatio + prevDurMs;
+                        gapMs = Math.max(0, rn.pressTime * speedRatio - prevOffMs);
+                    }
+                    noteDurations.push(Math.round(durMs / BEAT_MS * TICKS_PER_BEAT));
+                    noteGaps.push(Math.round(gapMs / BEAT_MS * TICKS_PER_BEAT));
+                });
+            } else if (currentSongKey && songs[currentSongKey]) {
+                // 내장곡 박자: 음 85% + 쉼표 15% (음이 겹치지 않도록)
+                songs[currentSongKey].notes.forEach((sn, i) => {
+                    const totalTick = Math.round(sn.d * TICKS_PER_BEAT);
+                    const noteTick  = Math.round(totalTick * 0.85); // 음 길이
+                    const restTick  = totalTick - noteTick;          // 쉼표
+                    noteDurations.push(noteTick);
+                    noteGaps.push(i === 0 ? 0 : restTick); // 첫 음은 gap 0, 이후는 이전 쉼표
+                });
+            } else {
+                // 균등 박자: 음 85% + 쉼표 15%
+                codes.forEach((_, i) => {
+                    const totalTick = Math.round(currentTempo / BEAT_MS * TICKS_PER_BEAT);
+                    const noteTick  = Math.round(totalTick * 0.85);
+                    const restTick  = totalTick - noteTick;
+                    noteDurations.push(noteTick);
+                    noteGaps.push(i === 0 ? 0 : restTick);
+                });
+            }
+
+            // MIDI 데이터 생성
+            const events = [];
+
+            // Tempo 이벤트 (BPM 120 = 500,000 μs/beat)
+            events.push([0x00, 0xFF, 0x51, 0x03,
+                (TEMPO_US >> 16) & 0xFF, (TEMPO_US >> 8) & 0xFF, TEMPO_US & 0xFF]);
+
+            // Program Change: 피아노(0번)
+            events.push([0x00, 0xC0, 0x00]);
+
+            // 음표 이벤트 (MIDI delta time 기준)
+            // delta time = 이전 이벤트로부터 경과한 tick 수
+            // [gap] Note ON  : 이전 Note OFF 이후 gap tick 대기 → 음 시작
+            // [dur] Note OFF : Note ON 이후 dur tick 대기 → 음 종료
+            codes.forEach((code, i) => {
+                const noteIdx = notes.findIndex(n => n.bin === code);
+                if (noteIdx === -1) {
+                    // 매핑 안 되는 코드: gap만큼 쉬고 다음으로
+                    const gap = noteGaps[i] || 0;
+                    const dur = noteDurations[i] || TICKS_PER_BEAT;
+                    // 빈 Note ON/OFF 대신 gap+dur를 다음 음의 gap에 합산
+                    if (i + 1 < codes.length) noteGaps[i + 1] = (noteGaps[i + 1] || 0) + gap + dur;
+                    return;
+                }
+                const midiNote = MIDI_BASE + noteIdx;
+                const velocity = 90;
+                const gap = noteGaps[i]     || 0;
+                const dur = noteDurations[i] || TICKS_PER_BEAT;
+
+                // Note ON: 이전 이벤트 이후 gap tick 대기
+                events.push([...varLen(gap), 0x90, midiNote, velocity]);
+                // Note OFF: Note ON 이후 dur tick 대기 (음이 울리는 시간)
+                events.push([...varLen(dur), 0x80, midiNote, 0]);
+            });
+
+            // End of Track — 마지막 음의 rest(쉼표)만큼 대기 후 종료
+            // delta=0이면 마지막 NoteOFF가 처리되기 전에 트랙이 끊길 수 있음
+            const lastRest = noteDurations.length > 0
+                ? Math.round((noteDurations[noteDurations.length - 1] * 0.18))
+                : 0;
+            events.push([...varLen(Math.max(lastRest, 1)), 0xFF, 0x2F, 0x00]);
+
+            // 트랙 데이터 flat
+            const trackData = events.flat();
+            const trackLen  = trackData.length;
+
+            // MIDI 파일 바이트 배열 조립
+            const bytes = [
+                // MThd (헤더 청크)
+                0x4D,0x54,0x68,0x64, // "MThd"
+                0x00,0x00,0x00,0x06, // 청크 길이 6
+                0x00,0x00,           // format 0
+                0x00,0x01,           // 트랙 수 1
+                (TICKS_PER_BEAT >> 8) & 0xFF, TICKS_PER_BEAT & 0xFF, // ticks/beat
+                // MTrk (트랙 청크)
+                0x4D,0x54,0x72,0x6B, // "MTrk"
+                (trackLen >> 24)&0xFF,(trackLen >> 16)&0xFF,
+                (trackLen >> 8)&0xFF, trackLen&0xFF,
+                ...trackData
+            ];
+
+            const blob = new Blob([new Uint8Array(bytes)], {type:'audio/midi'});
+            const url  = URL.createObjectURL(blob);
+            const a    = document.createElement('a');
+            a.href = url; a.download = 'my_midi_music.mid'; a.click();
+            URL.revokeObjectURL(url);
+            document.getElementById('terminal-status').innerText = '🎼 MID 파일 저장 완료!';
+        }
+
+        // MIDI 가변 길이 인코딩 (Variable-Length Quantity)
+        function varLen(val) {
+            if (val < 0x80) return [val];
+            const out = [];
+            out.unshift(val & 0x7F); val >>= 7;
+            while (val > 0) { out.unshift((val & 0x7F) | 0x80); val >>= 7; }
+            return out;
+        }
+
+        function audioBufferToWav(buffer) {
+            const nc=buffer.numberOfChannels, sr=buffer.sampleRate, ns=buffer.length, ds=ns*nc*2;
+            const ab=new ArrayBuffer(44+ds); const v=new DataView(ab);
+            const w=(o,s)=>{for(let i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i));};
+            w(0,'RIFF'); v.setUint32(4,36+ds,true); w(8,'WAVE'); w(12,'fmt ');
+            v.setUint32(16,16,true); v.setUint16(20,1,true); v.setUint16(22,nc,true);
+            v.setUint32(24,sr,true); v.setUint32(28,sr*nc*2,true);
+            v.setUint16(32,nc*2,true); v.setUint16(34,16,true);
+            w(36,'data'); v.setUint32(40,ds,true);
+            const ch=[]; for(let c=0;c<nc;c++) ch.push(buffer.getChannelData(c));
+            let off=44;
+            for(let s=0;s<ns;s++) for(let c=0;c<nc;c++){
+                const smp=Math.max(-1,Math.min(1,ch[c][s]));
+                v.setInt16(off,smp<0?smp*32768:smp*32767,true); off+=2;
+            }
+            return new Blob([ab],{type:'audio/wav'});
+        }
+
+        // ② 키보드 Note ON/OFF
+        window.addEventListener('keydown', (e) => {
+            if (currentMode !== 'midi') return;
+            if (e.target.tagName === 'TEXTAREA') return;
+            const idx = notes.findIndex(n => n.keyCode === e.key.toLowerCase());
+            if (idx !== -1 && !e.repeat) { e.preventDefault(); noteOn(idx); }
+        });
+        window.addEventListener('keyup', (e) => {
+            if (currentMode !== 'midi') return;
+            if (e.target.tagName === 'TEXTAREA') return;
+            const idx = notes.findIndex(n => n.keyCode === e.key.toLowerCase());
+            if (idx !== -1) noteOff(idx);
+        });
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,111 @@
+
+        @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
+        :root {
+            --bg-deep: #050B14;
+            --text-main: #E0F2FE;
+        }
+
+        * { cursor: default !important; box-sizing: border-box; font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', sans-serif; -webkit-user-select: none; -moz-user-select: none; user-select: none; }
+
+        body {
+            margin: 0; padding: 0; width: 100vw; height: 100vh; 
+            background-color: var(--bg-deep);
+            color: var(--text-main); 
+            overflow: hidden;
+            display: flex; flex-direction: column;
+        }
+
+        /* ==========================================================
+           ✅ DATA BITBOX 공통 네비바 (오른쪽 정렬 적용 완벽 복구)
+           ========================================================== */
+        #dbb-topnav {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 9999999;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 9px 22px;
+            background: rgba(18, 12, 30, 0.85);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            box-sizing: border-box;
+        }
+        
+        #dbb-topnav a.dbb-btn {
+            display: inline-flex; align-items: center; gap: 5px;
+            font-size: 0.72rem; font-weight: 700; letter-spacing: 0.3px;
+            text-decoration: none;
+            padding: 6px 14px; border-radius: 20px;
+            border: 1.5px solid rgba(255, 255, 255, 0.25);
+            color: #f8fafc;
+            background: rgba(255, 255, 255, 0.08);
+            transition: all 0.18s ease;
+            white-space: nowrap;
+        }
+
+        #dbb-topnav a.dbb-btn:hover {
+            background: rgba(255, 255, 255, 0.18);
+            border-color: rgba(255, 255, 255, 0.5);
+            box-shadow: 0 0 14px rgba(255, 255, 255, 0.15);
+            transform: translateY(-1px);
+        }
+
+        #dbb-topnav .dbb-title {
+            display: flex; 
+            align-items: center; 
+            gap: 8px;
+            margin-left: auto; /* ✅ 글자를 오른쪽 끝으로 정렬하는 마법! */
+            font-size: 0.9rem; 
+            font-weight: 800;
+            color: #e9d5ff;
+            letter-spacing: 0.5px;
+        }
+
+        /* ==========================================================
+           ══ 선택 화면 영역 ══
+           ========================================================== */
+        #screen-select {
+            display: flex; flex: 1; margin-top: 48px; height: calc(100vh - 48px);
+            align-items: center; justify-content: center;
+            background: linear-gradient(135deg, #0a1628 0%, #1a2a4a 50%, #0d2137 100%);
+            position: relative;
+        }
+        #screen-select::before {
+            content: ''; position: absolute; inset: 0; pointer-events: none;
+            background: radial-gradient(ellipse at 30% 50%, rgba(0, 245, 196, 0.08) 0%, transparent 60%),
+                        radial-gradient(ellipse at 70% 50%, rgba(10, 132, 255, 0.08) 0%, transparent 60%);
+        }
+        .sel-wrap { position: relative; z-index: 1; text-align: center; padding: 40px 20px; }
+        .sel-title { font-size: 2.2rem; font-weight: 900; color: white; margin-bottom: 10px; letter-spacing: -0.02em; }
+        .sel-sub { font-size: 1.8rem; color: rgba(255, 255, 255, 0.45); margin-bottom: 52px; font-weight: 600; }
+        .sel-cards { display: flex; gap: 24px; align-items: stretch; justify-content: center; max-width: 1400px; margin: 0 auto; }
+        
+        .sel-card {
+            width: 340px; padding: 44px 30px; border-radius: 28px;
+            cursor: pointer !important; display: flex; flex-direction: column;
+            align-items: center; gap: 14px; text-decoration: none;
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s;
+        }
+        
+        .sel-bitmap { background: linear-gradient(145deg, #0d2137, #1a3a5c); border: 1.5px solid rgba(10, 132, 255, 0.3); }
+        .sel-bitmap:hover { transform: translateY(-14px) scale(1.03); box-shadow: 0 30px 60px rgba(10, 132, 255, 0.3); border-color: rgba(10, 132, 255, 0.7); }
+        
+        .sel-vector { background: linear-gradient(145deg, #0d1f0d, #1a3520); border: 1.5px solid rgba(0, 245, 196, 0.3); }
+        .sel-vector:hover { transform: translateY(-14px) scale(1.03); box-shadow: 0 30px 60px rgba(0, 245, 196, 0.2); border-color: rgba(0, 245, 196, 0.7); }
+
+        .sel-icon { line-height: 1; display: flex; align-items: center; justify-content: center; }
+        .sel-chip { font-size: 0.6rem; font-weight: 900; letter-spacing: 4px; padding: 3px 14px; border-radius: 20px; text-transform: uppercase; }
+        .sel-bitmap .sel-chip { background: rgba(10, 132, 255, 0.2); color: #5ac8fa; border: 1px solid rgba(10, 132, 255, 0.3); }
+        .sel-vector .sel-chip { background: rgba(0, 245, 196, 0.15); color: #00f5c4; border: 1px solid rgba(0, 245, 196, 0.3); }
+        
+        .sel-name { font-size: 1.5rem; font-weight: 900; color: white; }
+        .sel-desc { font-size: 0.85rem; color: rgba(255, 255, 255, 0.55); line-height: 1.75; text-align: center; font-weight: 600; }
+        .sel-badge { font-size: 0.78rem; font-weight: 800; padding: 7px 20px; border-radius: 20px; margin-top: 4px; }
+        .sel-bitmap .sel-badge { background: rgba(10, 132, 255, 0.15); color: #5ac8fa; }
+        .sel-vector .sel-badge { background: rgba(0, 245, 196, 0.1); color: #00f5c4; }
+        
+        .sel-go { font-size: 0.88rem; font-weight: 900; padding: 11px 30px; border-radius: 20px; margin-top: 6px; transition: all 0.2s; }
+        .sel-bitmap .sel-go { background: rgba(10, 132, 255, 0.2); color: #5ac8fa; }
+        .sel-vector .sel-go { background: rgba(0, 245, 196, 0.12); color: #00f5c4; }
+        .sel-bitmap:hover .sel-go { background: #0a84ff; color: white; }
+        .sel-vector:hover .sel-go { background: #00f5c4; color: #0a1628; }
+        .sel-vs { display: flex; align-items: center; justify-content: center; width: 60px; flex-shrink: 0; font-size: 1rem; font-weight: 900; color: rgba(255, 255, 255, 0.2); }

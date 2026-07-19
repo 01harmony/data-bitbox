@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1920">
+<title>고급 벡터 작업실 - 자유 창작</title>
+  <link rel="stylesheet" href="./css/image_play_vector_concept.css">
+</head>
+<body>
+
+<div id="dbb-topnav">
+    <div style="display:flex;gap:9px;align-items:center;">
+        <a class="dbb-btn" href="index.html">← 메인으로</a>
+        <a class="dbb-btn" href="05_image.html">📖 개념으로</a>
+        <a class="dbb-btn" href="05_image_play.html">🎮 게임 선택</a>
+    </div>
+    <span class="dbb-title">🎨 이미지의 디지털 표현 · 벡터 이미지 활용 실습</span>
+    <div class="header-badges">
+        <div class="badge">개체: <span id="objCount">0</span>개</div>
+        <div class="badge" style="background:#fce7f3; color:#db2777; border-color: rgba(219, 39, 119, 0.3);">좌표: <span id="coordCount">0</span>개</div>
+    </div>
+</div>
+
+<div class="main-area">
+  <div class="control-panel">
+    
+    <div class="panel-section">
+      <div class="section-title">🛠️ 도구 선택</div>
+
+      <!-- 1줄: 그리기 도구 -->
+      <div style="font-size:0.75rem; font-weight:700; color:var(--text-muted); margin-bottom:5px;">✏️ 그리기</div>
+      <div class="mode-grid" style="margin-bottom:10px;">
+        <div class="mode-btn active" id="btn-draw"   onclick="setMode('draw')"  ><span>✏️</span>선</div>
+        <div class="mode-btn"        id="btn-circle" onclick="setMode('circle')"><span>⭕</span>원</div>
+        <div class="mode-btn"        id="btn-rect"   onclick="setMode('rect')"  ><span>⬜</span>사각형</div>
+        <div class="mode-btn"        id="btn-ellipse"onclick="setMode('ellipse')"><span>🥚</span>타원</div>
+      </div>
+
+      <!-- 2줄: 편집 도구 -->
+      <div style="font-size:0.75rem; font-weight:700; color:var(--text-muted); margin-bottom:5px;">🛠️ 편집</div>
+      <div class="mode-grid" style="margin-bottom:12px;">
+        <div class="mode-btn" id="btn-fill"  onclick="setMode('fill')" ><span>🪣</span>색칠하기</div>
+        <div class="mode-btn" id="btn-edit"  onclick="setMode('edit')" ><span>👆</span>수정하기</div>
+        <div class="mode-btn" id="btn-erase" onclick="setMode('erase')"><span>🧼</span>지우개</div>
+        <div class="mode-btn" id="btn-undo"  onclick="undoAction()"    ><span>↩️</span>되돌리기</div>
+      </div>
+
+      <!-- 선두께 + 경로종료/지우기 — 그리기 버튼 바로 아래 -->
+      <div style="margin-top:10px;">
+        <div style="font-size:0.82rem; font-weight:700; color:var(--text-muted); margin-bottom:6px;">선 두께 (Stroke Width)</div>
+        <div class="slider-wrap">
+          <input type="range" class="slider" id="stroke-slider" min="1" max="20" value="4" oninput="updateStrokeWidth()">
+          <span class="slider-val" id="stroke-val">4</span>
+        </div>
+      </div>
+      <div class="action-row">
+        <button class="btn btn-finish" id="btn-finish-path" onclick="finishPath(false)" disabled>✔️ 경로 종료</button>
+        <button class="btn btn-clear" onclick="clearCanvas()">🗑️ 모두 지우기</button>
+      </div>
+
+      <div class="help-box" id="help-text">
+        <b>선 그리기 &lt;polyline&gt;</b><br>클릭해 점을 찍어 선을 만듭니다. 첫 점을 다시 클릭하면 닫힌 면이 되고, '경로 종료'를 누르면 열린 선이 됩니다.<br>코드: <code>points</code>(좌표 목록)
+      </div>
+    </div>
+
+    <div class="panel-section">
+      <div class="section-title">🎨 색상 선택 (24비트 RGB)</div>
+      <!-- 고정 14색 + 커스텀 7슬롯 -->
+      <div class="palette" id="color-palette"></div>
+
+      <!-- 인라인 24비트 색상판 (커스텀 슬롯 클릭 시 펼쳐짐) -->
+      <div id="inline-color-picker">
+        <canvas id="icp-canvas" height="130"></canvas>
+        <div id="icp-hue-row">
+          <span style="font-size:0.75rem;color:#64748b;font-weight:700;">색조</span>
+          <input type="range" id="icp-hue" min="0" max="360" value="0"
+            oninput="icpOnHueChange()">
+        </div>
+        <div id="icp-preview-row">
+          <div id="icp-preview"></div>
+          <input type="text" id="icp-hex" maxlength="7" placeholder="#ff0000"
+            oninput="icpOnHexInput()">
+          <span style="font-size:0.72rem;color:#94a3b8;font-weight:600;">HEX</span>
+        </div>
+        <button id="icp-confirm" onclick="icpConfirm()">✅ 색상 선택</button>
+      </div>
+    </div>
+
+    <div class="panel-section">
+      <div class="section-title">💾 그림 저장하기</div>
+      <div class="save-section">
+        <button class="btn-save-svg" onclick="saveSVG()">📐 SVG로 저장 (벡터 파일)</button>
+        <button class="btn-save-png" onclick="savePNG()">🖼️ PNG로 저장 (비트맵 파일)</button>
+        <div class="save-note">
+          📐 <b>SVG</b>: 벡터 파일 — 확대해도 깨지지 않음. <br>브라우저·메모장에서 불러오기 가능.<br>
+          🖼️ <b>PNG</b>: 비트맵 파일 — 확대 시 깨짐. <br>그림판 등에서 불러오기 가능. 
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="canvas-area" id="canvas-area">
+    <div class="svg-wrap mode-draw" id="svg-wrap">
+      <svg id="artCanvas" xmlns="http://www.w3.org/2000/svg">
+        <g id="grid-layer"></g>
+
+        <g id="objects-group"></g>
+        
+        <g id="drawing-layer">
+          <polyline id="drawing-path" class="drawing-temp-line" points=""></polyline>
+          <line id="preview-line" class="drawing-temp-line" x1="-10" y1="-10" x2="-10" y2="-10" style="display:none;"></line>
+          <circle id="start-node" class="start-node" cx="-50" cy="-50" style="display:none;"></circle>
+        </g>
+        
+        <g id="edit-nodes-group"></g>
+      </svg>
+    </div>
+  </div>
+
+  <div class="code-sidebar">
+    <div class="code-title">
+      <span>&lt;svg&gt; 코드 보기</span>
+      <span style="font-weight:normal; color:#94a3b8; font-size:0.8rem;">실시간 반영</span>
+    </div>
+    <div style="margin-bottom: 10px; color:#f472b6;">&lt;svg viewBox="0 0 1200 1000"&gt;</div>
+    
+    <div id="code-output" style="flex:1;">
+      </div>
+    
+    <div style="margin-top: 10px; color:#f472b6;">&lt;/svg&gt;</div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast">알림 메시지</div>
+
+<script>
+// --- 전역 상태 ---
+// 학생이 선택 가능한 7개 색상 슬롯 (초기값: 무지개 7색)
+// 고정 기본 14색 (클릭만 하면 바로 사용)
+const fixedColors = [
+  '#ef4444', '#f97316', '#f59e0b', '#84cc16', '#0ea5e9', '#3b82f6', '#8b5cf6', // 1줄: 무지개
+  '#ffffff', '#d1d5db', '#94a3b8', '#10b981', '#14b8a6', '#ec4899', '#000000'  // 2줄: 흰·연회·회·청록·에메랄드·핑크·검정
+];
+// 24비트 picker 7슬롯 (학생이 자유롭게 색 선택)
+let customColors = ['#ff6b6b','#ffd93d','#6bcb77','#4d96ff','#c77dff','#ff9a3c','#f72585'];
+let activeColor = '#ef4444';
+let currentMode = 'draw'; // draw, fill, edit, erase
+let currentStrokeWidth = 4;
+
+// 데이터 모델
+let vectorObjects = []; // { type: 'polyline'|'polygon', points: [{x,y}], stroke: str, strokeWidth: num, fill: str }
+let currentPath = [];
+
+// DOM 요소
+const svgEl = document.getElementById('artCanvas');
+const svgWrap = document.getElementById('svg-wrap');
+const drawingPathEl = document.getElementById('drawing-path');
+const previewLineEl = document.getElementById('preview-line');
+const startNodeEl = document.getElementById('start-node');
+
+let dragState = null;    // { objIdx, ptIdx }
+let shapeStart = null;   // 원·사각형·타원 드래그 시작점
+let tempShapeEl = null;  // 드래그 중 미리보기 요소
+
+// --- 초기화 ---
+function init() {
+  drawGridLabels(); // 배경에 X,Y 좌표 축 그리기
+  renderPalette();
+  setMode('draw');
+}
+
+// ⭐ 모눈종이 및 100단위 X,Y 좌표 텍스트, 원점 안내선 렌더링
+function drawGridLabels() {
+  const gridLayer = document.getElementById('grid-layer');
+  if(!gridLayer) return;
+  
+  let html = '';
+  // 100 간격으로 라인과 텍스트 생성
+  for(let i=100; i<=2000; i+=100) {
+    // 세로선 (X 좌표)
+    html += `<line x1="${i}" y1="0" x2="${i}" y2="2000" stroke="#e2e8f0" stroke-width="1" />`;
+    html += `<text x="${i+4}" y="16" fill="#94a3b8" font-size="12" font-weight="bold" font-family="JetBrains Mono">${i}</text>`;
+    // 가로선 (Y 좌표)
+    html += `<line x1="0" y1="${i}" x2="2000" y2="${i}" stroke="#e2e8f0" stroke-width="1" />`;
+    html += `<text x="4" y="${i-4}" fill="#94a3b8" font-size="12" font-weight="bold" font-family="JetBrains Mono">${i}</text>`;
+  }
+  
+  // 화살표 길이 단축 및 위치 조정
+  // X축 화살표 (오른쪽으로)
+  html += `<line x1="0" y1="0" x2="45" y2="0" stroke="#ff2d55" stroke-width="5" />`;
+  html += `<polygon points="45,-5 55,0 45,5" fill="#ff2d55" />`;
+  html += `<text x="60" y="14" fill="#ff2d55" font-size="13" font-weight="900">X축(+)</text>`;
+  
+  // Y축 화살표 (아래쪽으로)
+  html += `<line x1="0" y1="0" x2="0" y2="45" stroke="#0071e3" stroke-width="5" />`;
+  html += `<polygon points="-5,45 0,55 5,45" fill="#0071e3" />`;
+  html += `<text x="10" y="65" fill="#0071e3" font-size="13" font-weight="900">Y축(+)</text>`;
+
+  // 원점(0,0) 표시
+  html += `<circle cx="0" cy="0" r="14" fill="white" />`;
+  html += `<circle cx="0" cy="0" r="3" fill="#1e293b" />`;
+  html += `<text x="8" y="20" fill="#1e293b" font-size="13" font-weight="900" font-family="JetBrains Mono">(0,0)</text>`;
+  
+  gridLayer.innerHTML = html;
+}
+
+function renderPalette() {
+  const pal = document.getElementById('color-palette');
+  let html = '';
+
+  // ── 고정 14색: 클릭 즉시 사용 (picker 없음) ──
+  fixedColors.forEach((c, i) => {
+    const isActive = (activeColor === c && activeType === 'fixed' && activeSlot === i);
+    const textColor = (c === '#ffffff' || c === '#d1d5db' || c === '#94a3b8') ? '#334155' : 'transparent';
+    html += `<div class="color-swatch ${isActive ? 'active' : ''}" id="fixed-swatch-${i}"
+      style="background:${c}; border:${c==='#ffffff'?'2px solid #e2e8f0':'2px solid transparent'};"
+      onclick="selectFixed(${i})" title="${c}"></div>`;
+  });
+
+  // ── 24비트 커스텀 7슬롯: 클릭 → 인라인 색상판 열기 ──
+  customColors.forEach((c, i) => {
+    const isOpen   = (icpOpenSlot === i);
+    const isActive = (activeType === 'custom' && activeSlot === i);
+    html += `<div class="color-swatch picker-slot ${isActive ? 'active' : ''} ${isOpen ? 'icp-open' : ''}"
+      id="custom-swatch-${i}"
+      style="background:${c}; ${isOpen ? 'box-shadow:0 0 0 3px var(--primary);' : ''}"
+      onclick="icpOpen(${i})"
+      title="클릭: 색상판 열기 | 현재색: ${c}">
+      <span class="picker-icon">🎨</span>
+    </div>`;
+  });
+
+  pal.innerHTML = html;
+}
+
+let activeSlot = 0;
+let activeType = 'fixed'; // 'fixed' | 'custom'
+
+// ── 고정색 클릭 → 즉시 활성화 ──────────────────────────────────
+function selectFixed(i) {
+  icpClose(); // 색상판 열려있으면 닫기
+  activeType = 'fixed';
+  activeSlot = i;
+  activeColor = fixedColors[i];
+  renderPalette();
+  if (currentMode === 'draw') drawingPathEl.style.stroke = activeColor;
+}
+
+// ── 인라인 24비트 색상판 (ICP) 로직 ────────────────────────────
+let icpOpenSlot  = -1;   // 현재 열린 슬롯 (-1 = 닫힘)
+let icpHue       = 0;    // 현재 색조 (0~360)
+let icpSat       = 0.8;  // 채도 커서 위치 (0~1)
+let icpVal       = 0.9;  // 명도 커서 위치 (0~1)
+let icpCurColor  = '#ff0000'; // 색상판에서 고른 미확정 색
+
+// HSV → HEX 변환 (정확한 switch 방식)
+function hsvToHex(h, s, v) {
+  const i = Math.floor(h / 60) % 6;
+  const f = h / 60 - Math.floor(h / 60);
+  const p = v * (1 - s);
+  const q = v * (1 - f * s);
+  const t = v * (1 - s * (1 - f));
+  let r, g, b;
+  switch (i) {
+    case 0: r=v; g=t; b=p; break;
+    case 1: r=q; g=v; b=p; break;
+    case 2: r=p; g=v; b=t; break;
+    case 3: r=p; g=q; b=v; break;
+    case 4: r=t; g=p; b=v; break;
+    case 5: r=v; g=p; b=q; break;
+  }
+  const toHex = x => Math.round(x * 255).toString(16).padStart(2, '0');
+  return '#' + toHex(r) + toHex(g) + toHex(b);
+}
+
+// HEX → HSV 변환
+function hexToHsv(hex) {
+  let r=parseInt(hex.slice(1,3),16)/255, g=parseInt(hex.slice(3,5),16)/255, b=parseInt(hex.slice(5,7),16)/255;
+  const max=Math.max(r,g,b), min=Math.min(r,g,b), d=max-min;
+  let h=0,s=max?d/max:0,v=max;
+  if(d){if(max===r)h=(g-b)/d%6;else if(max===g)h=(b-r)/d+2;else h=(r-g)/d+4; h=((h*60)+360)%360;}
+  return {h,s,v};
+}
+
+// 색상판 캔버스 그리기
+function icpDraw() {
+  const canvas = document.getElementById('icp-canvas');
+  if (!canvas) return;
+  const W = canvas.offsetWidth || canvas.width;
+  canvas.width = W;
+  const H = canvas.height;
+  const ctx = canvas.getContext('2d');
+  // 기본색 (순수 색조)
+  const baseColor = `hsl(${icpHue},100%,50%)`;
+  // 흰색 → 색조 그라디언트 (채도)
+  const gradS = ctx.createLinearGradient(0,0,W,0);
+  gradS.addColorStop(0,'#fff'); gradS.addColorStop(1,baseColor);
+  ctx.fillStyle = gradS; ctx.fillRect(0,0,W,H);
+  // 투명 → 검정 그라디언트 (명도)
+  const gradV = ctx.createLinearGradient(0,0,0,H);
+  gradV.addColorStop(0,'transparent'); gradV.addColorStop(1,'#000');
+  ctx.fillStyle = gradV; ctx.fillRect(0,0,W,H);
+  // 커서
+  const cx = icpSat * W, cy = (1-icpVal) * H;
+  ctx.beginPath(); ctx.arc(cx,cy,7,0,Math.PI*2);
+  ctx.strokeStyle='white'; ctx.lineWidth=2; ctx.stroke();
+  ctx.beginPath(); ctx.arc(cx,cy,5,0,Math.PI*2);
+  ctx.strokeStyle='rgba(0,0,0,0.5)'; ctx.lineWidth=1.5; ctx.stroke();
+}
+
+// 캔버스 클릭/드래그로 채도·명도 선택
+function icpPickFromCanvas(e) {
+  const canvas = document.getElementById('icp-canvas');
+  const rect   = canvas.getBoundingClientRect();
+  icpSat = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+  icpVal = Math.max(0, Math.min(1, 1 - (e.clientY - rect.top) / rect.height));
+  icpCurColor = hsvToHex(icpHue, icpSat, icpVal);
+  icpDraw();
+  icpUpdatePreview();
+}
+
+// 색조 슬라이더 변경
+function icpOnHueChange() {
+  icpHue = parseInt(document.getElementById('icp-hue').value);
+  icpCurColor = hsvToHex(icpHue, icpSat, icpVal);
+  icpDraw();
+  icpUpdatePreview();
+}
+
+// HEX 직접 입력
+function icpOnHexInput() {
+  const val = document.getElementById('icp-hex').value;
+  if (/^#[0-9a-fA-F]{6}$/.test(val)) {
+    icpCurColor = val;
+    const hsv = hexToHsv(val);
+    icpHue=hsv.h; icpSat=hsv.s; icpVal=hsv.v;
+    document.getElementById('icp-hue').value = Math.round(icpHue);
+    icpDraw();
+    document.getElementById('icp-preview').style.background = icpCurColor;
+  }
+}
+
+// 미리보기 업데이트
+function icpUpdatePreview() {
+  const prev = document.getElementById('icp-preview');
+  const hex  = document.getElementById('icp-hex');
+  if (prev) prev.style.background = icpCurColor;
+  if (hex)  hex.value = icpCurColor;
+}
+
+// 색상판 열기
+function icpOpen(i) {
+  // 이미 열린 슬롯 다시 클릭 → 닫기
+  if (icpOpenSlot === i) { icpClose(); return; }
+  icpOpenSlot = i;
+  // 현재 슬롯 색을 초기값으로
+  const hsv = hexToHsv(customColors[i]);
+  icpHue=hsv.h; icpSat=hsv.s; icpVal=hsv.v;
+  icpCurColor = customColors[i];
+  document.getElementById('icp-hue').value = Math.round(icpHue);
+  renderPalette(); // 열린 슬롯 테두리 표시
+  setTimeout(() => { icpDraw(); icpUpdatePreview(); }, 30); // 렌더 후 canvas 크기 확정
+  // 캔버스 이벤트 (클릭·드래그)
+  const canvas = document.getElementById('icp-canvas');
+  canvas.onmousedown = (e) => { icpPickFromCanvas(e); canvas.onmousemove = icpPickFromCanvas; };
+  window.addEventListener('mouseup', () => { canvas.onmousemove = null; }, { once: false });
+}
+
+// 색상판 닫기
+function icpClose() {
+  icpOpenSlot = -1;
+  renderPalette();
+}
+
+// ✅ 더블클릭으로 색상 확정 → 슬롯에 저장 + 활성화
+function icpConfirm() {
+  if (icpOpenSlot < 0) return;
+  const i = icpOpenSlot;
+  customColors[i] = icpCurColor;
+  activeType = 'custom';
+  activeSlot = i;
+  activeColor = icpCurColor;
+  if (currentMode === 'draw') drawingPathEl.style.stroke = activeColor;
+  icpClose();
+  showToast(`색상 ${icpCurColor} 저장됨`);
+}
+
+function icpCancel() { icpClose(); }
+
+function updateStrokeWidth() {
+  currentStrokeWidth = document.getElementById('stroke-slider').value;
+  document.getElementById('stroke-val').textContent = currentStrokeWidth;
+  if(currentMode === 'draw') {
+    drawingPathEl.style.strokeWidth = currentStrokeWidth;
+  }
+}
+
+function setMode(mode) {
+  currentMode = mode;
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+  // btn-undo는 모드 버튼이 아니므로 active 제외
+  const modeBtn = document.getElementById(`btn-${mode}`);
+  if (modeBtn) modeBtn.classList.add('active');
+  
+ // SVG 래퍼 클래스 변경 (마우스 커서/호버 효과 처리용)
+  svgWrap.className = `svg-wrap mode-${mode}`;
+
+  const help = document.getElementById('help-text');
+  if(mode === 'draw') {
+    help.innerHTML = "<b>선 그리기 &lt;polyline&gt;</b><br>클릭해 점을 찍어 선을 만듭니다. 첫 점을 다시 클릭하면 닫힌 면이 되고, '경로 종료'를 누르면 열린 선이 됩니다.<br>코드: <code>points</code>(좌표 목록)";
+  } else if(mode === 'circle') {
+    help.innerHTML = "<b>원 그리기 &lt;circle&gt;</b><br>클릭·드래그로 원을 그립니다.<br>코드: <code>cx, cy</code>(중심 좌표) /<code>r</code>(반지름)";
+    cancelDrawing();
+  } else if(mode === 'rect') {
+    help.innerHTML = "<b>사각형 그리기 &lt;rect&gt;</b><br>클릭·드래그로 사각형을 그립니다.<br>코드: <code>x, y</code>(시작점) /<br><code>width, height</code>(가로·세로)";
+    cancelDrawing();
+  } else if(mode === 'ellipse') {
+    help.innerHTML = "<b>타원 그리기 &lt;ellipse&gt;</b><br>클릭·드래그로 타원을 그립니다.<br>코드: <code>cx, cy</code>(중심) /<br><code>rx, ry</code>(가로·세로 반지름)";
+    cancelDrawing();
+  } else if(mode === 'fill') {
+    help.innerHTML = "<b>색칠하기</b><br>팔레트에서 색상을 선택하고 도화지의 선이나 면을 클릭하면 내부(Fill)가 채워집니다. 투명(X)을 누르면 색이 빠집니다.";
+    cancelDrawing();
+  } else if(mode === 'edit') {
+    help.innerHTML = "<b>수정하기</b><br>개체의 핸들(●)을 드래그해 형태를 수정합니다.<br>🟢 중심이동 / 🟠가로·반지름 / <br>🟣 세로·반지름";
+    cancelDrawing();
+  } else if(mode === 'erase') {
+    help.innerHTML = "<b>지우개</b><br>삭제하고 싶은 개체(선이나 도형)를 클릭하면 코드가 함께 지워집니다.";
+    cancelDrawing();
+  }
+  
+  renderCanvas(); // 모드 변경시 노드 표시 여부 등을 위해 재렌더링
+}
+
+function undoAction() {
+  const help = document.getElementById('help-text');
+  if (vectorObjects.length === 0) {
+    help.innerHTML = "<b>↩️ 되돌리기</b><br>되돌릴 개체가 없습니다.";
+    showToast('되돌릴 개체가 없습니다.'); return;
+  }
+  vectorObjects.pop();
+  cancelDrawing();
+  renderCanvas();
+  const remaining = vectorObjects.length;
+  help.innerHTML = `<b>↩️ 되돌리기</b><br>마지막 개체가 지워졌습니다.<br>남은 개체: ${remaining}개`;
+  showToast('마지막 개체를 되돌렸습니다.');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2000);
+}
+
+function clearCanvas() {
+  vectorObjects = [];
+  cancelDrawing();
+  renderCanvas();
+  showToast('도화지를 깔끔하게 지웠습니다!');
+}
+
+function cancelDrawing() {
+  currentPath = [];
+  updateDrawingPreview();
+  document.getElementById('btn-finish-path').disabled = true;
+}
+
+// 마우스 좌표 구하기 (SVG 내부 좌표계 기준)
+function getMousePos(evt) {
+  const CTM = svgEl.getScreenCTM();
+  const clientX = evt.touches ? evt.touches[0].clientX : evt.clientX;
+  const clientY = evt.touches ? evt.touches[0].clientY : evt.clientY;
+  return {
+    x: (clientX - CTM.e) / CTM.a,
+    y: (clientY - CTM.f) / CTM.d
+  };
+}
+
+// --- 마우스 이벤트 처리 ---
+svgEl.addEventListener('mousedown', handleMouseDown);
+svgEl.addEventListener('mousemove', handleMouseMove);
+window.addEventListener('mouseup', handleMouseUp);
+// 터치 지원
+svgEl.addEventListener('touchstart', (e)=> { if(e.target.tagName !== 'BUTTON' && e.target.tagName !== 'INPUT'){ e.preventDefault(); handleMouseDown({clientX: e.touches[0].clientX, clientY: e.touches[0].clientY, target: document.elementFromPoint(e.touches[0].clientX, e.touches[0].clientY)}); }}, {passive: false});
+svgEl.addEventListener('touchmove', (e)=> { e.preventDefault(); handleMouseMove({clientX: e.touches[0].clientX, clientY: e.touches[0].clientY}); }, {passive: false});
+window.addEventListener('touchend', handleMouseUp);
+
+function handleMouseDown(e) {
+  const target = e.target;
+  const pt = getMousePos(e);
+
+  if (currentMode === 'draw') {
+    // 1. 첫 점을 눌러서 '닫힌 도형(polygon)' 만들기
+    if (target.id === 'start-node' && currentPath.length >= 2) {
+      finishPath(true);
+      return;
+    }
+    // 2. 빈 곳을 눌러 새 점 찍기
+    // 마지막 점과 같으면 무시
+    if (currentPath.length > 0) {
+      const last = currentPath[currentPath.length-1];
+      if(Math.abs(last.x - pt.x) < 5 && Math.abs(last.y - pt.y) < 5) return;
+    }
+    
+    currentPath.push({x: pt.x, y: pt.y});
+    drawingPathEl.style.stroke = (activeColor === 'none' ? '#cbd5e1' : activeColor);
+    drawingPathEl.style.strokeWidth = currentStrokeWidth;
+    updateDrawingPreview();
+    document.getElementById('btn-finish-path').disabled = false;
+  }
+  else if (currentMode === 'edit') {
+    if (target.classList.contains('edit-node')) {
+      const oIdx = parseInt(target.getAttribute('data-obj'));
+      const pIdx = target.getAttribute('data-pt');   // polyline/polygon용
+      const role = target.getAttribute('data-role');  // circle/rect/ellipse용
+      dragState = { objIdx: oIdx, ptIdx: pIdx, role: role };
+      target.classList.add('dragging');
+    }
+  }
+  else if (currentMode === 'fill') {
+    // 개체 클릭하여 색 채우기
+    if (target.classList.contains('drawn-obj')) {
+      const idx = target.getAttribute('data-idx');
+      vectorObjects[idx].fill = activeColor;
+      // 선(polyline)인데 색을 채우려 하면 polygon으로 타입 변환
+      if(activeColor !== 'none' && vectorObjects[idx].type === 'polyline' && vectorObjects[idx].points.length > 2) {
+          vectorObjects[idx].type = 'polygon';
+      }
+      renderCanvas();
+    }
+  }
+  else if (['circle','rect','ellipse'].includes(currentMode)) {
+    if (target.classList.contains('drawn-obj')) return; // 기존 개체 위는 무시
+    shapeStart = { x: pt.x, y: pt.y };
+    const ns = 'http://www.w3.org/2000/svg';
+    if (tempShapeEl) tempShapeEl.remove();
+    const tag = currentMode === 'rect' ? 'rect' : currentMode; // circle/ellipse 그대로
+    tempShapeEl = document.createElementNS(ns, tag);
+    tempShapeEl.setAttribute('fill', 'none');
+    tempShapeEl.setAttribute('stroke', activeColor === 'none' ? '#1e293b' : activeColor);
+    tempShapeEl.setAttribute('stroke-width', currentStrokeWidth);
+    tempShapeEl.setAttribute('stroke-dasharray', '6,4');
+    tempShapeEl.setAttribute('opacity', '0.6');
+    document.getElementById('drawing-layer').appendChild(tempShapeEl);
+  }
+  else if (currentMode === 'erase') {
+    // 개체 클릭하여 지우기
+    if (target.classList.contains('drawn-obj')) {
+      const idx = target.getAttribute('data-idx');
+      vectorObjects.splice(idx, 1);
+      renderCanvas();
+      showToast('개체가 삭제되었습니다.');
+    }
+  }
+}
+
+function handleMouseMove(e) {
+  const pt = getMousePos(e);
+
+  if (currentMode === 'draw' && currentPath.length > 0) {
+    const lastPt = currentPath[currentPath.length - 1];
+    previewLineEl.setAttribute('x1', lastPt.x);
+    previewLineEl.setAttribute('y1', lastPt.y);
+    previewLineEl.setAttribute('x2', pt.x);
+    previewLineEl.setAttribute('y2', pt.y);
+    previewLineEl.style.stroke = (activeColor === 'none' ? '#cbd5e1' : activeColor);
+    previewLineEl.style.strokeWidth = currentStrokeWidth;
+    previewLineEl.style.display = 'block';
+    
+    // 첫 점 근처에 가면 자석처럼 붙는 느낌을 위해 닫기 타겟 위치 업데이트
+    const firstPt = currentPath[0];
+    startNodeEl.setAttribute('cx', firstPt.x);
+    startNodeEl.setAttribute('cy', firstPt.y);
+    startNodeEl.style.display = 'block';
+  }
+  else if (['circle','rect','ellipse'].includes(currentMode) && shapeStart && tempShapeEl) {
+    const sx = shapeStart.x, sy = shapeStart.y;
+    const dx = pt.x - sx, dy = pt.y - sy;
+    if (currentMode === 'rect') {
+      tempShapeEl.setAttribute('x',      Math.min(sx, pt.x));
+      tempShapeEl.setAttribute('y',      Math.min(sy, pt.y));
+      tempShapeEl.setAttribute('width',  Math.abs(dx));
+      tempShapeEl.setAttribute('height', Math.abs(dy));
+    } else if (currentMode === 'circle') {
+      tempShapeEl.setAttribute('cx', sx);
+      tempShapeEl.setAttribute('cy', sy);
+      tempShapeEl.setAttribute('r',  Math.round(Math.sqrt(dx*dx + dy*dy)));
+    } else { // ellipse
+      tempShapeEl.setAttribute('cx', sx + dx/2);
+      tempShapeEl.setAttribute('cy', sy + dy/2);
+      tempShapeEl.setAttribute('rx', Math.abs(dx/2));
+      tempShapeEl.setAttribute('ry', Math.abs(dy/2));
+    }
+  }
+  else if (currentMode === 'edit' && dragState) {
+    const oIdx = dragState.objIdx;
+    const obj  = vectorObjects[oIdx];
+    const objEl = document.querySelector(`.drawn-obj[data-idx="${oIdx}"]`);
+
+    if (obj.type === 'polyline' || obj.type === 'polygon') {
+      // 기존 방식: points 배열 업데이트
+      obj.points[dragState.ptIdx] = { x: pt.x, y: pt.y };
+      const ptsStr = obj.points.map(p => `${p.x},${p.y}`).join(' ');
+      if (objEl) objEl.setAttribute('points', ptsStr);
+      const nodeEl = document.querySelector(`.edit-node[data-obj="${oIdx}"][data-pt="${dragState.ptIdx}"]`);
+      if (nodeEl) { nodeEl.setAttribute('cx', pt.x); nodeEl.setAttribute('cy', pt.y); }
+
+    } else if (obj.type === 'circle') {
+      if (dragState.role === 'center') {
+        obj.cx = pt.x; obj.cy = pt.y;
+      } else if (dragState.role === 'r') {
+        obj.r = Math.round(Math.sqrt((pt.x-obj.cx)**2 + (pt.y-obj.cy)**2));
+      }
+      if (objEl) { objEl.setAttribute('cx', obj.cx); objEl.setAttribute('cy', obj.cy); objEl.setAttribute('r', obj.r); }
+      // 핸들 노드 위치도 즉시 갱신
+      const centerNode = document.querySelector(`.edit-node[data-obj="${oIdx}"][data-role="center"]`);
+      const rNode      = document.querySelector(`.edit-node[data-obj="${oIdx}"][data-role="r"]`);
+      if (centerNode) { centerNode.setAttribute('cx', obj.cx); centerNode.setAttribute('cy', obj.cy); }
+      if (rNode)      { rNode.setAttribute('cx', obj.cx + obj.r); rNode.setAttribute('cy', obj.cy); }
+
+    } else if (obj.type === 'rect') {
+      // 드래그 중인 꼭짓점에 따라 x/y/width/height 조정
+      const role = dragState.role;
+      if (role === 'tl') { obj.width  += obj.x - pt.x; obj.height += obj.y - pt.y; obj.x = pt.x; obj.y = pt.y; }
+      if (role === 'tr') { obj.width   = pt.x - obj.x; obj.height += obj.y - pt.y; obj.y = pt.y; }
+      if (role === 'bl') { obj.width  += obj.x - pt.x; obj.height  = pt.y - obj.y; obj.x = pt.x; }
+      if (role === 'br') { obj.width   = pt.x - obj.x; obj.height  = pt.y - obj.y; }
+      // 음수 크기 방지
+      if (obj.width  < 2) obj.width  = 2;
+      if (obj.height < 2) obj.height = 2;
+      if (objEl) { objEl.setAttribute('x', obj.x); objEl.setAttribute('y', obj.y); objEl.setAttribute('width', obj.width); objEl.setAttribute('height', obj.height); }
+      // 4핸들 위치 갱신
+      const roles = ['tl','tr','bl','br'];
+      const coords = [[obj.x, obj.y],[obj.x+obj.width, obj.y],[obj.x, obj.y+obj.height],[obj.x+obj.width, obj.y+obj.height]];
+      roles.forEach((r, i) => {
+        const n = document.querySelector(`.edit-node[data-obj="${oIdx}"][data-role="${r}"]`);
+        if (n) { n.setAttribute('cx', coords[i][0]); n.setAttribute('cy', coords[i][1]); }
+      });
+
+    } else if (obj.type === 'ellipse') {
+      if (dragState.role === 'center') { obj.cx = pt.x; obj.cy = pt.y; }
+      if (dragState.role === 'rx')     { obj.rx = Math.round(Math.abs(pt.x - obj.cx)); }
+      if (dragState.role === 'ry')     { obj.ry = Math.round(Math.abs(pt.y - obj.cy)); }
+      if (objEl) { objEl.setAttribute('cx', obj.cx); objEl.setAttribute('cy', obj.cy); objEl.setAttribute('rx', obj.rx); objEl.setAttribute('ry', obj.ry); }
+      const centerNode = document.querySelector(`.edit-node[data-obj="${oIdx}"][data-role="center"]`);
+      const rxNode     = document.querySelector(`.edit-node[data-obj="${oIdx}"][data-role="rx"]`);
+      const ryNode     = document.querySelector(`.edit-node[data-obj="${oIdx}"][data-role="ry"]`);
+      if (centerNode) { centerNode.setAttribute('cx', obj.cx); centerNode.setAttribute('cy', obj.cy); }
+      if (rxNode)     { rxNode.setAttribute('cx', obj.cx + obj.rx); rxNode.setAttribute('cy', obj.cy); }
+      if (ryNode)     { ryNode.setAttribute('cx', obj.cx); ryNode.setAttribute('cy', obj.cy + obj.ry); }
+    }
+
+    updateCodeViewer();
+  }
+}
+
+function handleMouseUp(e) {
+  if (dragState) {
+    const nodeEl = document.querySelector('.edit-node.dragging');
+    if(nodeEl) nodeEl.classList.remove('dragging');
+    dragState = null;
+    renderCanvas();
+  }
+  // 도형 드래그 확정
+  if (shapeStart && tempShapeEl) {
+    const pt = getMousePos(e);
+    const sx = shapeStart.x, sy = shapeStart.y;
+    const dx = pt.x - sx, dy = pt.y - sy;
+    if (Math.abs(dx) > 4 || Math.abs(dy) > 4) { // 너무 작은 드래그 무시
+      const col = activeColor === 'none' ? '#1e293b' : activeColor;
+      let obj = { type: currentMode, stroke: col, strokeWidth: currentStrokeWidth, fill: 'none', points: [] };
+      if (currentMode === 'rect') {
+        obj.x = Math.round(Math.min(sx, pt.x));  obj.y = Math.round(Math.min(sy, pt.y));
+        obj.width = Math.round(Math.abs(dx));     obj.height = Math.round(Math.abs(dy));
+      } else if (currentMode === 'circle') {
+        obj.cx = Math.round(sx);  obj.cy = Math.round(sy);
+        obj.r  = Math.round(Math.sqrt(dx*dx + dy*dy));
+      } else { // ellipse
+        obj.cx = Math.round(sx + dx/2);  obj.cy = Math.round(sy + dy/2);
+        obj.rx = Math.round(Math.abs(dx/2));  obj.ry = Math.round(Math.abs(dy/2));
+      }
+      vectorObjects.push(obj);
+      renderCanvas();
+      const label = {circle:'원(circle)', rect:'사각형(rect)', ellipse:'타원(ellipse)'};
+      showToast(`${label[currentMode]}이 추가되었습니다!`);
+    }
+    tempShapeEl.remove(); tempShapeEl = null; shapeStart = null;
+  }
+}
+
+// 캔버스 벗어나면 미리보기 선 숨김
+svgWrap.addEventListener('mouseleave', () => {
+  previewLineEl.style.display = 'none';
+});
+
+// --- 그리기 로직 ---
+function updateDrawingPreview() {
+  if (currentPath.length === 0) {
+    drawingPathEl.setAttribute('points', '');
+    previewLineEl.style.display = 'none';
+    startNodeEl.style.display = 'none';
+  } else {
+    drawingPathEl.setAttribute('points', currentPath.map(p => `${p.x},${p.y}`).join(' '));
+    // 첫 점에 닫기 타겟 렌더링
+    const firstPt = currentPath[0];
+    startNodeEl.setAttribute('cx', firstPt.x);
+    startNodeEl.setAttribute('cy', firstPt.y);
+    startNodeEl.style.display = 'block';
+  }
+}
+
+// 현재 경로를 확정하여 개체 배열에 추가 (isClosed: true면 polygon, false면 polyline)
+function finishPath(isClosed) {
+  if(currentPath.length < 2) {
+    cancelDrawing(); return;
+  }
+  
+  const newObj = {
+    type: isClosed ? 'polygon' : 'polyline',
+    points: [...currentPath],
+    stroke: activeColor === 'none' ? '#1e293b' : activeColor, // 선 색상이 none이면 기본 검정 계열
+    strokeWidth: currentStrokeWidth,
+    fill: isClosed ? 'rgba(255,255,255,0.8)' : 'none' // 열린선은 채우기 없음 기본
+  };
+  
+  vectorObjects.push(newObj);
+  
+  cancelDrawing();
+  renderCanvas();
+  showToast(isClosed ? '닫힌 도형(면)이 생성되었습니다!' : '열린 선(경로)이 확정되었습니다.');
+}
+
+// --- 전체 렌더링 ---
+function renderCanvas() {
+  const objGroup = document.getElementById('objects-group');
+  const nodeGroup = document.getElementById('edit-nodes-group');
+  
+  let objHTML = '';
+  let nodeHTML = '';
+  let totalPts = 0;
+
+  vectorObjects.forEach((obj, oIdx) => {
+    const base = `class="drawn-obj" data-idx="${oIdx}" fill="${obj.fill}" stroke="${obj.stroke}" stroke-width="${obj.strokeWidth}"`;
+    if (obj.type === 'polyline' || obj.type === 'polygon') {
+      const ptsStr = obj.points.map(p => `${p.x},${p.y}`).join(' ');
+      objHTML += `<${obj.type} ${base} points="${ptsStr}" stroke-linecap="round" stroke-linejoin="round" />`;
+      if (currentMode === 'edit') {
+        obj.points.forEach((pt, pIdx) => {
+          nodeHTML += `<circle cx="${pt.x}" cy="${pt.y}" class="edit-node" data-obj="${oIdx}" data-pt="${pIdx}" />`;
+        });
+      }
+      totalPts += obj.points.length;
+    } else if (obj.type === 'circle') {
+      objHTML += `<circle ${base} cx="${obj.cx}" cy="${obj.cy}" r="${obj.r}" />`;
+      if (currentMode === 'edit') {
+        // 중심 핸들 + 반지름 끝점 핸들
+        nodeHTML += `<circle cx="${obj.cx}" cy="${obj.cy}" class="edit-node" data-obj="${oIdx}" data-role="center" style="stroke:#10b981;" />`;
+        nodeHTML += `<circle cx="${obj.cx + obj.r}" cy="${obj.cy}" class="edit-node" data-obj="${oIdx}" data-role="r" style="stroke:#f97316;" />`;
+      }
+      totalPts += 1;
+    } else if (obj.type === 'rect') {
+      objHTML += `<rect ${base} x="${obj.x}" y="${obj.y}" width="${obj.width}" height="${obj.height}" />`;
+      if (currentMode === 'edit') {
+        // 4꼭짓점 핸들
+        const rx = obj.x, ry = obj.y, rw = obj.width, rh = obj.height;
+        nodeHTML += `<circle cx="${rx}"      cy="${ry}"      class="edit-node" data-obj="${oIdx}" data-role="tl" />`;
+        nodeHTML += `<circle cx="${rx+rw}"   cy="${ry}"      class="edit-node" data-obj="${oIdx}" data-role="tr" />`;
+        nodeHTML += `<circle cx="${rx}"      cy="${ry+rh}"   class="edit-node" data-obj="${oIdx}" data-role="bl" />`;
+        nodeHTML += `<circle cx="${rx+rw}"   cy="${ry+rh}"   class="edit-node" data-obj="${oIdx}" data-role="br" />`;
+      }
+      totalPts += 2;
+    } else if (obj.type === 'ellipse') {
+      objHTML += `<ellipse ${base} cx="${obj.cx}" cy="${obj.cy}" rx="${obj.rx}" ry="${obj.ry}" />`;
+      if (currentMode === 'edit') {
+        // 중심 + rx 끝점 + ry 끝점 핸들
+        nodeHTML += `<circle cx="${obj.cx}"        cy="${obj.cy}"        class="edit-node" data-obj="${oIdx}" data-role="center" style="stroke:#10b981;" />`;
+        nodeHTML += `<circle cx="${obj.cx+obj.rx}" cy="${obj.cy}"        class="edit-node" data-obj="${oIdx}" data-role="rx"     style="stroke:#f97316;" />`;
+        nodeHTML += `<circle cx="${obj.cx}"        cy="${obj.cy+obj.ry}" class="edit-node" data-obj="${oIdx}" data-role="ry"     style="stroke:#8b5cf6;" />`;
+      }
+      totalPts += 2;
+    }
+  });
+
+  objGroup.innerHTML = objHTML;
+  nodeGroup.innerHTML = nodeHTML;
+
+  // 뱃지 업데이트
+  document.getElementById('objCount').textContent = vectorObjects.length;
+  document.getElementById('coordCount').textContent = totalPts;
+  
+  updateCodeViewer();
+}
+
+// --- 코드 뷰어 업데이트 ---
+function updateCodeViewer() {
+  const viewer = document.getElementById('code-output');
+  if (vectorObjects.length === 0) {
+    viewer.innerHTML = '<div style="color:var(--text-muted); padding: 10px;">&lt;!-- 도화지에 선을 그려 데이터(좌표)를 만들어보세요! --&gt;</div>';
+    return;
+  }
+
+  let html = '';
+  vectorObjects.forEach(obj => {
+    const sc = obj.stroke === 'none' ? '#cbd5e1' : obj.stroke;
+    const fc = obj.fill   === 'none' ? '#cbd5e1' : obj.fill;
+    const commonTail = `
+        &nbsp;&nbsp;<span class="code-hl-attr">stroke</span>="<span style="color:${sc};font-weight:bold;">${obj.stroke}</span>" <span class="code-hl-attr">stroke-width</span>="<span style="color:white;">${obj.strokeWidth}</span>"<br>
+        &nbsp;&nbsp;<span class="code-hl-attr">fill</span>="<span style="color:${fc};font-weight:bold;">${obj.fill}</span>" /&gt;`;
+    let attrs = '';
+    if (obj.type === 'polyline' || obj.type === 'polygon') {
+      const pts = obj.points.map(p => `${Math.round(p.x)},${Math.round(p.y)}`).join(' ');
+      attrs = `&nbsp;&nbsp;<span class="code-hl-attr">points</span>="<span class="code-hl-val">${pts}</span>"<br>`;
+    } else if (obj.type === 'circle') {
+      attrs = `&nbsp;&nbsp;<span class="code-hl-attr">cx</span>="<span class="code-hl-val">${obj.cx}</span>" <span class="code-hl-attr">cy</span>="<span class="code-hl-val">${obj.cy}</span>" <span class="code-hl-attr">r</span>="<span class="code-hl-val">${obj.r}</span>"<br>`;
+    } else if (obj.type === 'rect') {
+      attrs = `&nbsp;&nbsp;<span class="code-hl-attr">x</span>="<span class="code-hl-val">${obj.x}</span>" <span class="code-hl-attr">y</span>="<span class="code-hl-val">${obj.y}</span>" <span class="code-hl-attr">width</span>="<span class="code-hl-val">${obj.width}</span>" <span class="code-hl-attr">height</span>="<span class="code-hl-val">${obj.height}</span>"<br>`;
+    } else if (obj.type === 'ellipse') {
+      attrs = `&nbsp;&nbsp;<span class="code-hl-attr">cx</span>="<span class="code-hl-val">${obj.cx}</span>" <span class="code-hl-attr">cy</span>="<span class="code-hl-val">${obj.cy}</span>" <span class="code-hl-attr">rx</span>="<span class="code-hl-val">${obj.rx}</span>" <span class="code-hl-attr">ry</span>="<span class="code-hl-val">${obj.ry}</span>"<br>`;
+    }
+    html += `<div class="code-item">&lt;<span class="code-hl-tag">${obj.type}</span><br>${attrs}${commonTail}</div>`;
+  });
+  viewer.innerHTML = html;
+}
+
+// ── SVG 저장 ───────────────────────────────────────────────────
+function saveSVG() {
+  if (vectorObjects.length === 0) { showToast('저장할 개체가 없습니다.'); return; }
+
+  // objects-group 내용만 추출 (그리드·임시선 제외)
+  const objGroup = document.getElementById('objects-group');
+  const objHTML  = objGroup.innerHTML;
+
+  const svgContent = `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1000" width="1200" height="1000">
+  <!-- 데이터 비트박스 · 벡터 이미지 활용 실습 -->
+${objHTML}
+</svg>`;
+
+  const blob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = '벡터그림.svg';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('SVG(벡터) 파일로 저장되었습니다!');
+}
+
+// ── PNG 저장 ───────────────────────────────────────────────────
+function savePNG() {
+  if (vectorObjects.length === 0) { showToast('저장할 개체가 없습니다.'); return; }
+
+  // SVG → Canvas → PNG 변환
+  const objGroup  = document.getElementById('objects-group');
+  const objHTML   = objGroup.innerHTML;
+  const svgString = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1000" width="1200" height="1000">
+    <rect width="1200" height="1000" fill="white"/>
+    ${objHTML}
+  </svg>`;
+
+  const img    = new Image();
+  const blob   = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+  const url    = URL.createObjectURL(blob);
+
+  img.onload = function() {
+    const canvas  = document.createElement('canvas');
+    canvas.width  = 1200;
+    canvas.height = 1000;
+    const ctx     = canvas.getContext('2d');
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0, 0, 1200, 1000);
+    ctx.drawImage(img, 0, 0);
+    URL.revokeObjectURL(url);
+
+    const a    = document.createElement('a');
+    a.download = '벡터그림.png';
+    a.href     = canvas.toDataURL('image/png');
+    a.click();
+    showToast('PNG(비트맵) 파일로 저장되었습니다!');
+  };
+  img.src = url;
+}
+
+// 시작
+init();
+</script>
+</body>
+</html>

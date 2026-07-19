@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1920">
+<title>Data Evolution: SNS Messenger</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Pretendard:wght@400;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./css/bit_play_concept.css">
+
+</head>
+<body>
+<!-- ✅ DATA BITBOX 공통 네비바 -->
+<style>
+#dbb-topnav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 99999;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 9px 22px;
+    background: rgba(255,255,255,0.13);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid #14b8a655;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.18);
+    font-family: 'Noto Sans KR','Pretendard','Inter',sans-serif;
+    box-sizing: border-box;
+}
+#dbb-topnav a.dbb-btn {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 0.72rem; font-weight: 700; letter-spacing: 0.3px;
+    text-decoration: none;
+    padding: 6px 14px; border-radius: 20px;
+    border: 1.5px solid #14b8a677;
+    color: #14b8a6;
+    background: rgba(20,184,166,0.12);
+    transition: all 0.18s ease;
+    white-space: nowrap;
+}
+#dbb-topnav a.dbb-btn:hover {
+    background: #14b8a622;
+    border-color: #14b8a6;
+    box-shadow: 0 0 14px #14b8a644;
+    transform: translateY(-1px);
+}
+#dbb-topnav .dbb-title {
+    font-size: 0.78rem; font-weight: 700;
+    color: #14b8a6;
+    letter-spacing: 0.3px;
+    opacity: 0.9;
+}
+
+</style>
+<div id="dbb-topnav">
+    <div style="display:flex;gap:9px;align-items:center;">
+        <a class="dbb-btn" href="index.html">← 메인으로</a>
+        <a class="dbb-btn" href="02_bit.html">📖 개념으로</a>
+    </div>
+    <span class="dbb-title">🎮 비트(Bit)란? · 활용 실습</span>
+</div>
+<!-- /네비바 -->
+
+
+<div id="manual-modal" class="modal-overlay">
+    <div class="modal-box">
+        <h2>📖 체험 설명서</h2>
+        <p style="color:white; font-size:18px; margin-bottom: 20px;">단 1개의 비트가 모여 거대한 &lt;빅데이터&gt;가 되는 과정을 체험하세요.</p>
+        <ul>
+            <li><b>1단계 (1 Bit):</b> 스페이스바를 눌러 스위치를 켭니다.</li>
+            <li><b>2단계 (1 Byte):</b> 숫자 <b>0과 1</b>을 8번 눌러 문자를 창조합니다.</li>
+            <li><b>3단계 (64 Bits):</b> 검은 타일 위를 문질러 이미지를 만듭니다.</li>
+            <li><b>최종 단계:</b> 두 컴퓨터를 연결하는 <b style="color:var(--neon-blue);">[광통신 네트워크]</b> 수신기가 되어보는 체험을 합니다!</li>
+        </ul>
+        <button class="start-btn" onclick="startGame()">체험 시스템 가동</button>
+    </div>
+</div>
+
+<div id="custom-alert-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-box alert-box">
+        <h2 id="alert-title">⚠️ 시스템 경고</h2>
+        <p id="alert-message" class="alert-message"></p>
+        <button class="start-btn" style="padding: 10px 30px; font-size: 16px;" onclick="closeCustomAlert()">확인</button>
+    </div>
+</div>
+
+<div class="header" id="header">
+    <div class="title">DATA EVOLUTION</div>
+</div>
+
+<div class="stage" id="stage1">
+    <p style="margin-bottom: 30px; font-size: 18px; color: #ccc;">가장 작은 디지털 정보의 단위, 1비트입니다.<br>화면을 <b>클릭</b>하거나 <b>스페이스바</b>를 눌러보세요.</p>
+    <div class="switch-btn" id="s1-btn">0</div>
+    <button class="next-btn" id="s1-next" onclick="goStage(2)">진화하기 →</button>
+</div>
+
+<div class="stage" id="stage2">
+    <p style="margin-bottom: 30px; font-size: 18px; color: #ccc; line-height: 1.6;">
+        가장 작은 단위인 <b>비트(Bit) 8개</b>가 모이면 <b>1바이트(Byte)</b>가 됩니다.<br>
+        대표적인 예) 8자리 이진수를 한 개의 문자로 표현하는 약속, 이를 <b>아스키코드(ASCII)</b>라고 부릅니다.<br>
+        알파벳 <b>'A'</b>에 해당하는 아스키코드 이진수 <b style="color:var(--neon-blue); font-size:24px; letter-spacing:2px;">01000001</b> 을 순서대로 입력해 보세요!
+    </p>
+    <div class="byte-container" id="s2-slots"></div>
+    <div class="byte-result" id="s2-result">A</div>
+    <p id="s2-text" style="margin-top:20px; color:var(--neon-blue); opacity:0; transition:0.5s; line-height: 1.6;"></p>
+    <button class="next-btn" id="s2-next" onclick="goStage(3)">진화하기 →</button>
+</div>
+
+<div class="stage" id="stage3">
+    <p style="margin-bottom: 20px; font-size: 18px; color: #ccc; line-height: 1.6;">64개의 비트(8x8)가 모였습니다.<br>마우스로 복권을 긁듯 검은 타일 전체를 <b>문질러서</b><br>데이터가 어떤 모양을 하고 있는지 확인해 보세요!</p>
+    <div class="grid-container" id="s3-grid"></div>
+    <button class="next-btn" id="s3-next" onclick="goStage(4)">비트의 빅데이터로의 진화 →</button>
+</div>
+
+<div class="stage" id="stage4">
+    <h2 style="font-family:'Orbitron'; color:var(--neon-blue); font-size:30px; margin-bottom:10px;">세상을 움직이는 거대한 데이터</h2>
+    
+    <div class="network-container">
+        <div class="optic-line line-top-left"></div>
+        <div class="optic-line line-top-right"></div>
+        <div class="optic-line line-bottom-left"></div>
+        <div class="optic-line line-bottom-right"></div>
+
+        <div class="world-node node-tl">
+            <div class="icon"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-1.99.9-1.99 2L3 19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-1 11h-4v4h-4v-4H6v-4h4V6h4v4h4v4z"/></svg></div>
+            <div class="label">인공지능<br>의료</div>
+        </div>
+        <div class="world-node node-tr">
+            <div class="icon"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/></svg></div>
+            <div class="label">자율주행<br>자동차</div>
+        </div>
+        <div class="world-node node-bl">
+            <div class="icon"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M15 11V5l-3-3-3 3v2H3v14h18V11h-6zm-8 8H5v-2h2v2zm0-4H5v-2h2v2zm0-4H5V9h2v2zm6 8h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2V9h2v2zm0-4h-2V5h2v2zm6 12h-2v-2h2v2zm0-4h-2v-2h2v2z"/></svg></div>
+            <div class="label">스마트<br>시티</div>
+        </div>
+        <div class="world-node node-br">
+            <div class="icon"><svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg></div>
+            <div class="label">글로벌<br>네트워크</div>
+        </div>
+
+        <div class="data-core" id="core-orb">
+            <svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+        </div>
+
+        <div class="source-icon" id="src1" style="top: 20px; left: 250px;">
+            <svg class="svg-icon" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+        </div>
+        <div class="source-icon" id="src2" style="bottom: 20px; left: 250px;">
+            <svg class="svg-icon" viewBox="0 0 24 24"><path d="M4 4h3l2-2h6l2 2h3c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2zm10 13c3.31 0 6-2.69 6-6s-2.69-6-6-6-6 2.69-6 6 2.69 6 6 6zm0-10c2.21 0 4 1.79 4 4s-1.79 4-4 4-4-1.79-4-4 1.79-4 4-4z"/></svg>
+        </div>
+        <div class="source-icon" id="src3" style="top: 150px; left: 80px;">
+            <svg class="svg-icon" viewBox="0 0 24 24"><path d="M18 4l2 4h-3l-2-4h-2l2 4h-3l-2-4H8l2 4H7L5 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4h-4z"/></svg>
+        </div>
+        <div class="source-icon" id="src4" style="top: 150px; right: 80px;">
+            <svg class="svg-icon" viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+        </div>
+    </div>
+
+    <div id="bridge-text">
+        여러분이 방금 만든 작은 데이터는 세상에 홀로 존재하지 않습니다.<br>세상의 다양한 데이터들과 어떻게 융합되는지 확인해 보세요.
+    </div>
+
+    <button class="big-data-btn" id="evolve-btn" onclick="stepEvolution()">데이터 융합하기</button>
+</div>
+
+<div class="stage" id="stage5" style="z-index: 100;">
+    <h2 style="color:var(--neon-blue); margin-bottom: 50px; font-family:'Orbitron'">OPTICAL NETWORK: SNS MESSENGER</h2>
+    
+    <div id="game-layout">
+        <div class="pc-monitor">
+            <div class="pc-header" style="color:var(--neon-blue)">🟢 내 PC (송신자)</div>
+            <div class="pc-screen sender-screen">
+                <div style="text-align: right;">
+                    <div class="bubble-send" id="sender-text"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="play-area">
+            <div id="game-hud">
+                <span style="color:white;">SCORE: <span id="score-display" style="color:var(--neon-blue)">0</span></span>
+            </div>
+            
+            <button id="abort-btn" class="action-btn" style="position: absolute; top: 15px; right: 15px; z-index: 50; padding: 6px 12px; font-size: 13px; background: #ff0844; color: white; display: none; box-shadow: 0 0 10px rgba(255,8,68,0.4);" onclick="forceReset()">⏹️ 전송 중지</button>
+
+            <canvas id="game-canvas" width="400" height="492"></canvas>
+            
+            <div id="target-hud">
+                <div>SIGNAL: '<span id="target-char" style="color:white; font-size:28px;">?</span>'</div>
+                <div id="bit-progress" class="bit-progress">_ _ _ _ _ _ _ _</div>
+            </div>
+            
+            <div id="ready-screen" class="game-overlay" style="display:flex;">
+                <h2 style="color:var(--neon-blue); font-size:24px; margin-bottom:10px;">MISSION: 메시지 수신</h2>
+                
+                <div style="width: 80%; text-align: left;">
+                    <select id="msg-select" class="neon-select" style="margin-top: 10px; margin-bottom: 5px;">
+                         <option value="">*** 메시지 선택 ***</option>
+                        <option value="0">I LOVE YOU (10글자)</option>
+                        <option value="1">BE HAPPY! (9글자)</option>
+                        <option value="2">GOOD LUCK! (10글자)</option>
+                        <option value="3">STAY STRONG (11글자)</option>
+                        <option value="4">NEVER GIVE UP (13글자)</option>
+                    </select>
+                    
+                    <select id="speed-select" class="neon-select" style="margin-top: 5px; margin-bottom: 20px;">
+                        <option value="">*** 데이터 전송 속도 선택 ***</option>
+                        <option value="2.5">데이터 전송 속도: 느림 🐢</option>
+                        <option value="6.0">데이터 전송 속도: 보통 🏃</option>
+                        <option value="10.0">데이터 전송 속도: 빠름 🚀</option>
+                    </select>
+                </div>
+
+                <div style="text-align: left; background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px; margin-bottom: 20px; width: 80%;">
+                    <p style="color:var(--neon-yellow); margin-top:0;">🟡 <b>오른쪽 수신기(RECV)</b> 위치를 위아래로 움직이세요.</p>
+                    <p style="color:var(--neon-blue); margin-bottom:0;">🔵 <b>날아오는 0과 1 (Bit)</b> = 초고속 전기 신호</p>
+                </div>
+                <p><span class="key-box">⬆️ 위 방향키</span> = [ 1 ] 라인으로 이동</p>
+                <p><span class="key-box">⬇️ 아래 방향키</span> = [ 0 ] 라인으로 이동</p>
+                <button class="start-btn" style="margin-top:20px;" onclick="startCountdown()">접속 (START)</button>
+            </div>
+
+            <div id="countdown-screen" class="game-overlay">3</div>
+        </div>
+
+        <div class="pc-monitor">
+            <div class="pc-header" style="color:var(--neon-green)">🟢 친구의 PC (수신자)</div>
+            <div class="pc-screen receiver-screen">
+                <div style="text-align: left;">
+                    <div class="bubble-recv" id="bubble-box"><span id="receiver-text"></span><span class="cursor" id="cursor">_</span></div>
+                </div>
+                <div id="corrupt-msg">ERROR: 패킷 손실!</div>
+            </div>
+            
+            <div id="receiver-controls">
+                <h3 style="color:var(--neon-green); margin-top:0; font-size:22px;">TRANSMISSION COMPLETE</h3>
+                <p style="font-size: 18px; margin-bottom: 20px;">수신 정확도: <span id="accuracy-display" style="color:white; font-weight:bold; font-size:24px;">100</span>%</p>
+                <div style="display: flex; gap: 15px; justify-content: center;">
+                    <button class="action-btn" style="padding: 10px 30px; font-size:16px;" onclick="resetToReady()">🔄 다시 보내기</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div id="bottom-toast">
+    <span>🎉 통신 완료! 데이터 전송 작업이 종료되었습니다.</span>
+</div>
+
+<script>
+    // --- 커스텀 알림(Alert) 모달 로직 ---
+    function showCustomAlert(title, message) {
+        document.getElementById('alert-title').innerText = title;
+        document.getElementById('alert-message').innerHTML = message;
+        document.getElementById('custom-alert-modal').style.display = 'flex';
+    }
+
+    function closeCustomAlert() {
+        document.getElementById('custom-alert-modal').style.display = 'none';
+    }
+
+
+    let currentStage = 0;
+
+    function startGame() {
+        document.getElementById('manual-modal').style.display = 'none';
+        document.getElementById('header').style.display = 'block';
+        goStage(1);
+    }
+
+    function goStage(num) {
+        document.querySelectorAll('.stage').forEach(el => el.classList.remove('active'));
+        document.getElementById(`stage${num}`).classList.add('active');
+        currentStage = num;
+        if(num === 2) initStage2(); if(num === 3) initStage3(); if(num === 5) initReadyScreen(); 
+    }
+
+    // --- Stage 1~3 로직 ---
+    function toggleBit() {
+        let btn = document.getElementById('s1-btn');
+        if(btn.innerText === "0") { btn.innerText = "1"; btn.classList.add('on'); document.getElementById('s1-next').classList.add('show'); } 
+        else { btn.innerText = "0"; btn.classList.remove('on'); }
+    }
+    document.getElementById('stage1').addEventListener('click', (e) => { if(e.target.tagName !== 'BUTTON') toggleBit(); });
+    
+    let byteInput = "";
+    function initStage2() { 
+        byteInput = ""; document.getElementById('s2-slots').innerHTML = ""; 
+        for(let i=0; i<8; i++) { 
+            let s = document.createElement('div'); s.className = 'bit-slot'; s.innerText = "_"; 
+            document.getElementById('s2-slots').appendChild(s); 
+        } 
+        document.getElementById('s2-result').classList.remove('show'); 
+        document.getElementById('s2-next').classList.remove('show'); 
+    }
+    
+    function handleByteInput(e) {
+        if((e.key === "0" || e.key === "1") && byteInput.length < 8) {
+            byteInput += e.key; document.querySelectorAll('.bit-slot')[byteInput.length - 1].innerText = e.key;
+            if(byteInput.length === 8) {
+                let decimalValue = parseInt(byteInput, 2);
+                let charValue = "";
+                let isPrintable = true;
+
+                if(decimalValue >= 33 && decimalValue <= 126) {
+                    charValue = String.fromCharCode(decimalValue);
+                } else if(decimalValue === 32) {
+                    charValue = "␣(공백)";
+                } else {
+                    charValue = "🚫";
+                    isPrintable = false;
+                }
+                
+                setTimeout(() => { 
+                    document.getElementById('s2-slots').style.display = 'none'; 
+                    let r = document.getElementById('s2-result'); r.innerText = charValue; r.classList.add('show'); 
+                    let textBox = document.getElementById('s2-text');
+                    
+                    if(isPrintable) {
+                        textBox.innerHTML = `방금 누르신 이진수 <b>${byteInput}</b> 은 십진수로 <b>${decimalValue}</b> 입니다.<br>컴퓨터의 아스키코드 약속에 따라 이 데이터는 <b>'${charValue}'</b> 가 됩니다!`;
+                    } else {
+                        textBox.innerHTML = `방금 누르신 십진수 <b>${decimalValue}</b> 은 아스키코드표에서<br>화면에 표시할 수 없는 <b>컴퓨터 제어 문자</b>로 약속되어 있습니다.`;
+                    }
+                    
+                    textBox.style.opacity = 1;
+                    document.getElementById('s2-next').classList.add('show'); 
+                }, 300);
+            }
+        }
+    }
+
+    const heartPattern = [
+        0,1,1,0,0,1,1,0, 
+        1,1,1,1,1,1,1,1, 
+        1,1,1,1,1,1,1,1, 
+        1,1,1,1,1,1,1,1, 
+        0,1,1,1,1,1,1,0, 
+        0,0,1,1,1,1,0,0, 
+        0,0,0,1,1,0,0,0, 
+        0,0,0,0,0,0,0,0
+    ];
+    let pixelsExplored = 0; 
+    
+    function initStage3() {
+        document.getElementById('s3-grid').innerHTML = ""; 
+        pixelsExplored = 0;
+        for(let i=0; i<64; i++) { 
+            let px = document.createElement('div'); 
+            px.className = 'pixel'; 
+            px.innerText = "0"; 
+            px.addEventListener('mouseover', ()=>explorePixel(i,px)); 
+            document.getElementById('s3-grid').appendChild(px); 
+        }
+    }
+    
+    function explorePixel(i, el) {
+        if(el.classList.contains('explored')) return; 
+        
+        el.classList.add('explored');
+        if(heartPattern[i]===1) { 
+            el.classList.add('filled'); 
+            el.innerText="1"; 
+        } else {
+            el.classList.add('empty'); 
+            el.innerText="0"; 
+        }
+        
+        pixelsExplored++;
+        if(pixelsExplored >= 64) { 
+            document.getElementById('s3-next').classList.add('show'); 
+        }
+    }
+
+ // ✨ Stage 4: 클릭 시 진행되는 진화 로직 ✨
+    let evolutionStep = 0;
+
+    function stepEvolution() {
+        const btn = document.getElementById('evolve-btn');
+        const textEl = document.getElementById('bridge-text');
+        const orb = document.getElementById('core-orb');
+
+        if (evolutionStep === 0) {
+            textEl.style.opacity = 0;
+            
+            // 진화가 끝날 때까지 버튼 클릭 방지 및 텍스트 변경
+            btn.style.pointerEvents = "none"; 
+            btn.innerText = "데이터 융합 중... ⏳"; 
+
+            setTimeout(() => {
+                textEl.innerHTML = "단독으로 존재하던 데이터들이 융합하며 <b style='color:var(--neon-green);'>Byte ➔ KB ➔ MB ➔ GB ➔ TB</b> 단위로 팽창하여<br><b style='color:var(--neon-purple); font-size:24px;'>'빅데이터(BIG DATA)'</b>로 거대하게 진화했습니다!";
+                textEl.style.opacity = 1;
+                
+                for(let i=1; i<=4; i++) {
+                    let src = document.getElementById('src' + i);
+                    src.innerHTML = "0110"; 
+                    src.style.fontFamily = "Orbitron";
+                    src.style.fontSize = "20px";
+                    src.style.fontWeight = "bold";
+                    src.classList.add('absorb');
+                }
+
+                setTimeout(() => {
+                    // 기본 expand 클래스(배경색, 네온 효과 등) 적용
+                    orb.classList.add('expand');
+                    // ⭐ 수정: 1초 간격의 단계별 성장에 맞춰 부드러운 텐션(애니메이션) 설정
+                    orb.style.transition = "all 1s cubic-bezier(0.25, 0.8, 0.25, 1)";
+                    
+                    // ⭐ 추가: 용량별로 커질 크기(픽셀) 배열 세팅
+                    let units = ["1 Byte", "256 KB", "10 MB", "500 GB", "100 TB"];
+                    let sizes = [100, 130, 160, 190, 220]; 
+                    let step = 0;
+                    
+                    // 1초 간격으로 텍스트와 크기 동시 업데이트
+                    let sizeInterval = setInterval(() => {
+                        if(step < units.length) {
+                            // 크기 키우기
+                            orb.style.width = sizes[step] + "px";
+                            orb.style.height = sizes[step] + "px";
+                            // 텍스트 업데이트
+                            orb.innerHTML = `<span style='font-size:22px; color:var(--neon-yellow); text-shadow:0 0 10px var(--neon-yellow);'>${units[step]}</span>`;
+                            step++;
+                        } else {
+                            clearInterval(sizeInterval);
+                            // 마지막 최종 빅데이터 크기는 가장 거대하게 (260px)
+                            orb.style.width = "260px";
+                            orb.style.height = "260px";
+                            orb.innerHTML = "BIG DATA<br><span style='font-size:12px; font-weight:normal; letter-spacing:1px; color:#ddd;'>1,000,000,000+ Bits</span>";
+                            
+                            // 진화가 완전히 끝나면 버튼을 다시 활성화
+                            btn.style.pointerEvents = "auto";
+                            btn.innerText = "세상과 연결하기";
+                        }
+                    }, 1000);
+
+                }, 500);
+
+            }, 500);
+            evolutionStep++;
+        }
+        else if (evolutionStep === 1) {
+            textEl.style.opacity = 0;
+            setTimeout(() => {
+                textEl.innerHTML = "이 거대한 데이터는 <b>'광케이블망'</b>을 타고 전 세계로 퍼져<br><b style='color:var(--neon-yellow);'>스마트시티와 자율주행, AI를 움직이며 세상을 변화시킵니다.</b>";
+                textEl.style.opacity = 1;
+                
+                document.querySelectorAll('.optic-line').forEach(line => line.classList.add('shoot'));
+                
+                setTimeout(() => {
+                    document.querySelectorAll('.world-node').forEach(node => node.classList.add('active'));
+                }, 500);
+
+                btn.innerText = "이제 내가 직접 전송해보기 🚀";
+                btn.style.background = "transparent";
+                btn.style.border = "2px solid var(--neon-yellow)";
+                btn.style.color = "var(--neon-yellow)";
+                btn.style.boxShadow = "none";
+                
+            }, 500);
+            evolutionStep++;
+        }
+        else if (evolutionStep === 2) {
+            document.getElementById('header').style.opacity = 1;
+            goStage(5);
+        }
+    }
+
+    // --- Stage 5: SNS 메시지 수신 게임 ---
+    const SENTENCES = [
+        "I LOVE YOU", 
+        "BE HAPPY!", 
+        "GOOD LUCK!", 
+        "STAY STRONG", 
+        "NEVER GIVE UP"
+    ];
+    let selectedSentence = "";
+    let currentCharIdx = 0;
+    let targetBinary = ""; let collectedBits = []; 
+    let score = 0; let perfectCharCount = 0; let totalPlayableChars = 0;
+    let isRunnerActive = false; 
+    let lastTime = 0; 
+
+    const canvas = document.getElementById('game-canvas');
+    const ctx = canvas.getContext('2d');
+    let gameLoopId;
+    let particles = [];
+
+    const player = { x: 340, radius: 40 }; 
+    const trackY = { 1: 150, 0: 300 }; 
+    let playerState = 0; 
+    let activeBits = [];
+    
+    let bitSpeed = 4.0; 
+    let bitSpacing = 110; 
+
+    let receivedString = ""; 
+
+    function resetToReady() {
+        document.getElementById('receiver-controls').style.display = 'none';
+        document.getElementById('bottom-toast').classList.remove('show');
+        document.getElementById('bubble-box').classList.remove('complete');
+        document.getElementById('cursor').style.display = 'inline';
+        document.getElementById('receiver-text').innerHTML = "";
+        document.getElementById('sender-text').innerHTML = "";
+        initReadyScreen();
+    }
+
+    function initReadyScreen() {
+        document.getElementById('ready-screen').style.display = 'flex';
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawTracks();
+    }
+
+    function startCountdown() {
+        let selectEl = document.getElementById('msg-select');
+        let speedEl = document.getElementById('speed-select');
+
+        if (selectEl.value === "" || speedEl.value === "") {
+            showCustomAlert("⚠️ 시스템 경고", "통신을 시작하기 전에 <b>'메시지'</b>와 <b>'데이터 전송 속도'</b>를<br>모두 선택해주세요!");
+            return;
+        }
+
+        selectedSentence = SENTENCES[selectEl.value];
+        bitSpeed = parseFloat(speedEl.value);
+
+        totalPlayableChars = selectedSentence.replace(/[ !?.]/g, "").length;
+
+        document.getElementById('ready-screen').style.display = 'none';
+        const cdScreen = document.getElementById('countdown-screen');
+        cdScreen.style.display = 'flex';
+        
+        let count = 3; cdScreen.innerText = count;
+        window.cdInterval = setInterval(() => {
+            count--;
+            if(count > 0) { cdScreen.innerText = count; } 
+            else if(count === 0) { cdScreen.innerText = "SEND!"; cdScreen.style.color = "var(--neon-green)"; } 
+            else {
+                clearInterval(window.cdInterval); cdScreen.style.display = 'none'; cdScreen.style.color = "var(--neon-yellow)";
+                startGameplay(); 
+            }
+        }, 1000);
+    }
+
+    function charToBinary(char) { return char.charCodeAt(0).toString(2).padStart(8, '0'); }
+
+    function renderSenderText() {
+        let html = "";
+        for(let i=0; i<selectedSentence.length; i++) {
+            if (i === currentCharIdx) html += `<span class="highlight-char">${selectedSentence[i] === " " ? "&nbsp;" : selectedSentence[i]}</span>`;
+            else html += selectedSentence[i] === " " ? "&nbsp;" : selectedSentence[i];
+        }
+        document.getElementById('sender-text').innerHTML = html;
+    }
+
+    function setupNextChar() {
+        if (currentCharIdx >= selectedSentence.length) { 
+            setTimeout(gameOver, 1000); 
+            return; 
+        }
+
+        let char = selectedSentence[currentCharIdx];
+        renderSenderText();
+
+        if (char === " " || char === "!" || char === "?" || char === ".") {
+            receivedString += char;
+            document.getElementById('receiver-text').innerHTML = receivedString.replace(/ /g, "&nbsp;");
+            currentCharIdx++;
+            setupNextChar();
+            return;
+        }
+
+        targetBinary = charToBinary(char);
+        collectedBits = []; activeBits = [];
+
+        document.getElementById('target-char').innerText = char;
+        updateBitProgressUI();
+        
+        for(let i=0; i<8; i++) {
+            let requiredValue = parseInt(targetBinary[i]);
+            activeBits.push({
+                x: -50 - (i * bitSpacing), 
+                value: requiredValue,
+                y: trackY[requiredValue],
+                index: i, processed: false
+            });
+        }
+    }
+
+    function updateBitProgressUI() {
+        let displayStr = ""; let currentFocus = collectedBits.length;
+        for (let i = 0; i < 8; i++) {
+            if (i < collectedBits.length) {
+                if(collectedBits[i] === 'X') displayStr += `<span class="bit-miss">X</span> `;
+                else displayStr += `<span class="bit-hit">${collectedBits[i]}</span> `;
+            } else if (i === currentFocus) { displayStr += `<span style="color:var(--neon-yellow); text-decoration:underline;">${targetBinary[i]}</span> `; } 
+            else { displayStr += `<span style="color:#555">${targetBinary[i]}</span> `; }
+        }
+        document.getElementById('bit-progress').innerHTML = displayStr;
+    }
+
+    function triggerCorruptMessage() {
+        let msg = document.getElementById('corrupt-msg');
+        msg.style.display = 'block';
+        setTimeout(() => { msg.style.display = 'none'; }, 800);
+    }
+
+    function createHitEffect(x, y, isPerfect) {
+        particles.push({
+            x: x, y: y, radius: 10, maxRadius: 40, alpha: 1,
+            color: isPerfect ? '#00ff66' : '#ff0844',
+            text: isPerfect ? '+10' : 'MISS!'
+        });
+    }
+
+    function drawParticles() {
+        for (let i = particles.length - 1; i >= 0; i--) {
+            let p = particles[i];
+            p.radius += 2; p.alpha -= 0.05;
+            ctx.beginPath(); ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+            ctx.strokeStyle = `rgba(${p.color === '#00ff66' ? '0,255,102' : '255,8,68'}, ${p.alpha})`;
+            ctx.lineWidth = 3; ctx.stroke();
+            ctx.fillStyle = `rgba(${p.color === '#00ff66' ? '0,255,102' : '255,8,68'}, ${p.alpha})`;
+            ctx.font = "bold 20px Orbitron"; ctx.fillText(p.text, p.x, p.y - p.radius);
+            if (p.alpha <= 0) particles.splice(i, 1);
+        }
+    }
+
+    function evaluateChar() {
+        let char = selectedSentence[currentCharIdx];
+        let isPerfect = !collectedBits.includes('X');
+        
+        if (isPerfect) { 
+            score += 100; 
+            perfectCharCount++;
+            receivedString += char; 
+        } else {
+            receivedString += `<span style="color:var(--neon-red)">#</span>`; 
+            triggerCorruptMessage();
+        }
+        
+        document.getElementById('receiver-text').innerHTML = receivedString.replace(/ /g, "&nbsp;");
+        updateScoreUI();
+
+        currentCharIdx++;
+        
+        if (currentCharIdx >= selectedSentence.length) {
+            renderSenderText();
+            setTimeout(gameOver, 1000); 
+        } else {
+            setTimeout(setupNextChar, 300); 
+        }
+    }
+
+    function startGameplay() {
+        score = 0; currentCharIdx = 0; perfectCharCount = 0; 
+        isRunnerActive = true; receivedString = ""; particles = [];
+        document.getElementById('receiver-text').innerHTML = "";
+        
+        // 🔥 게임 시작 시 중지 버튼 표시
+        document.getElementById('abort-btn').style.display = 'block'; 
+        
+        updateScoreUI(); setupNextChar();
+        cancelAnimationFrame(gameLoopId); 
+        
+        lastTime = performance.now(); 
+        runnerLoop(lastTime); 
+    }
+
+    // 🔥 추가된 전송 중지 로직
+    function forceReset() {
+        isRunnerActive = false;
+        cancelAnimationFrame(gameLoopId);
+        document.getElementById('abort-btn').style.display = 'none';
+        
+        if(window.cdInterval) {
+            clearInterval(window.cdInterval);
+            document.getElementById('countdown-screen').style.display = 'none';
+        }
+        
+        resetToReady();
+    }
+
+    function updateRunner(dt) { 
+        if (!dt) dt = 1; 
+        
+        for (let i = 0; i < activeBits.length; i++) {
+            let b = activeBits[i];
+            if(b.processed) continue;
+            
+            b.x += (bitSpeed * dt); 
+
+            if (b.x >= player.x - player.radius && b.x <= player.x) {
+                if (playerState === b.value) { 
+                    b.processed = true;
+                    collectedBits.push(b.value.toString()); 
+                    score += 10; updateScoreUI(); 
+                    
+                    createHitEffect(b.x, trackY[playerState], true); 
+                    
+                    updateBitProgressUI();
+                    if (b.index === 7) { setTimeout(evaluateChar, 100); }
+                }
+            } 
+            else if (b.x > player.x) {
+                b.processed = true;
+                collectedBits.push('X'); 
+                
+                createHitEffect(player.x, b.y, false); 
+                
+                updateBitProgressUI();
+                if (b.index === 7) { setTimeout(evaluateChar, 100); }
+            }
+        }
+    }
+
+    function drawTracks() {
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.1)"; ctx.lineWidth = 2; ctx.beginPath();
+        ctx.moveTo(0, trackY[1]); ctx.lineTo(canvas.width, trackY[1]); ctx.moveTo(0, trackY[0]); ctx.lineTo(canvas.width, trackY[0]); ctx.stroke();
+        
+        ctx.fillStyle = "rgba(255, 255, 255, 0.05)";
+        ctx.font = "italic 900 30px Orbitron"; ctx.textAlign = "center";
+        ctx.fillText("SPEED OF LIGHT >>>", 200, 225);
+
+        ctx.beginPath();
+        ctx.setLineDash([5, 15]);
+        ctx.moveTo(player.x, trackY[playerState]); ctx.lineTo(canvas.width, 225);
+        ctx.strokeStyle = "rgba(252, 226, 5, 0.3)"; ctx.stroke();
+        ctx.setLineDash([]);
+    }
+
+    function drawRunner() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height); 
+        drawTracks();
+
+        ctx.font = "bold 24px Orbitron"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+        activeBits.forEach(b => {
+            if(b.processed) return;
+            
+            ctx.beginPath();
+            ctx.moveTo(b.x, b.y); ctx.lineTo(b.x - 30, b.y);
+            ctx.strokeStyle = b.value === 1 ? "rgba(79, 172, 254, 0.6)" : "rgba(0, 242, 254, 0.6)";
+            ctx.lineWidth = 6; ctx.stroke();
+
+            ctx.fillStyle = b.value === 1 ? "rgba(79, 172, 254, 0.3)" : "rgba(0, 242, 254, 0.3)";
+            ctx.strokeStyle = b.value === 1 ? "#4facfe" : "#00f2fe";
+            ctx.fillRect(b.x - 20, b.y - 20, 40, 40); ctx.strokeRect(b.x - 20, b.y - 20, 40, 40);
+            ctx.fillStyle = "#fff"; ctx.fillText(b.value, b.x, b.y);
+        });
+
+        let pY = trackY[playerState];
+        ctx.beginPath(); ctx.arc(player.x, pY, player.radius, Math.PI * 0.5, Math.PI * 1.5, false);
+        ctx.strokeStyle = "var(--neon-yellow)"; ctx.lineWidth = 5; ctx.stroke();
+        
+        ctx.beginPath(); ctx.arc(player.x, pY, player.radius, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(252, 226, 5, 0.1)"; ctx.fill();
+        ctx.fillStyle = "var(--neon-yellow)"; ctx.font = "bold 16px Orbitron"; ctx.fillText("RECV", player.x + 12, pY);
+
+        drawParticles();
+    }
+
+    function runnerLoop(timestamp) {
+        if (!isRunnerActive) return; 
+        
+        if (!timestamp) timestamp = performance.now();
+        let dt = (timestamp - lastTime) / (1000 / 60); 
+        lastTime = timestamp;
+
+        updateRunner(dt); 
+        if(isRunnerActive) { drawRunner(); gameLoopId = requestAnimationFrame(runnerLoop); }
+    }
+
+    function gameOver() {
+        isRunnerActive = false; 
+        
+        // 🔥 게임 종료 시 중지 버튼 숨김
+        document.getElementById('abort-btn').style.display = 'none';
+        
+        let accuracy = Math.round((perfectCharCount / totalPlayableChars) * 100);
+        document.getElementById('accuracy-display').innerText = accuracy;
+        if(accuracy < 100) document.getElementById('accuracy-display').style.color = "var(--neon-red)";
+        else document.getElementById('accuracy-display').style.color = "white";
+
+        document.getElementById('cursor').style.display = 'none';
+        if(accuracy === 100) {
+            document.getElementById('bubble-box').classList.add('complete');
+        }
+
+        document.getElementById('receiver-controls').style.display = 'block';
+        document.getElementById('bottom-toast').classList.add('show');
+    }
+
+    function updateScoreUI() { document.getElementById('score-display').innerText = score; }
+
+    window.addEventListener('keydown', (e) => {
+        if (currentStage === 1) { if (e.code === 'Space' || e.code === 'Enter') { e.preventDefault(); toggleBit(); } }
+        if (currentStage === 2) handleByteInput(e);
+        if (currentStage === 5 && isRunnerActive) {
+            if (e.key === "0" || e.code === "ArrowDown") { playerState = 0; e.preventDefault(); } 
+            else if (e.key === "1" || e.code === "ArrowUp") { playerState = 1; e.preventDefault(); }
+        }
+    });
+</script>
+</body>
+</html>

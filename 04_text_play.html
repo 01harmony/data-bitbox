@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Digital BitBox - AI 방탈출 미션</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&family=JetBrains+Mono:wght@700;900&display=swap" rel="stylesheet">
+    <style>
+        /* 테마 컬러 및 시스템 변수 */
+        :root {
+            --apple-blue: #0A84FF; --apple-gray: #86868b;
+            --apple-pink: #FF375F; --apple-red: #FF453A; 
+            --bg-dark: #09090B; --bg-panel: #1C1C1E;
+            --success-green: #30D158;
+            --terminal-bg: #000000;
+            --terminal-green: #39FF14;
+            --cyber-gold: #FFD60A;
+        }
+
+        * { box-sizing: border-box; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #48484A; border-radius: 10px; }
+
+        html, body { margin: 0; padding: 0; height: 100vh; font-family: 'Inter', sans-serif; background-color: var(--bg-dark); color: #F2F2F7; display: flex; flex-direction: column; overflow: hidden;
+            padding-top: 46px;
+        }
+
+        /* 배경 효과 (어두운 방탈출 테마) */
+        body { background-image: radial-gradient(circle at 10% 10%, rgba(10, 132, 255, 0.05) 0%, transparent 50%), radial-gradient(circle at 90% 90%, rgba(57, 255, 20, 0.05) 0%, transparent 50%);
+        padding-top: 46px;
+    }
+
+        /* 교실 상태 알림판 테두리 효과 */
+        body::after {
+            content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            pointer-events: none; box-shadow: inset 0 0 0 0 transparent;
+            transition: box-shadow 0.4s ease-in-out; z-index: 9999;
+        }
+        body.status-help::after { box-shadow: inset 0 0 0 24px rgba(255, 69, 58, 0.6); }
+        body.status-done::after { box-shadow: inset 0 0 0 24px rgba(48, 209, 88, 0.6); }
+
+        /* 상태 컨트롤러 */
+        .status-controller { 
+            position: fixed; bottom: 30px; left: 30px; display: flex; gap: 10px; z-index: 6000; 
+            background: rgba(28, 28, 30, 0.8); padding: 12px; border-radius: 20px; border: 1px solid #3A3A3C; backdrop-filter: blur(10px);
+        }
+        .status-btn { padding: 8px 16px; border-radius: 14px; font-weight: 900; font-size: 0.95rem; border: none; background: #2C2C2E; color: #F2F2F7; cursor: pointer; transition: 0.2s; }
+        .status-btn:hover { background: #3A3A3C; transform: translateY(-3px); }
+        .status-btn.btn-help:hover { color: var(--apple-red); }
+        .status-btn.btn-done:hover { color: var(--success-green); }
+
+        /* 메인 레이아웃 */
+        main { display: flex; width: 100%; height: 100%; }
+
+        /* ⭐ 좌측: AI 모니터 영역 */
+        .left-game-panel {
+            flex: 2; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 40px; position: relative;
+        }
+
+        .cyber-title {
+            color: var(--apple-blue); font-size: 2.2rem; font-weight: 900; letter-spacing: 2px; margin-bottom: 5px; font-family: 'Inter', sans-serif; text-shadow: 0 0 15px rgba(10, 132, 255, 0.6); text-align: center;
+        }
+        .story-subtitle { font-size: 1rem; color: #AEAEB2; margin-bottom: 30px; font-weight: 600; text-align: center; }
+
+        .monitor-layout { display: flex; align-items: center; justify-content: center; gap: 30px; width: 100%; max-width: 1000px; }
+
+        .monitor-wrapper { display: flex; flex-direction: column; align-items: center; flex: 1; min-width: 400px; }
+
+        /* 모니터 디자인 */
+        .monitor-frame {
+            background: #1C1C1E; padding: 20px; border-radius: 16px; border: 2px solid #3A3A3C;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 20px rgba(10, 132, 255, 0.2); width: 100%; position: relative;
+        }
+        .monitor-screen {
+            background: var(--terminal-bg); height: 350px; border-radius: 8px; padding: 25px; 
+            text-align: left; overflow-y: auto; display: flex; flex-direction: column; position: relative;
+        }
+        .monitor-screen::after {
+            content: " "; display: block; position: absolute; top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%); z-index: 2; background-size: 100% 4px; pointer-events: none;
+        }
+
+        .binary-output {
+            font-family: 'JetBrains Mono', monospace; font-size: 1.3rem; color: var(--terminal-green); text-shadow: 0 0 5px rgba(57, 255, 20, 0.5); 
+            word-wrap: break-word; line-height: 1.6; z-index: 3;
+        }
+        .sys-msg { color: var(--apple-blue); }
+        .cursor { display: inline-block; width: 12px; height: 1.3rem; background: var(--terminal-green); animation: blink 1s step-end infinite; vertical-align: middle; margin-left: 5px; }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        /* ⭐ 모니터 옆 스토리 팁 상자 (방탈출 힌트 쪽지) */
+        .tip-box-3d {
+            display: flex; flex-direction: column; justify-content: center;
+            background: rgba(255, 214, 10, 0.1); border: 2px dashed var(--cyber-gold); border-radius: 12px; padding: 25px; 
+            width: 300px; flex-shrink: 0; text-align: left;
+            cursor: pointer; position: relative; backdrop-filter: blur(5px);
+        }
+        .tip-title { font-weight: 900; color: var(--cyber-gold); margin-bottom: 12px; font-size: 1.2rem; display: flex; align-items: center; gap: 8px;}
+        .tip-text { font-size: 1rem; color: #E5E5EA; line-height: 1.6; font-weight: 400; word-break: keep-all;}
+        .highlight-text { color: #000; font-weight: 800; background: var(--cyber-gold); padding: 2px 6px; border-radius: 4px; display: inline-block; margin-top: 5px;}
+
+        .status-display {
+            margin-top: 25px; color: #8E8E93; font-weight: 800; font-size: 1rem; background: #1C1C1E; padding: 12px 25px; border-radius: 20px; border: 1px solid #3A3A3C;
+        }
+        .highlight-data { color: var(--apple-pink); font-family: 'JetBrains Mono'; font-size: 1.3rem; margin-left: 10px; }
+
+        /* ⭐ 우측: 방탈출 퀴즈 영역 */
+        .right-quest-panel {
+            flex: 1; background: #121214; border-left: 1px solid #3A3A3C; display: flex; flex-direction: column; padding: 40px 30px; overflow-y: auto; min-width: 450px; box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+        }
+
+        .quest-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .quest-title { font-size: 1.5rem; font-weight: 900; color: #FFFFFF; display: flex; align-items: center; gap: 10px;}
+        .quest-title span { background: var(--apple-red); font-size: 0.8rem; padding: 4px 8px; border-radius: 6px; letter-spacing: 1px; }
+        #scoreBoard { background: rgba(10, 132, 255, 0.2); color: var(--apple-blue); border: 1px solid var(--apple-blue); padding: 6px 15px; border-radius: 12px; font-weight: 900; font-size: 1.1rem; font-family: 'JetBrains Mono';}
+
+        .story-briefing { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px; font-size: 0.95rem; color: #D1D1D6; line-height: 1.5; margin-bottom: 25px; border-left: 5px solid var(--apple-blue); }
+
+        /* ⭐ 훨씬 더 굵고 돋보이는 입력창 설계 */
+        .type-input { 
+            width: 100%; min-height: 90px; padding: 15px; border-radius: 16px; 
+            border: 4px solid var(--apple-blue); /* 테두리를 두껍게 */
+            background: #1C1C1E; font-size: 1.8rem; font-weight: 900; 
+            color: var(--terminal-green); text-align: center; 
+            transition: 0.3s; cursor: text !important; outline: none; margin-bottom: 25px; 
+            font-family: 'Inter', sans-serif;
+            box-shadow: 0 0 25px rgba(10, 132, 255, 0.3), inset 0 0 10px rgba(0,0,0,0.8);
+        }
+        .type-input:focus { border-color: var(--success-green); box-shadow: 0 0 30px rgba(48, 209, 88, 0.4), inset 0 0 10px rgba(0,0,0,0.8); background: #121214; }
+        .type-input::placeholder { color: #636366; font-family: 'Inter'; font-weight: 800; font-size: 1.4rem;}
+
+        .clue-box { background: rgba(57, 255, 20, 0.05); border: 2px dashed var(--terminal-green); padding: 15px; border-radius: 12px; margin-bottom: 25px; text-align: center; }
+        .clue-title { font-size: 0.9rem; font-weight: 800; color: var(--terminal-green); margin-bottom: 10px; letter-spacing: 1px;}
+        .clue-words { font-weight: 900; color: #FFFFFF; font-size: 1.15rem; line-height: 1.6; word-spacing: 15px;}
+
+        .quiz-box { 
+            font-size: 1.05rem; line-height: 1.8; color: #AEAEB2; font-weight: 600; 
+            background: #1C1C1E; padding: 20px 25px; border-radius: 12px; border: 1px solid #3A3A3C; 
+            margin-bottom: 15px; transition: 0.3s;
+        }
+        .quiz-box:hover { border-color: #636366; background: #2C2C2E; transform: translateX(3px); }
+        .quiz-box strong { color: #E5E5EA; }
+
+        /* 빈칸 입력상자 */
+        .blank { 
+            box-sizing: border-box; display: inline-block; width: 95px; height: 36px; 
+            background: #09090B; border: 2px solid #48484A; 
+            border-radius: 6px; vertical-align: middle; padding: 0 10px;
+            text-align: center; line-height: 30px; 
+            font-size: 1.1rem; font-weight: 900; color: var(--apple-blue); 
+            margin: 0 6px; transition: all 0.2s ease; outline: none;
+        }
+        .blank:focus { border-color: var(--apple-blue); box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.2); width: 115px; }
+        .blank.correct { background: rgba(48, 209, 88, 0.2); color: var(--success-green); border-color: var(--success-green); }
+        .blank:disabled { opacity: 1; }
+
+        /* 완료 모달 창 */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(10px); z-index: 9000; align-items: center; justify-content: center; }
+        .modal-content { background: #1C1C1E; padding: 40px; border-radius: 24px; width: 450px; text-align: center; border: 1px solid #3A3A3C; box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 30px rgba(10, 132, 255, 0.3); color: #F2F2F7; }
+        .modal-content h2 { color: var(--apple-blue); font-weight: 900; font-size: 2rem; margin-bottom: 10px;}
+        .modal-content p { color: #AEAEB2; line-height: 1.6; margin-bottom: 25px; font-size: 1.1rem;}
+    </style>
+</head>
+<body>
+<!-- ✅ DATA BITBOX 공통 네비바 -->
+<style>
+#dbb-topnav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 99999;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 9px 22px;
+    background: rgba(255,255,255,0.13);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(232,244,255,0.2);
+    box-shadow: 0 2px 20px rgba(0,0,0,0.18);
+    font-family: 'Noto Sans KR','Pretendard','Inter',sans-serif;
+    box-sizing: border-box;
+}
+#dbb-topnav a.dbb-btn {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 0.72rem; font-weight: 700; letter-spacing: 0.3px;
+    text-decoration: none;
+    padding: 6px 14px; border-radius: 20px;
+    border: 1.5px solid rgba(232,244,255,0.35);
+    color: #E8F4FF;
+    background: rgba(232,244,255,0.08);
+    transition: all 0.18s ease;
+    white-space: nowrap;
+}
+#dbb-topnav a.dbb-btn:hover {
+    background: rgba(232,244,255,0.15);
+    border-color: rgba(232,244,255,0.6);
+    box-shadow: 0 0 14px rgba(232,244,255,0.2);
+    transform: translateY(-1px);
+}
+#dbb-topnav .dbb-title {
+    font-size: 0.78rem; font-weight: 700;
+    color: #E8F4FF;
+    letter-spacing: 0.3px;
+    opacity: 0.9;
+}
+
+</style>
+<div id="dbb-topnav">
+    <div style="display:flex;gap:9px;align-items:center;">
+        <a class="dbb-btn" href="index.html">← 메인으로</a>
+        <a class="dbb-btn" href="04_text.html">📖 개념으로</a>
+    </div>
+    <span class="dbb-title">🎮 문자의 디지털 표현 · 활용 실습</span>
+</div>
+<!-- /네비바 -->
+
+
+    
+    <main>
+        <div class="left-game-panel">
+            <div class="cyber-title">Digital BitBox</div>
+            <div class="story-subtitle">⚠️ 방탈출 시스템 가동. 문자를 입력하여 AI의 잠금을 해제하세요.</div>
+            
+            <div class="monitor-layout">
+                <div class="monitor-wrapper">
+                    <div class="monitor-frame">
+                        <div class="monitor-screen" id="monitorScreen">
+                            <div class="binary-output">
+                                <span class="sys-msg">[SYSTEM] 데이터 유저 환영합니다.<br>[SYSTEM] 입력된 데이터가 이진수(0과 1)로 변환되어 출력됩니다.</span><br><br>
+                                <span id="binaryText"></span><span class="cursor"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tip-box-3d" onclick="document.getElementById('typeInput').focus()">
+                    <div class="tip-title">📝 탈출을 위한 비밀 쪽지</div>
+                    <div class="tip-text">
+                        데이터 유저님, 잘 들으세요! 이 방을 나가려면 컴퓨터가 글자를 어떻게 읽는지 알아야 해요.<br><br>
+                        우측 입력창에 <strong>영어 'A'</strong>를 입력하고, <strong>한글 '가'</strong>를 입력하여 0과 1의 개수를 비교해보세요.<br><br>
+                        글자 종류가 많은 한글은 <strong>UTF-8</strong> 규칙에 따라 영어(8비트)보다 3배나 큰 <strong>24비트(3바이트)</strong> 공간을 사용한답니다!<br>
+                        <span class="highlight-text">힌트: 8비트의 3배는 몇 비트?</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="status-display">
+                현재 입력한 문자: <span class="highlight-data" id="current-char">없음</span>
+            </div>
+        </div>
+
+        <div class="right-quest-panel">
+            <div class="quest-header">
+                <div class="quest-title">방탈출 자물쇠 🚪 <span>LOCKED</span></div>
+                <div id="scoreBoard">해제율: <span id="currentScore">0</span>%</div>
+            </div>
+
+            <div class="story-briefing">
+                <strong>[미션 목표]</strong><br>
+                아래 거대한 입력창에 데이터를 자유롭게 입력해 보세요. AI가 문자를 어떻게 0과 1로 바꾸는지 원리를 파악하고, 4개의 자물쇠(빈칸)를 모두 풀어 방에서 탈출하세요!
+            </div>
+
+            <input type="text" id="typeInput" class="type-input" placeholder="데이터 입력 (여기를 클릭하세요!)" oninput="updateBinaryScreen()" autocomplete="off">
+
+            <div class="clue-box">
+                <div class="clue-title">🔑 자물쇠 힌트 조각 (아래 암호를 해독해 빈칸에 입력하세요)</div>
+                <div class="clue-words">24 다릅니다 같습니다 숫자 커집니다</div>
+            </div>
+
+            <div class="quiz-box">1. 영문자 'A'와 한글 '가'를 각각 입력해 모니터를 관찰하세요. 영문자는 8개의 비트(0과 1)로 표현되지만, 문자의 종류가 방대한 한글은 <input type="text" class="blank" data-answer="24" autocomplete="off"> 개의 비트로 길게 변환됩니다.</div>
+            
+            <div class="quiz-box">2. 대문자 'A'와 소문자 'a'를 입력했을 때 모니터에 출력되는 이진수 값은 완전히 <input type="text" class="blank" data-answer="다릅니다" autocomplete="off">. (컴퓨터는 대소문자를 구분합니다.)</div>
+            
+            <div class="quiz-box">3. 단어 사이에 띄어쓰기(스페이스바)를 입력해 보세요. 눈에 보이지 않는 공백조차도 컴퓨터에게는 고유한 <input type="text" class="blank" data-answer="숫자" autocomplete="off"> (이진수)로 변환되어 저장됩니다.</div>
+            
+            <div class="quiz-box">4. 우리가 입력하는 텍스트 데이터가 길어지면 길어질수록, 컴퓨터 메모리에 보관해야 하는 이진수(0과 1)의 양도 당연히 <input type="text" class="blank" data-answer="커집니다" autocomplete="off">.</div>
+        </div>
+    </main>
+
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-content">
+            <div style="font-size:4rem; margin-bottom:15px; text-shadow: 0 0 20px rgba(48,209,88,0.8);">🔓🏃‍♂️</div>
+            <h2 style="color:var(--success-green);">방탈출 성공!</h2>
+            <p>축하합니다, 데이터 유저님!<br>문자가 0과 1로 변환되는 원리를 완벽하게 파악하여 굳게 닫혀있던 AI의 문을 열었습니다.</p>
+            <button onclick="closeModal()" style="width:100%; padding:15px; background:var(--success-green); color:#000; border:none; border-radius:12px; font-weight:900; font-size:1.1rem; cursor:pointer;">게임 종료</button>
+        </div>
+    </div>
+
+    <script>
+        // --- 상태 컨트롤 ---
+        function setStatus(status) {
+            document.body.className = ''; 
+            if(status === 'help') document.body.classList.add('status-help');
+            if(status === 'done') document.body.classList.add('status-done');
+        }
+
+        // --- 모니터 시스템 연동 로직 (UTF-8 24비트 변환 적용) ---
+        const monitorDisplay = document.getElementById('binaryText');
+        const currentCharDisplay = document.getElementById('current-char');
+        const screenDiv = document.getElementById('monitorScreen');
+
+        function textToBinary(text) {
+            if (!text) return "<span class='sys-msg'>[대기 상태] 데이터를 입력하십시오...</span>";
+            
+            const encoder = new TextEncoder(); // UTF-8 변환
+            let binaryResult = "";
+            
+            for (let i = 0; i < text.length; i++) {
+                let char = text[i];
+                let bytes = encoder.encode(char); 
+                
+                if (bytes.length > 1) {
+                    // 한글 등 24비트 문자는 노란색으로 강조
+                    let binStr = Array.from(bytes).map(b => b.toString(2).padStart(8, '0')).join('');
+                    binaryResult += `<span style="color:var(--cyber-gold); font-weight:bold;">${binStr}</span> `;
+                } else {
+                    // 영어, 숫자, 공백 등은 8비트로 출력
+                    binaryResult += bytes[0].toString(2).padStart(8, '0') + " ";
+                }
+            }
+            return binaryResult;
+        }
+
+        function updateBinaryScreen() {
+            const inputVal = document.getElementById('typeInput').value;
+            currentCharDisplay.innerText = inputVal || "없음";
+            monitorDisplay.innerHTML = textToBinary(inputVal);
+            screenDiv.scrollTop = screenDiv.scrollHeight;
+        }
+
+        // --- 퀴즈 및 키보드 입력 이벤트 ---
+        let score = 0;
+        const totalQuestions = 4;
+        const inputs = document.querySelectorAll('.blank');
+
+        inputs.forEach(input => {
+            // 포커스 시 모니터 연동
+            input.addEventListener('focus', function() {
+                currentCharDisplay.innerText = this.value || "(분석 중...)";
+                monitorDisplay.innerHTML = textToBinary(this.value);
+            });
+
+            // 실시간 정답 체크
+            input.addEventListener('input', function() {
+                let currentVal = this.value;
+                currentCharDisplay.innerText = currentVal || "(분석 중...)";
+                monitorDisplay.innerHTML = textToBinary(currentVal);
+                screenDiv.scrollTop = screenDiv.scrollHeight;
+
+                if (!this.classList.contains('correct')) {
+                    if (currentVal.trim() === this.getAttribute('data-answer')) {
+                        this.classList.add('correct');
+                        this.disabled = true; 
+                        
+                        // 모니터에 로그 추가
+                        monitorDisplay.innerHTML += "<br><span style='color:var(--apple-blue);'>[자물쇠 해제 성공!]</span>";
+                        
+                        score += 25; 
+                        document.getElementById('currentScore').innerText = score;
+                        
+                        // 클리어 시 모달 호출
+                        if (score === 100) {
+                            setTimeout(() => {
+                                document.getElementById('modalOverlay').style.display = 'flex';
+                                setStatus('done'); 
+                            }, 600);
+                        }
+                    }
+                }
+            });
+        });
+
+        function closeModal() { document.getElementById('modalOverlay').style.display = 'none'; }
+    </script>
+</body>
+</html>

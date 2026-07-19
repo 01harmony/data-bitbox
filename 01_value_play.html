@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1920">
+<title>Digital vs Analog Explorer - Falling Action</title>
+<link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./css/value_play_concept.css">
+<style>
+/* 특징 카드: 문장형 텍스트가 잘 보이도록 */
+.card.feature-card {
+    font-size: 15px;
+    max-width: 170px;
+    text-align: center;
+    line-height: 1.35;
+    white-space: normal;
+    word-break: keep-all;
+    border-style: dashed;
+}
+</style>
+</head>
+<body>
+<!-- ✅ DATA BITBOX 공통 네비바 -->
+<style>
+#dbb-topnav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 99999;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 9px 22px;
+    background: rgba(255,255,255,0.13);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid #14b8a655;
+    box-shadow: 0 2px 20px rgba(0,0,0,0.18);
+    font-family: 'Noto Sans KR','Pretendard','Inter',sans-serif;
+    box-sizing: border-box;
+}
+#dbb-topnav a.dbb-btn {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 0.72rem; font-weight: 700; letter-spacing: 0.3px;
+    text-decoration: none;
+    padding: 6px 14px; border-radius: 20px;
+    border: 1.5px solid #14b8a677;
+    color: #14b8a6;
+    background: rgba(20,184,166,0.12);
+    transition: all 0.18s ease;
+    white-space: nowrap;
+}
+#dbb-topnav a.dbb-btn:hover {
+    background: #14b8a622;
+    border-color: #14b8a6;
+    box-shadow: 0 0 14px #14b8a644;
+    transform: translateY(-1px);
+}
+#dbb-topnav .dbb-title {
+    font-size: 0.78rem; font-weight: 700;
+    color: #14b8a6;
+    letter-spacing: 0.3px;
+    opacity: 0.9;
+}
+</style>
+<div id="dbb-topnav">
+    <div style="display:flex;gap:9px;align-items:center;">
+        <a class="dbb-btn" href="index.html">← 메인으로</a>
+        <a class="dbb-btn" href="01_value.html">📖 개념으로</a>
+    </div>
+    <span class="dbb-title">🎮 디지털 데이터의 가치 · 활용 실습</span>
+</div>
+<!-- /네비바 -->
+
+
+<div id="quiz-modal" class="modal-overlay show">
+    <div class="modal-box" id="quiz-box">
+        <svg width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:white; background:var(--analog-color); border-radius:50%; padding:15px; margin-bottom:20px; box-shadow: 0 10px 25px rgba(255,8,68,0.4);">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+        <h3>게임 접속 보안 퀴즈</h3>
+        <p style="font-size: 18px; color: white;">사진 속 바늘 시계는<br>어떤 데이터 형식일까요?</p>
+        <div class="modal-buttons">
+            <button class="btn-confirm" onclick="checkQuiz('digital')">디지털</button>
+            <button class="btn-analog" onclick="checkQuiz('analog')">아날로그</button>
+        </div>
+        <p id="quiz-error" style="color: #ff0844; margin-top: 20px; margin-bottom: 0; font-weight: 800; font-size: 18px; display: none;">땡! 다시 생각해보세요. 😅</p>
+    </div>
+</div>
+
+<div class="topbar" id="topbar">
+    <div style="display:flex; align-items:flex-start; gap:20px;">
+        <button class="home-btn" onclick="openModal()">🏠 게임 초기화</button>
+        <div>SCORE: <span id="score">0</span> <br><span class="combo-text" id="combo"></span></div>
+    </div>
+    <div>⏱ <span id="time">60</span>s</div>
+</div>
+
+<div class="title">Digital vs Analog</div>
+
+<div class="memo" id="memo">
+    🕹️ <b>게임 방법</b><br><br>
+    방향키(←→↑↓)로 로봇을 이동해 떨어지는 사물과 특징 카드를 잡아주세요.<br>
+    DIGITAL / ANALOG 구역에 정확히 분류하면 점수를 획득합니다.<br>
+    <br>
+    <span style="color:#fbbf24; font-weight:900; font-size:18px;">🔥 콤보 달성 시 2의 지수승(2배씩)으로 점수가 폭발합니다!</span><br>
+    <span style="color:#ff0844; font-weight:900; font-size:18px;">⚠️ 폭탄에 닿으면 현재 점수의 2배가 감점되니 조심하세요!</span><br>
+    <span style="color:#00f2fe; font-weight:900; font-size:18px;">🚨 한곳에 4초 이상 멈춰있으면 폭탄이 터지며 100점 감점! (멈춤 금지)</span><br>
+    <br>
+    <button onclick="startGame()">도전 시작!</button>
+</div>
+
+<div id="custom-modal" class="modal-overlay">
+    <div class="modal-box">
+        <h3>게임 초기화</h3>
+        <p>진행 중인 게임이 초기화됩니다.<br>처음으로 돌아가시겠습니까?</p>
+        <div class="modal-buttons">
+            <button class="btn-cancel" onclick="closeModal()">취소</button>
+            <button class="btn-confirm" onclick="confirmGoHome()">확인</button>
+        </div>
+    </div>
+</div>
+
+<div class="game" id="game">
+    <div class="player" id="player">🤖</div>
+    
+    <div class="zone-container">
+        <div class="zone digital" id="zone-digital">DIGITAL</div>
+        <div class="zone analog" id="zone-analog">ANALOG</div>
+    </div>
+</div>
+
+<script>
+const originalData = [
+    {name:"스마트폰", type:"digital"}, {name:"CCTV", type:"digital"}, {name:"GPS", type:"digital"},
+    {name:"USB", type:"digital"}, {name:"자율주행", type:"digital"}, {name:"클라우드", type:"digital"},
+    {name:"💻", type:"digital", isImg: true}, {name:"📱", type:"digital", isImg: true}, {name:"⌚", type:"digital", isImg: true}, 
+    {name:"LP판", type:"analog"}, {name:"종이책", type:"analog"}, {name:"손편지", type:"analog"},
+    {name:"필름카메라", type:"analog"}, {name:"카세트테이프", type:"analog"}, {name:"만년필", type:"analog"},
+    {name:"🕰️", type:"analog", isImg: true}, {name:"🌡️", type:"analog", isImg: true}, {name:"📻", type:"analog", isImg: true},
+    {name:"0과 1로 표현", type:"digital", isFeature: true}, {name:"복사해도 품질 유지", type:"digital", isFeature: true},
+    {name:"수정과 편집이 쉬움", type:"digital", isFeature: true}, {name:"끊어진 값(이산적)", type:"digital", isFeature: true},
+    {name:"연속적인 값", type:"analog", isFeature: true}, {name:"복사할수록 품질 저하", type:"analog", isFeature: true},
+    {name:"시간이 지나면 변형됨", type:"analog", isFeature: true}, {name:"자연 그대로의 신호", type:"analog", isFeature: true},
+    {name:"컴퓨터로 처리할 수 있음", type:"digital", isFeature: true}, {name:"먼 곳까지 빠르게 전송", type:"digital", isFeature: true},
+    {name:"사람의 감각으로 직접 느낌", type:"analog", isFeature: true}, {name:"정확한 값을 재기 어려움", type:"analog", isFeature: true}
+];
+
+let game = document.getElementById("game");
+let player = document.getElementById("player");
+let scoreEl = document.getElementById("score");
+let comboEl = document.getElementById("combo");
+let timeEl = document.getElementById("time");
+
+let score = 0;
+let combo = 0;
+let time = 60;
+let isPlaying = false;
+let timerInterval;
+
+// 플레이어 상태
+let pX = window.innerWidth / 2;
+let pY = window.innerHeight / 2;
+let speed = 8;
+let keys = {};
+let carriedCard = null;
+let cards = []; 
+
+// 안티 캠핑(Anti-Camping) 시스템 변수
+let lastLoopTime = Date.now();
+let lastStayX = pX;
+let lastStayY = pY;
+let stayTimer = 0;
+
+// 키보드 리스너
+window.addEventListener("keydown", (e) => { keys[e.code] = true; });
+window.addEventListener("keyup", (e) => { keys[e.code] = false; });
+
+function checkQuiz(answer) {
+    if(answer === 'analog') {
+        document.getElementById('quiz-modal').classList.remove('show');
+        setTimeout(() => {
+            document.getElementById('quiz-modal').style.display = 'none';
+            document.getElementById('topbar').style.display = 'flex';
+            document.getElementById('game').style.opacity = '1';
+            document.getElementById('memo').style.display = 'block';
+        }, 300);
+    } else {
+        const quizBox = document.getElementById('quiz-box');
+        const errorMsg = document.getElementById('quiz-error');
+        errorMsg.style.display = 'block';
+        quizBox.classList.add('shake');
+        setTimeout(() => { quizBox.classList.remove('shake'); }, 400);
+        setTimeout(() => { errorMsg.style.display = 'none'; }, 2000);
+    }
+}
+
+function openModal() {
+    isPlaying = false; 
+    const modal = document.getElementById('custom-modal');
+    modal.style.display = 'flex';
+    void modal.offsetWidth; 
+    modal.classList.add('show');
+}
+
+function closeModal() {
+    const modal = document.getElementById('custom-modal');
+    modal.classList.remove('show');
+    
+    setTimeout(() => {
+        modal.style.display = 'none';
+        if (time > 0 && document.getElementById("memo").style.display === "none") {
+            isPlaying = true;
+            lastLoopTime = Date.now(); // 일시정지 후 시간 튀는 현상 방지
+            requestAnimationFrame(gameLoop);
+        }
+    }, 300);
+}
+
+function confirmGoHome() { location.reload(); }
+
+function startGame() {
+    document.getElementById("memo").style.display = "none";
+    if(!isPlaying) {
+        isPlaying = true;
+        lastLoopTime = Date.now();
+        lastStayX = window.innerWidth / 2;
+        lastStayY = window.innerHeight / 2;
+        spawnCards(8); 
+        requestAnimationFrame(gameLoop);
+        timerInterval = setInterval(updateTime, 1000);
+    }
+}
+
+// 폭발 이펙트 함수
+function showExplosion(x, y) {
+    let el = document.createElement("div");
+    el.innerText = "💥";
+    el.style.position = "absolute";
+    el.style.left = x + "px";
+    el.style.top = y + "px";
+    el.style.transform = "translate(-50%, -50%)";
+    el.style.fontSize = "100px";
+    el.style.zIndex = "1000";
+    el.style.pointerEvents = "none";
+    el.style.animation = "popExplosion 0.5s ease-out forwards";
+    game.appendChild(el);
+    setTimeout(() => el.remove(), 500);
+}
+
+// 아이템 생성
+function createCard(isInitial = false) {
+    let el = document.createElement("div");
+    let isBomb = Math.random() < 0.2;
+
+    if(isBomb) {
+        el.className = "bomb";
+        el.innerText = "💣";
+        el.dataset.type = "bomb";
+    } else {
+        let item = originalData[Math.floor(Math.random() * originalData.length)];
+        el.className = "card";
+        el.innerText = item.name;
+        el.dataset.type = item.type;
+        if(item.isImg) el.classList.add("img-card");
+        if(item.isFeature) el.classList.add("feature-card");
+    }
+    
+    let startX = 50 + Math.random() * (window.innerWidth - 150);
+    let startY = isInitial ? (Math.random() * (window.innerHeight - 300)) : (-Math.random() * 200 - 100);
+    
+    el.style.left = startX + "px";
+    el.style.top = startY + "px";
+    
+    el.dataset.y = startY;
+    el.dataset.vy = Math.random() * 1.2 + 0.9; 
+    
+    game.appendChild(el);
+    return el;
+}
+
+function spawnCards(count) {
+    for(let i=0; i<count; i++) cards.push(createCard(true)); 
+}
+
+function showFloatingText(text, x, y, color) {
+    let el = document.createElement("div");
+    el.className = "floating-text";
+    el.innerText = text;
+    el.style.left = x + "px";
+    el.style.top = y + "px";
+    el.style.color = color;
+    game.appendChild(el);
+    setTimeout(() => el.remove(), 1000);
+}
+
+// 메인 루프
+function gameLoop() {
+    if(!isPlaying) return;
+
+    let now = Date.now();
+    let dt = now - lastLoopTime;
+    lastLoopTime = now;
+
+    if (keys["ArrowLeft"]) pX -= speed;
+    if (keys["ArrowRight"]) pX += speed;
+    if (keys["ArrowUp"]) pY -= speed;
+    if (keys["ArrowDown"]) pY += speed;
+
+    pX = Math.max(35, Math.min(window.innerWidth - 35, pX));
+    pY = Math.max(35, Math.min(window.innerHeight - 35, pY));
+
+    player.style.left = pX + "px";
+    player.style.top = pY + "px";
+
+    // ⭐ 안티 캠핑 시스템 (한 곳에 머무르는 것 방지)
+    // 위치가 30픽셀 이상 변했는지 체크
+    if (Math.abs(pX - lastStayX) > 30 || Math.abs(pY - lastStayY) > 30) {
+        lastStayX = pX;
+        lastStayY = pY;
+        stayTimer = 0;
+        player.style.boxShadow = "0 0 30px rgba(255,255,255,0.4)"; // 시각 효과 원상 복구
+    } else {
+        stayTimer += dt;
+        
+        // 2초 이상 머물면 그림자 붉은색으로 펄스 경고
+        if (stayTimer > 2000) {
+            let intensity = Math.min(1, (stayTimer - 2000) / 2000);
+            player.style.boxShadow = `0 0 ${30 + intensity*20}px rgba(255, 8, 68, ${0.4 + intensity*0.6})`;
+        }
+        
+        // 4초 이상 머물면 폭발 패널티
+        if (stayTimer >= 4000) {
+            stayTimer = 0;
+            lastStayX = pX; 
+            lastStayY = pY;
+            player.style.boxShadow = "0 0 30px rgba(255,255,255,0.4)";
+            
+            score -= 100;
+            combo = 0;
+            
+            scoreEl.innerText = score;
+            comboEl.innerText = "";
+            showFloatingText("-100 (캠핑 금지!)", pX - 50, pY - 80, "#ff0844");
+            showExplosion(pX, pY);
+            
+            document.body.classList.add("shake");
+            setTimeout(() => document.body.classList.remove("shake"), 400);
+        }
+    }
+
+    let pRect = player.getBoundingClientRect();
+
+    // 낙하 처리
+    for (let i = 0; i < cards.length; i++) {
+        let card = cards[i];
+        if (card !== carriedCard) {
+            let y = parseFloat(card.dataset.y) + parseFloat(card.dataset.vy);
+            card.dataset.y = y;
+            card.style.top = y + "px";
+
+            // 바닥 지나면 리스폰
+            if (y > window.innerHeight + 50) {
+                card.remove();
+                cards.splice(i, 1);
+                i--;
+                cards.push(createCard(false));
+            }
+        }
+    }
+
+    // 아이템 충돌 판정
+    if (!carriedCard) {
+        for (let i = 0; i < cards.length; i++) {
+            let card = cards[i];
+            let cRect = card.getBoundingClientRect();
+            
+            if (pRect.left < cRect.right && pRect.right > cRect.left &&
+                pRect.top < cRect.bottom && pRect.bottom > cRect.top) {
+                
+                if(card.dataset.type === "bomb") {
+                    let penalty = Math.max(20, score * 2); // 0점 이하일 때도 기본 20점 깎이도록 방어코드
+                    score -= penalty;
+                    combo = 0;
+                    
+                    comboEl.innerText = "";
+                    scoreEl.innerText = score;
+                    showFloatingText(`-${penalty}`, pX, pY - 80, "#ff0844");
+                    showExplosion(pX, pY);
+                    
+                    document.body.classList.add("shake");
+                    setTimeout(() => document.body.classList.remove("shake"), 400);
+
+                    card.remove();
+                    cards.splice(i, 1);
+                    cards.push(createCard(false)); 
+                    break;
+                } else {
+                    carriedCard = card;
+                    card.classList.add("carried");
+                    break;
+                }
+            }
+        }
+    }
+
+    if (carriedCard) {
+        carriedCard.style.left = (pX - carriedCard.offsetWidth/2) + "px";
+        carriedCard.style.top = (pY - carriedCard.offsetHeight/2 - 50) + "px";
+    }
+
+    let zoneHeight = 150;
+    let inZone = (pY > window.innerHeight - zoneHeight);
+    
+    let digitalZone = document.getElementById("zone-digital");
+    let analogZone = document.getElementById("zone-analog");
+
+    digitalZone.classList.remove("active-d");
+    analogZone.classList.remove("active-a");
+
+    if (inZone) {
+        let currentZone = (pX < window.innerWidth / 2) ? "digital" : "analog";
+        
+        if(currentZone === "digital") digitalZone.classList.add("active-d");
+        else analogZone.classList.add("active-a");
+
+        if (carriedCard) {
+            let isCorrect = (carriedCard.dataset.type === currentZone);
+            
+            if (isCorrect) {
+                combo++;
+                // 콤보 계산: 10 * 2^(combo-1)
+                let earned = 10 * Math.pow(2, combo - 1); 
+                score += earned;
+                
+                comboEl.innerText = combo > 1 ? `${combo} COMBO! 🔥` : "";
+                showFloatingText(`+${earned}`, pX, pY - 80, "#4ade80");
+            } else {
+                combo = 0;
+                score -= 10;
+                comboEl.innerText = "";
+                showFloatingText("-10", pX, pY - 80, "#f87171");
+                document.body.classList.add("shake");
+                setTimeout(() => document.body.classList.remove("shake"), 400);
+            }
+
+            scoreEl.innerText = score;
+            
+            carriedCard.remove();
+            cards = cards.filter(c => c !== carriedCard);
+            carriedCard = null;
+            cards.push(createCard(false)); 
+        }
+    }
+
+    requestAnimationFrame(gameLoop);
+}
+
+function updateTime() {
+    if(!isPlaying) return; 
+    time--;
+    timeEl.innerText = time;
+    if(time <= 0) {
+        isPlaying = false;
+        clearInterval(timerInterval);
+        setTimeout(() => {
+            alert(`게임 종료! 최종 점수: ${score}점\n최고의 플레이였습니다! 👏`);
+            location.reload();
+        }, 100);
+    }
+}
+</script>
+</body>
+</html>

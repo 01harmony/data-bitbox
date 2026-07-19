@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1920">
+    <title>동물 구출 작전 수행</title>
+  <link rel="stylesheet" href="./css/image_play_bitmap_concept.css">
+
+</head>
+<body>
+<div id="dbb-topnav">
+    <div style="display:flex;gap:9px;align-items:center;">
+        <a class="dbb-btn" href="index.html">← 메인으로</a>
+        <a class="dbb-btn" href="05_image.html">📖 개념으로</a>
+        <a class="dbb-btn" href="05_image_play.html">🎮 게임 선택</a>
+    </div>
+    <span class="dbb-title">🎮 이미지의 디지털 표현 · 비트맵 이미지 활용 실습</span>
+</div>
+<div class="zoo-bg">
+        <div class="clouds">☁️ ☁️ ☁️</div>
+        <div class="trees">🌳 🦒 🌲 🐘 🌴</div>
+    </div>
+
+    <header>
+        <div class="header-title"><span class="paw-icon">🐾</span> 동물 구출 작전 수행</div>
+          </header>
+
+    <main>
+        <div class="display-panel">
+            
+            <div class="game-area-wrap">
+                <canvas id="gameCanvas"></canvas>
+                <div id="cage" class="cage-overlay"></div> 
+            </div>
+            
+            <div id="hud-score-area" class="hud-score hidden">
+                <div class="hud-label">총 구출 점수</div>
+                <div class="hud-value" id="hud-txt-score">0</div>
+            </div>
+
+            <div id="toast">구출 성공! 🎉</div>
+            
+            <div id="screen-standby" class="overlay">
+                <div style="font-size: 5rem; margin-bottom: 10px;">🚁📡</div>
+                <h1 style="color: #2d3436; font-size: 2.2rem;">아프리카 초원 탐사 드론</h1>
+                <div style="background: rgba(255,255,255,0.6); padding: 25px 30px; border-radius: 16px; max-width: 550px; text-align: left; border: 1px solid rgba(0,0,0,0.1); margin-bottom: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.05);">
+                    <p style="margin-top: 0; font-size: 1.15rem; font-weight: 800; color: #d63031;">"현재 탐사 드론의 통신 상태가 좋지 않습니다." 📉</p>
+                    <p>대역폭의 제한으로 인해 고화질 원본 사진 대신 <b>'저해상도 비트맵 이미지'</b>로만 수신되고 있습니다.</p>
+                    <p style="margin-bottom: 0;">제한된 데이터(해상도 및 RGB 채널)를 분석하여, 밀렵꾼의 철장에 갇힌 <b>멸종 위기 동물을 식별하고 구출</b>하세요!</p>
+                </div>
+                <button class="btn-submit" style="width: 250px;" onclick="startGame()">▶ 구출 작전 시작</button>
+            </div>
+
+            <div id="screen-over" class="overlay hidden">
+                <h1 id="over-title">작전 종료</h1>
+                <p id="final-stats" style="font-size: 1.3rem; margin-bottom: 20px;"></p>
+                <button class="btn-submit" style="width: 250px;" onclick="location.reload()">처음으로 돌아가기</button>
+            </div>
+        </div>
+
+        <div class="control-panel">
+            <div class="status-board">
+                <div class="status-box">
+                    <div class="status-label">남은 시간</div>
+                    <div class="status-value" id="txt-timer" style="color:var(--accent-red)">01:30</div>
+                </div>
+                <div class="status-box">
+                    <div class="status-label">구출 진행도</div>
+                    <div class="status-value" id="txt-count" style="color:var(--accent-blue)">0/15</div>
+                </div>
+                <div class="status-box">
+                    <div class="status-label">현재 라운드 점수</div>
+                    <div class="status-value" id="txt-current-score" style="color:#009432">0</div>
+                </div>
+            </div>
+
+            <div class="security-alert">
+                🔒 [슬라이더 조작 주의]<br>화질이 좋아질수록 구출 점수는 낮아집니다. #한 번 올린 수치는 되돌릴 수 없으니, 최소한의 정보로 동물을 찾아보세요!
+            </div>
+            
+            <div class="slider-group">
+                <div class="slider-header"><span>해상도 (Resolution)</span><span class="val-display" id="val-res">10</span></div>
+                <input type="range" id="slider-res" min="10" max="120" value="10" oninput="updateSlider('maxRes', this)">
+                <div class="slider-range-labels"><span>10 (최저화질)</span><span>120 (최고화질)</span></div>
+            </div>
+            <div class="slider-group">
+                <div class="slider-header"><span style="color:#d63031">Red 채널</span><span class="val-display" id="val-r" style="color:#d63031">0</span></div>
+                <input type="range" id="slider-r" min="0" max="255" value="0" oninput="updateSlider('maxR', this)">
+                <div class="slider-range-labels"><span>0</span><span>255</span></div>
+            </div>
+            <div class="slider-group">
+                <div class="slider-header"><span style="color:#00b894">Green 채널</span><span class="val-display" id="val-g" style="color:#00b894">0</span></div>
+                <input type="range" id="slider-g" min="0" max="255" value="0" oninput="updateSlider('maxG', this)">
+                <div class="slider-range-labels"><span>0</span><span>255</span></div>
+            </div>
+            <div class="slider-group">
+                <div class="slider-header"><span style="color:#0984e3">Blue 채널</span><span class="val-display" id="val-b" style="color:#0984e3">0</span></div>
+                <input type="range" id="slider-b" min="0" max="255" value="0" oninput="updateSlider('maxB', this)">
+                <div class="slider-range-labels"><span>0</span><span>255</span></div>
+            </div>
+
+            <div class="action-area hidden" id="ui-action">
+                <input type="text" id="input-answer" class="input-box" placeholder="구출할 동물 이름 입력" onkeypress="if(event.key==='Enter') checkAnswer()" autocomplete="off">
+                <button class="btn-submit" onclick="checkAnswer()">✅ 정답 제출</button>
+                
+                <div class="sub-btn-group">
+                    <button class="btn-sub" onclick="skipMission()">⏭️ 스킵</button>
+                    <button class="btn-sub btn-reset" onclick="location.reload()">🔄 처음부터</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        const offCanvas = document.createElement('canvas');
+        offCanvas.width = 640; offCanvas.height = 480;
+        
+        let isPlaying = false, clearCount = 0, totalScore = 0, timeLeft = 90;
+        let timerInterval, currentMission, missionQueue = [];
+        const limits = { maxRes: 10, maxR: 0, maxG: 0, maxB: 0 };
+
+        const animals = [
+            { id: 'dog', emoji: '🐶', ans: ['강아지', '개', '멍멍이', 'dog'] },
+            { id: 'cat', emoji: '🐱', ans: ['고양이', '야옹이', '냥이', 'cat'] },
+            { id: 'rabbit', emoji: '🐰', ans: ['토끼', 'rabbit', 'bunny'] },
+            { id: 'fox', emoji: '🦊', ans: ['여우', 'fox'] },
+            { id: 'pig', emoji: '🐷', ans: ['돼지', 'pig'] },
+            { id: 'lion', emoji: '🦁', ans: ['사자', '라이온', 'lion'] },
+            { id: 'monkey', emoji: '🐵', ans: ['원숭이', '잔나비', 'monkey'] },
+            { id: 'panda', emoji: '🐼', ans: ['판다', '팬더', 'panda'] },
+            { id: 'cow', emoji: '🐮', ans: ['소', '황소', '암소', 'cow'] },
+            { id: 'elephant', emoji: '🐘', ans: ['코끼리', '엘리펀트', 'elephant'] },
+            { id: 'tiger', emoji: '🐯', ans: ['호랑이', 'tiger'] },
+            { id: 'giraffe', emoji: '🦒', ans: ['기린', 'giraffe'] },
+            { id: 'bird', emoji: '🐦', ans: ['새', '참새', 'bird'] },
+            { id: 'ostrich', emoji: '🦤', ans: ['타조', '도도새', 'ostrich'] },
+            { id: 'sheep', emoji: '🐑', ans: ['양', 'sheep'] }
+        ];
+
+        function drawAnimal(emoji) {
+            const oCtx = offCanvas.getContext('2d');
+            oCtx.clearRect(0, 0, 640, 480); 
+            oCtx.font = '280px Arial';
+            oCtx.textAlign = 'center';
+            oCtx.textBaseline = 'middle';
+            oCtx.fillText(emoji, 320, 260); 
+        }
+
+        function updateSlider(key, el) {
+            if (!isPlaying) return; 
+            const val = parseInt(el.value);
+            if (val < limits[key]) el.value = limits[key]; 
+            else limits[key] = val;
+            render();
+        }
+
+        function startGame() {
+            document.getElementById('screen-standby').classList.add('hidden');
+            document.getElementById('ui-action').classList.remove('hidden');
+            document.getElementById('hud-score-area').classList.remove('hidden'); 
+            
+            missionQueue = [...animals].sort(() => Math.random() - 0.5).slice(0, 15);
+            clearCount = 0; totalScore = 0; isPlaying = true;
+            
+            startTimer();
+            loadNext();
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timeLeft = 90;
+            updateTimerUI();
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerUI();
+                if (timeLeft <= 0) endGame();
+            }, 1000);
+        }
+
+        function updateTimerUI() {
+            const m = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+            const s = (timeLeft % 60).toString().padStart(2, '0');
+            document.getElementById('txt-timer').innerText = `${m}:${s}`;
+        }
+
+        function loadNext() {
+            if (missionQueue.length === 0 && clearCount > 0) { endGame(true); return; }
+            if (!isPlaying) return;
+
+            document.getElementById('cage').classList.remove('cage-opened');
+
+            Object.assign(limits, { maxRes: 10, maxR: 0, maxG: 0, maxB: 0 });
+            document.getElementById('slider-res').value = 10;
+            document.getElementById('slider-r').value = 0;
+            document.getElementById('slider-g').value = 0;
+            document.getElementById('slider-b').value = 0;
+
+            currentMission = missionQueue.shift();
+            drawAnimal(currentMission.emoji);
+            document.getElementById('input-answer').value = '';
+            document.getElementById('input-answer').focus();
+            render();
+        }
+
+        function render() {
+            document.getElementById('val-res').innerText = limits.maxRes;
+            document.getElementById('val-r').innerText = limits.maxR;
+            document.getElementById('val-g').innerText = limits.maxG;
+            document.getElementById('val-b').innerText = limits.maxB;
+
+            const roundScore = Math.floor((120 - limits.maxRes) * 5 + (255 - limits.maxR) + (255 - limits.maxG) + (255 - limits.maxB));
+            document.getElementById('txt-current-score').innerText = roundScore;
+
+            const res = limits.maxRes;
+            const temp = document.createElement('canvas');
+            temp.width = res; temp.height = Math.floor(res * 0.75);
+            const tCtx = temp.getContext('2d');
+            tCtx.drawImage(offCanvas, 0, 0, temp.width, temp.height);
+
+            ctx.clearRect(0, 0, 640, 480);
+            ctx.imageSmoothingEnabled = false;
+            ctx.drawImage(temp, 0, 0, temp.width, temp.height, 0, 0, 640, 480);
+
+            let imgData = ctx.getImageData(0, 0, 640, 480);
+            let p = imgData.data;
+            for (let i = 0; i < p.length; i += 4) {
+                if (p[i+3] > 0) { 
+                    p[i] = Math.min(p[i], limits.maxR);
+                    p[i+1] = Math.min(p[i+1], limits.maxG);
+                    p[i+2] = Math.min(p[i+2], limits.maxB);
+                }
+            }
+            ctx.putImageData(imgData, 0, 0);
+        }
+
+        function checkAnswer() {
+            const inputEl = document.getElementById('input-answer');
+            const input = inputEl.value.trim();
+            
+            if (currentMission.ans.includes(input)) {
+                clearCount++;
+                const roundScore = Math.floor((120 - limits.maxRes) * 5 + (255 - limits.maxR) + (255 - limits.maxG) + (255 - limits.maxB));
+                totalScore += roundScore;
+                
+                document.getElementById('txt-count').innerText = `${clearCount}/15`;
+                document.getElementById('hud-txt-score').innerText = totalScore;
+                
+                const toast = document.getElementById('toast');
+                toast.style.opacity = 1;
+                setTimeout(() => toast.style.opacity = 0, 1500);
+
+                ctx.imageSmoothingEnabled = true;
+                ctx.clearRect(0, 0, 640, 480);
+                ctx.drawImage(offCanvas, 0, 0, 640, 480);
+                document.getElementById('cage').classList.add('cage-opened');
+                
+                setTimeout(loadNext, 1200); 
+            } else {
+                inputEl.classList.add('error-shake');
+                setTimeout(() => inputEl.classList.remove('error-shake'), 400);
+            }
+        }
+
+        function skipMission() { missionQueue.push(currentMission); loadNext(); }
+
+        function endGame(isClear = false) {
+            isPlaying = false;
+            clearInterval(timerInterval);
+            document.getElementById('screen-over').classList.remove('hidden');
+            document.getElementById('hud-score-area').classList.add('hidden'); 
+            const stats = document.getElementById('final-stats');
+            if (isClear) {
+                document.getElementById('over-title').innerText = "MISSION COMPLETE!";
+                stats.innerHTML = `15마리의 동물을 모두 구출했습니다.<br>최종 획득 점수: <span style="font-size:3rem; color:#009432; font-weight:900;">${totalScore}</span>`;
+            } else {
+                stats.innerHTML = `시간이 초과되었습니다.<br>구출 성공: ${clearCount}/15<br>최종 획득 점수: ${totalScore}`;
+            }
+        }
+
+        function setStatus(type) {
+            const body = document.getElementById('mainBody');
+            body.style.boxShadow = 'none';
+            if (type === 'sos') body.style.boxShadow = 'inset 0 0 0 20px var(--accent-red)';
+            if (type === 'done') body.style.boxShadow = 'inset 0 0 0 20px #009432';
+        }
+
+        canvas.width = 640; canvas.height = 480;
+    </script>
+</body>
+</html>

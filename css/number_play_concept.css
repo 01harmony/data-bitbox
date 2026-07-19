@@ -1,0 +1,229 @@
+
+        /* ✨ 숫자의 디지털 표현 전용 컬러 팔레트 (오션 블루 & 스카이 블루) */
+        :root {
+            --bg-pastel: #f0f9ff; /* 청량한 하늘색 그라데이션 배경 */
+            --blue-main: #0284c7; /* 오션 블루 (메인) */
+            --blue-light: #38bdf8; /* 스카이 블루 */
+            --gold-main: #d97706; /* 고급스러운 골드 (텍스트 강조) */
+            --gold-light: #fbbf24;
+            
+            /* 플레이어 컬러 (푸른 계열 내에서 대비) */
+            --p1-color: #0ea5e9; /* 1P: 맑은 파란색 */
+            --p1-shadow: #38bdf8;
+            --p2-color: #6366f1; /* 2P: 인디고 블루 */
+            --p2-shadow: #818cf8;
+            
+            --text-main: #0f172a;
+            --text-sub: #475569;
+            --apple-red: #ef4444;
+            --apple-green: #10b981;
+            
+            --card-white: #ffffff;
+        }
+
+        * { cursor: default !important; box-sizing: border-box; -webkit-user-select: none; -moz-user-select: none; user-select: none; }
+
+        body {
+            margin: 0; padding: 0; height: 100vh;
+            font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            display: flex; flex-direction: column; overflow: hidden;
+            transition: box-shadow 0.3s ease;
+            position: relative;
+        padding-top: 46px;
+    }
+        
+        /* 은은한 도트 패턴을 배경에 깔아 깊이감 추가 */
+        body::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: radial-gradient(rgba(2, 132, 199, 0.05) 2px, transparent 2px);
+            background-size: 30px 30px; z-index: 0;
+        }
+
+        /* [상단 헤더] 깔끔한 글래스 느낌 */
+        header {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            padding: 15px 35px; display: flex; justify-content: flex-start; align-items: center;
+            border-bottom: 1px solid rgba(2, 132, 199, 0.1);
+            z-index: 1000; position: relative;
+        }
+
+        .header-title { font-size: 1.3rem; font-weight: 900; letter-spacing: -0.5px; color: var(--blue-main); display: flex; align-items: center; gap: 8px;}
+
+        main { flex: 1; display: flex; align-items: center; justify-content: center; padding: 20px; position: relative; z-index: 10; }
+
+        /* [메인 게임 카드] 고급스러운 테이블 느낌 */
+        .bakery-card {
+            background: var(--card-white);
+            width: 100%; max-width: 1200px; min-height: 75vh;
+            border-radius: 32px;
+            border: 1px solid rgba(2, 132, 199, 0.1);
+            box-shadow: 0 25px 50px rgba(2, 132, 199, 0.08);
+            padding: 40px 50px; display: flex; flex-direction: column; align-items: center;
+            position: relative; z-index: 10;
+        }
+
+        /* 상단 대시보드 */
+        .game-info { width: 100%; display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        
+        .badge { 
+            font-weight: 800; font-size: 1.05rem; padding: 10px 20px; border-radius: 16px; 
+            display: flex; align-items: center; gap: 6px;
+        }
+        .best-score { background: #f8fafc; color: var(--text-sub); border: 1px solid #e2e8f0; }
+        
+        .timer-box { font-size: 2rem; font-weight: 900; color: var(--blue-main); font-family: 'JetBrains Mono', monospace; letter-spacing: -1px; }
+        .timer-box span { display: inline-block; min-width: 50px; text-align: center; }
+        
+        .score-box { background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); color: var(--gold-main); border: 2px solid var(--gold-light); font-size: 1.2rem;}
+
+        /* 주문판 */
+        .order-display {
+            background: #f0f9ff; border: 2px solid rgba(56, 189, 248, 0.3);
+            padding: 20px 60px; border-radius: 24px; margin-bottom: 35px;
+            text-align: center; width: 100%; max-width: 500px;
+            box-shadow: 0 10px 25px rgba(56, 189, 248, 0.1);
+            position: relative;
+        }
+        .order-label { font-size: 1.05rem; font-weight: 900; color: var(--blue-main); margin-bottom: 5px; }
+        .target-num { font-size: 6rem; font-weight: 900; margin: 0; color: var(--text-main); line-height: 1.1; font-family: 'JetBrains Mono', monospace; transition: 0.3s; }
+
+        /* ⭐ 새로 추가된 오븐 게이지 UI ⭐ */
+        .oven-gauge-wrap {
+            width: 100%; height: 24px; background: #e2e8f0; border-radius: 12px;
+            margin-top: 15px; overflow: hidden; position: relative;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .oven-gauge-fill {
+            height: 100%; width: 0%; background: linear-gradient(90deg, var(--blue-light), var(--blue-main));
+            border-radius: 12px; transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s;
+        }
+        .oven-gauge-fill.over { background: var(--apple-red); }
+        .gauge-text {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.8rem; font-weight: 900; color: #1e293b;
+            z-index: 2; text-shadow: 0 1px 3px rgba(255,255,255,0.8);
+        }
+
+        /* ⭐ 특별 손님 (V.I.P) 및 콤보 텍스트 UI ⭐ */
+        .vip-guest { animation: vipPulse 1s infinite alternate; color: var(--gold-main) !important; }
+        @keyframes vipPulse { 
+            from { transform: scale(1); text-shadow: 0 0 10px rgba(217, 119, 6, 0.3); } 
+            to { transform: scale(1.1); text-shadow: 0 0 25px rgba(217, 119, 6, 0.7); } 
+        }
+        .combo-alert { font-size: 1.15rem; font-weight: 900; color: var(--apple-red); margin-bottom: 10px; animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+
+        /* 2인용 분할 영역 */
+        .coop-area { display: flex; width: 100%; justify-content: center; gap: 30px; margin-bottom: 30px; }
+        
+        .player-zone {
+            display: flex; flex-direction: column; align-items: center;
+            padding: 30px 35px; border-radius: 28px;
+            background: #ffffff; box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+            border: 2px solid transparent; transition: 0.3s;
+        }
+        .player-zone.p1 { border-color: rgba(14, 165, 233, 0.15); background: linear-gradient(to bottom, #ffffff, #f0f9ff); }
+        .player-zone.p2 { border-color: rgba(99, 102, 241, 0.15); background: linear-gradient(to bottom, #ffffff, #eef2ff); }
+
+        .player-title { font-weight: 900; margin-bottom: 20px; font-size: 1.15rem; padding: 8px 20px; border-radius: 14px; }
+        .p1-title { background: rgba(14, 165, 233, 0.1); color: var(--p1-color); }
+        .p2-title { background: rgba(99, 102, 241, 0.1); color: var(--p2-color); }
+
+        .bit-area { display: flex; gap: 15px; }
+        .bit-box { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+        
+        /* ✨ 비트 버튼: 프리미엄 키보드 스위치 느낌의 디자인 */
+        .bit-btn {
+            width: 70px; height: 85px; border-radius: 16px;
+            background: #ffffff; border: 2px solid #e2e8f0;
+            font-size: 2.2rem; font-weight: 900; color: #cbd5e1; font-family: 'JetBrains Mono';
+            cursor: pointer !important; transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 8px 0 #cbd5e1, 0 15px 15px rgba(0,0,0,0.05);
+        }
+        
+        /* 1P 활성화 스타일 */
+        .bit-btn.active.p1-btn {
+            background: var(--p1-color); color: white; border-color: var(--p1-color);
+            transform: translateY(8px); box-shadow: 0 0 0 var(--p1-shadow);
+        }
+        /* 2P 활성화 스타일 */
+        .bit-btn.active.p2-btn {
+            background: var(--p2-color); color: white; border-color: var(--p2-color);
+            transform: translateY(8px); box-shadow: 0 0 0 var(--p2-shadow);
+        }
+
+        .weight { font-size: 1.1rem; font-weight: 900; color: var(--text-sub); }
+        .key-hint { font-size: 0.85rem; font-weight: 800; color: #94a3b8; background: #f1f5f9; padding: 4px 12px; border-radius: 8px; margin-top: 2px; border: 1px solid #e2e8f0;}
+
+        /* 현재 합계 */
+        .sum-box {
+            font-size: 1.4rem; font-weight: 800; color: var(--text-main);
+            background: #f8fafc; padding: 15px 40px; border-radius: 20px;
+            border: 1px solid #e2e8f0; display: flex; align-items: center; gap: 15px;
+        }
+        .sum-val { font-size: 2.2rem; font-weight: 900; color: var(--blue-main); font-family: 'JetBrains Mono';}
+
+        /* 빵 튀어오르는 애니메이션 */
+        .floating-bread {
+            position: absolute;
+            font-size: 3.5rem;
+            pointer-events: none; 
+            z-index: 5000;
+            animation: popUpBread 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));
+        }
+        @keyframes popUpBread {
+            0% { transform: translateY(0) scale(0.5) rotate(0deg); opacity: 1; }
+            50% { transform: translateY(-180px) scale(1.3) rotate(15deg); opacity: 1; }
+            100% { transform: translateY(-120px) scale(1) rotate(30deg); opacity: 0; }
+        }
+
+        @keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+
+        /* 세련된 글래스모피즘 오버레이 */
+        #overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 100; border-radius: 32px; text-align: center;
+        }
+        .start-btn {
+            padding: 18px 50px; font-size: 1.5rem; font-weight: 900;
+            background: linear-gradient(135deg, var(--blue-main), var(--blue-light));
+            color: white; border: none; box-shadow: 0 10px 25px rgba(2, 132, 199, 0.3);
+            border-radius: 20px; cursor: pointer !important; margin-top: 30px;
+            transition: 0.3s;
+        }
+        .start-btn:hover { transform: translateY(-3px); box-shadow: 0 15px 35px rgba(2, 132, 199, 0.4); }
+
+        /* 게임 컨트롤 버튼 */
+        .game-ctrl-row { display: flex; gap: 10px; align-items: center; }
+        .ctrl-btn {
+            padding: 8px 16px; border-radius: 12px; font-weight: 800; font-size: 0.82rem;
+            border: none; cursor: pointer !important; transition: 0.2s;
+            display: flex; align-items: center; gap: 5px;
+        }
+        .ctrl-btn-home  { background: #f1f5f9; color: #475569; border: 1.5px solid #cbd5e1; }
+        .ctrl-btn-home:hover  { background: #e2e8f0; transform: translateY(-1px); }
+        .ctrl-btn-pause { background: #fef3c7; color: #d97706; border: 1.5px solid #fcd34d; }
+        .ctrl-btn-pause:hover { background: #fde68a; transform: translateY(-1px); }
+        .ctrl-btn-pause.paused { background: #d1fae5; color: #059669; border-color: #6ee7b7; }
+        .ctrl-btn-restart { background: #fee2e2; color: #ef4444; border: 1.5px solid #fca5a5; }
+        .ctrl-btn-restart:hover { background: #fecaca; transform: translateY(-1px); }
+
+        .success-flash { animation: successCard 0.4s ease; }
+        @keyframes successCard { 
+            0% { transform: scale(1); } 
+            50% { transform: scale(1.02); border-color: var(--blue-light); box-shadow: 0 0 50px rgba(56, 189, 248, 0.2);} 
+            100% { transform: scale(1); } 
+        }
+        /* ── 크로스 브라우저: input[type=range] Safari/Firefox 지원 ── */
+        input[type=range] { -webkit-appearance: none; appearance: none; }
+        input[type=range]::-webkit-slider-runnable-track { height: 8px; border-radius: 4px; background: #e2e8f0; }
+        input[type=range]::-moz-range-track { height: 8px; border-radius: 4px; background: #e2e8f0; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 20px; height: 20px; border-radius: 50%; background: var(--blue-main); cursor: pointer !important; margin-top: -6px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        input[type=range]::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%; background: var(--blue-main); cursor: pointer !important; border: none; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }

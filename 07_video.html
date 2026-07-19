@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>동영상의 디지털 표현 - 개념 탐구</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&family=JetBrains+Mono:wght@700;900&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
+<link rel="stylesheet" href="./css/video_concept.css">
+
+</head>
+<body id="mainBody">
+
+    <header>
+        <div class="header-top">
+            <div class="header-left">
+                <span class="target-badge">대상: 중학교 1~3학년</span>
+                <h1 class="main-title" onclick="location.href='index.html'">데이터 비트박스</h1>
+            </div>
+            <div class="status-controller">
+                <button class="status-btn" onclick="resetStatus()">🔄 초기화</button>
+                <button class="status-btn btn-help" onclick="setStatus('help')">🙋‍♂️ SOS 요청</button>
+                <button class="status-btn btn-done" onclick="setStatus('done')">✅ 미션 완료</button>
+            </div>
+        </div>
+
+         <nav>
+            <div class="menu-item">
+                <span class="menu-link">디지털 데이터의 가치</span>
+                <ul class="dropdown">
+                    <li><a href="01_value.html">📖 개념 탐구</a></li>
+                    <li><a href="01_value_play.html">🛠️ 활용 실습</a></li>
+                </ul>
+            </div>
+            <div class="menu-item"><span class="menu-link">비트란?</span><ul class="dropdown"><li><a href="02_bit.html">📖 개념 탐구</a></li><li><a href="02_bit_play.html">🛠️ 활용 실습</a></li></ul></div>
+            <div class="menu-item"><span class="menu-link">숫자의 디지털 표현</span><ul class="dropdown"><li><a href="03_number.html">📖 개념 탐구</a></li><li><a href="03_number_play.html">🛠️ 활용 실습</a></li></ul></div>
+            <div class="menu-item"><span class="menu-link">문자의 디지털 표현</span><ul class="dropdown"><li><a href="04_text.html">📖 개념 탐구</a></li><li><a href="04_text_play.html">🛠️ 활용 실습</a></li></ul></div>
+            <div class="menu-item"><span class="menu-link">이미지의 디지털 표현</span><ul class="dropdown"><li><a href="05_image.html">📖 개념 탐구</a></li><li><a href="05_image_play.html">🛠️ 활용 실습</a></li></ul></div>
+            <div class="menu-item"><span class="menu-link">소리의 디지털 표현</span><ul class="dropdown"><li><a href="06_sound.html">📖 개념 탐구</a></li><li><a href="06_sound_play.html">🛠️ 활용 실습</a></li></ul></div>
+            <div class="menu-item"><span class="menu-link active">동영상의 디지털 표현</span><ul class="dropdown"><li><a href="07_video.html">📖 개념 탐구</a></li><li><a href="07_video_play.html">🛠️ 활용 실습</a></li></ul></div>
+        </nav>
+
+    </header>
+
+    <main>
+        <div class="content-container">
+            <div class="glass-panel">
+
+                <div class="progress">
+                    <div class="prog-dot cur" id="dot0"></div>
+                    <div class="prog-dot" id="dot1"></div>
+                    <div class="prog-dot" id="dot2"></div>
+                    <div class="prog-dot" id="dot3"></div>
+                </div>
+
+                <div id="step1-visual" class="step-container active">
+                    <div class="slide-section">
+                        <div class="visual-title">💡 동영상은 어떻게 움직이는 걸까?</div>
+                        <div style="font-size: 0.95rem; color: #424245; font-weight: 700;">
+                            동영상은 수많은 정지 이미지(프레임)가 아주 빠르게 지나가는 잔상 효과를 이용한 것 입니다!<br><br>아래 [프레임 분해하기] 버튼을 눌러 통통 튀는 공이 어떻게 쪼개지는지 확인하세요.
+                        </div>
+                        
+                        <div class="video-container" id="videoContainer">
+                            <canvas id="videoVisCanvas" width="600" height="300"></canvas>
+                        </div>
+                        
+                        <button class="action-btn" id="btnDissect" onclick="toggleFilmScan()">🎞️ 프레임 분해하기 (정지 이미지 확인)</button>
+                    </div>
+
+                    <div class="step-navigation">
+                        <div class="nav-arrow next" onclick="goStep('step2-concept')">
+                            <div>동영상의 디지털 표현 원리</div>
+                            <svg viewBox="0 0 24 24"><path d="M10 17l5-5-5-5v10z"/></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="step2-concept" class="step-container">
+                    <div style="font-size: 1.3rem; font-weight: 900; color: var(--multi-navy); margin-bottom: 10px; text-align: left; padding-left: 10px;">동영상의 디지털 표현 원리</div>
+                    <div class="concept-wrap">
+                        <div class="concept-row">
+                            <div class="concept-icon">👀</div>
+                            <div style="flex:1;">
+                                <b style="color:var(--multi-navy-light)">잔상 효과 (Persistence of Vision)</b> : 눈에 보였던 물체가 사라진 후에도 짧은 시간 동안 이미지가 기억에 남아있는 현상. <br>이 원리를 이용해 정지된 이미지를 연속으로 보여주면 뇌는 그것을 움직임으로 착각합니다.
+                            </div>
+                        </div>
+                        <div class="concept-row">
+                            <div class="concept-icon">🖼️</div>
+                            <div style="flex:1;">
+                               <b>프레임 (Frame) : </b><button class="pill-btn" onclick="revealInline(this, '동영상을 구성하는 한 장의 정지 이미지', '#00b894')">❔</button><br>
+                                수많은 프레임들이 모여 하나의 영상 흐름을 만들어 냅니다.
+                            </div>
+                        </div>
+                        <div class="concept-row">
+                            <div class="concept-icon">⏱️</div>
+                            <div style="flex:1;">
+                               <b>프레임률(fps) : </b><button class="pill-btn" onclick="revealInline(this, '1초당 화면에 보여주는 프레임의 개수 (Frames Per Second)', '#00b894')">❔</button><br>
+                                <span style="font-size: 0.85rem; color: var(--text-sub);">* fps 수치가 높을수록 1초에 더 많은 그림을 보여주어 움직임이 훨씬 부드럽습니다. (영화는 보통 24fps, 게임은 60fps 이상)</span>
+                            </div>
+                        </div>
+                        <div class="concept-row">
+                            <div class="concept-icon">🗜️</div>
+                            <div style="flex:1;">
+                                <b>동영상 압축 (Compression) : </b><button class="pill-btn" onclick="revealInline(this, '데이터의 용량을 줄이는 과정', '#00b894')">❔</button><br>
+                                동영상은 수많은 이미지의 연속이므로 파일 크기가 어마어마합니다. <br>따라서 앞뒤 프레임의 비슷한 부분을 묶거나 생략하여 용량을 줄이는 코덱(Codec) 기술이 필수적입니다.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step-navigation">
+                        <div class="nav-arrow prev" onclick="goStep('step1-visual')">
+                            <svg viewBox="0 0 24 24"><path d="M14 7l-5 5 5 5V7z"/></svg>
+                            <div>동영상 프레임 분석기</div>
+                        </div>
+                        <div class="nav-arrow next" onclick="goStep('step3-advanced')">
+                            <div>동영상 프레임 분석</div>
+                            <svg viewBox="0 0 24 24"><path d="M10 17l5-5-5-5v10z"/></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="step3-advanced" class="step-container">
+                    <div style="font-size: 1.3rem; font-weight: 900; color: var(--multi-navy); margin-bottom: 5px; text-align:left;">🔥 심화 실습: 프레임(fps) 실험실</div>
+                    <p style="color: var(--text-sub); font-size: 0.95rem; margin-top: 5px; margin-bottom: 15px; font-weight: 600; text-align:left;">
+                        슬라이더로 fps를 바꿔보세요. <b>1초 동안의 프레임이 그림으로 펼쳐집니다!</b><br>
+                        🎬 영화 기준인 <b>24fps</b>까지 올리면 24장의 정지 이미지가 나타나고, fps가 높을수록 자연스러운 영상이 연출됩니다.</p>
+
+                    <div class="fps-lab">
+
+                        <!-- 슬라이더 + 일시정지 -->
+                        <div class="fps-slider-box">
+                            <span style="font-weight:900; color:var(--multi-navy); font-size:1rem; flex-shrink:0;">fps 조절:</span>
+                            <input type="range" id="fpsSlider" min="1" max="24" step="1" value="8" oninput="updateFPS()" style="flex:1; cursor:pointer; accent-color:var(--multi-navy); height:8px; border-radius:4px;">
+                            <span id="fpsValDisplay" style="font-weight:900; color:#2d3436; min-width:65px; font-size:1.15rem; text-align:right;">8 fps</span>
+                            <button id="fpsPauseBtn" onclick="toggleFPSPause()" style="flex-shrink:0; padding:6px 16px; border-radius:10px; border:2px solid var(--multi-navy); background:white; color:var(--multi-navy); font-weight:900; font-size:0.9rem; cursor:pointer;">⏸ 일시정지</button>
+                        </div>
+
+                        <!-- fps 감각 힌트 바 -->
+                        <div style="display:flex; gap:6px; margin-bottom:10px; flex-wrap:wrap;">
+                            <span style="font-size:0.78rem; font-weight:800; padding:3px 10px; border-radius:20px; background:#ffe3e3; color:#c0392b;">1~6fps: 🐌 뚝뚝</span>
+                            <span style="font-size:0.78rem; font-weight:800; padding:3px 10px; border-radius:20px; background:#fff3cd; color:#856404;">7~12fps: 😐 어색</span>
+                            <span style="font-size:0.78rem; font-weight:800; padding:3px 10px; border-radius:20px; background:#d4edda; color:#155724;">13~23fps: 🙂 부드러움</span>
+                            <span style="font-size:0.78rem; font-weight:800; padding:3px 10px; border-radius:20px; background:#cce5ff; color:#004085;">24fps: 🎬 영화 수준!</span>
+                        </div>
+
+                        <!-- 재생 캔버스 -->
+                        <div class="fps-canvas-wrap">
+                            <canvas id="fpsCanvas" width="500" height="220"></canvas>
+                        </div>
+
+                        <!-- 프레임 격자 -->
+                        <div id="fpsTimelineWrap" style="width:100%; margin-top:14px;">
+                            <div style="font-size:0.85rem; font-weight:800; color:var(--text-sub); margin-bottom:8px; display:flex; align-items:center; gap:8px;">
+                                <span>📷 1초 동안의 정지 이미지 —</span>
+                                <span id="fpsFrameCount" style="color:var(--multi-navy); font-size:0.95rem;">8프레임</span>
+                                <span id="fpsStandard" style="font-size:0.8rem; color:#e17055; font-weight:700;"></span>
+                            </div>
+                            <div style="font-size:0.78rem; color:#636e72; margin-bottom:8px; line-height:1.5;">
+                                👇 이미지 1장이 프레임입니다. fps가 높을수록 이미지가 많아져요!<br>
+                                fps = 1초 안에 지나가는 이미지 수 → 눈이 하나로 이어진 움직임으로 착각합니다.
+                            </div>
+                            <div id="fpsFrameStrip"></div>
+                            <p id="fpsExplainText" style="font-size:0.85rem; font-weight:700; color:#636e72; margin-top:10px; min-height:22px; line-height:1.6;"></p>
+                        </div>
+
+                        <!-- 미션 박스 -->
+                        <div class="mission-box">
+                            <div style="font-size:1.1rem; margin-bottom:8px;"><b>🚨 [탐구 미션] 압축 전 데이터 용량 구하기</b></div>
+                            해상도 크기로 인해 프레임 <b style="color:var(--apple-red)">1장의 용량이 2MB</b>인 고화질 이미지가 있습니다.<br>
+                            이 이미지를 사용하여 <b style="color:var(--apple-red)">30fps</b>의 속도로 <b style="color:var(--apple-red)">10초</b> 분량의 동영상을 촬영한다면, 압축 기술을 적용하기 전 동영상의 총 데이터 용량은 몇 MB가 될까요?
+                            <div class="mission-input-group">
+                                <span style="font-weight:1000; color:#495057;">정답: </span>
+                                <input type="text" id="missionInput" class="mission-input" placeholder="숫자만 입력">
+                                <span style="font-weight:900; color:#495057;">MB</span>
+                                <button class="mission-btn" onclick="checkMission()">제출하기</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="step-navigation">
+                        <div class="nav-arrow prev" onclick="goStep('step2-concept')">
+                            <svg viewBox="0 0 24 24"><path d="M14 7l-5 5 5 5V7z"/></svg>
+                            <div>동영상의 디지털 표현 원리</div>
+                        </div>
+                        <div class="nav-arrow next" onclick="goStep('step4-quiz')">
+                            <div>개념 확인 (최종 퀴즈)</div>
+                            <svg viewBox="0 0 24 24"><path d="M10 17l5-5-5-5v10z"/></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="step4-quiz" class="step-container">
+                    <div style="font-size: 1.3rem; font-weight: 900; color: var(--apple-red); margin-bottom: 25px;">🎯 최종 퀴즈: 동영상의 디지털 표현 마스터하기!</div>
+
+                    <div class="quiz-controls-row">
+                        <div class="inline-tip" onclick="openTipPopup()">
+                            <svg viewBox="0 0 24 24" fill="currentColor" style="width:18px; height:18px;"><path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7zm2.85 11.1l-.85.6V16h-4v-2.3l-.85-.6C7.8 12.16 7 10.63 7 9c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.63-.8 3.16-2.15 4.1z"/></svg>
+                            미션 가이드
+                        </div>
+                        <div style="display: flex; gap: 15px; align-items: center;">
+                            <div id="quizTimer" class="quiz-timer">⏱️ 00:00</div>
+                            <button id="startQuizBtn" class="start-quiz-btn" onclick="startQuizTimer()">▶️ 퀴즈 시작</button>
+                            <button id="resetTimerBtn" class="reset-timer-btn" onclick="resetQuiz()">🔄 타이머 초기화</button>
+                        </div>
+                    </div>
+
+                    <div class="word-score-container" id="wordBankWrap">
+                        <div class="word-bank" id="wordBank" style="opacity: 0.4; pointer-events: none;">
+                            <div class="word-item" draggable="true" ondragstart="drag(event)">프레임</div>
+                            <div class="word-item" draggable="true" ondragstart="drag(event)">fps</div>
+                            <div class="word-item" draggable="true" ondragstart="drag(event)">픽셀</div>
+                            <div class="word-item" draggable="true" ondragstart="drag(event)">압축</div>
+                            <div class="word-item" draggable="true" ondragstart="drag(event)">스트리밍</div>
+                            <div class="word-item" draggable="true" ondragstart="drag(event)">잔상</div>
+                        </div>
+                    </div>
+
+                    <div id="quizForm">
+                        <div class="quiz-box">1. 동영상은 여러 장의 정지 이미지를 연속적으로 보여주어 뇌가 움직인다고 착각하게 만드는 눈의 <input type="text" class="blank" data-answer="잔상" data-score="15" oninput="checkAns(this)" ondrop="drop(event)" ondragover="allowDrop(event)" autocomplete="off" disabled> 효과를 이용한다. <span style="color:var(--apple-red); font-weight:900;">[15점]</span></div>
+                        <div class="quiz-box">2. 동영상을 구성하는 한 장 한 장의 정지 이미지를 <input type="text" class="blank" data-answer="프레임" data-score="15" oninput="checkAns(this)" ondrop="drop(event)" ondragover="allowDrop(event)" autocomplete="off" disabled> (이)라고 부른다. <span style="color:var(--apple-red); font-weight:900;">[15점]</span></div>
+                        <div class="quiz-box">3. 1초 동안 화면에 보여주는 이미지의 장수를 나타내는 단위를 <input type="text" class="blank" data-answer="fps" data-score="15" oninput="checkAns(this)" ondrop="drop(event)" ondragover="allowDrop(event)" autocomplete="off" disabled> (이)라고 한다. 값이 클수록 부드럽다. <span style="color:var(--apple-red); font-weight:900;">[15점]</span></div>
+                        <div class="quiz-box">4. 동영상은 그대로 저장하면 용량이 너무 크기 때문에, 중복되는 데이터를 제거하여 파일 크기를 줄이는 <input type="text" class="blank" data-answer="압축" data-score="15" oninput="checkAns(this)" ondrop="drop(event)" ondragover="allowDrop(event)" autocomplete="off" disabled> 과정을 거친다. <span style="color:var(--apple-red); font-weight:900;">[15점]</span></div>
+                        <div class="quiz-box">5. 화면을 구성하는 가장 작은 점을 의미하며, 프레임 한 장의 해상도를 결정하는 요소는 <input type="text" class="blank" data-answer="픽셀" data-score="20" oninput="checkAns(this)" ondrop="drop(event)" ondragover="allowDrop(event)" autocomplete="off" disabled> 이다. <span style="color:var(--apple-red); font-weight:900;">[20점]</span></div>
+                        <div class="quiz-box" style="margin-bottom:0;">6. 인터넷에서 대용량의 동영상 파일을 모두 다운로드하지 않고, 조금씩 전송받으면서 동시에 재생하는 기술을 <input type="text" class="blank" data-answer="스트리밍" data-score="20" oninput="checkAns(this)" ondrop="drop(event)" ondragover="allowDrop(event)" autocomplete="off" disabled> (이)라고 한다. <span style="color:var(--apple-red); font-weight:900;">[20점]</span></div>
+                    </div>
+
+                    <div style="text-align: center; display: none;" id="submitQuizBtnWrap">
+                        <button class="submit-quiz-btn" onclick="submitQuiz()">✏️ 채점하기</button>
+                    </div>
+
+                    <div class="step-navigation">
+                        <div class="nav-arrow prev" onclick="goStep('step3-advanced')">
+                            <svg viewBox="0 0 24 24"><path d="M14 7l-5 5 5 5V7z"/></svg>
+                            <div>동영상 프레임 분석</div>
+                        </div>
+                        
+                        <div style="display: flex; gap: 10px; margin-left: auto;">
+                            <div class="nav-arrow report-btn" onclick="downloadReportTXT()">
+                                <div>📄 텍스트 저장</div>
+                            </div>
+                            <div class="nav-arrow img-report-btn" onclick="downloadReportImageOffline()">
+                                <div>🖼️ 이미지(PNG) 저장</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            
+            <div id="toast">정답입니다! 🎉</div>
+        </div>
+
+         <aside class="sidebar-right">
+            <div class="memo-section">
+                <div style="font-weight:900; color:#1e1e2f; margin-bottom:12px; font-size:1.05rem;">📌 배움 노트</div>
+                <textarea id="memoInput" class="memo-area" placeholder="중요한 내용을 기록하세요. 궁금한 사항은 기록하고 질문하세요."></textarea>
+            </div>
+            <div class="reflection-section">
+                <div style="font-weight:900; color:#1e1e2f; margin-bottom:12px; font-size:1.05rem;">🌿 배움 활동 소감</div>
+                <textarea id="reflectionInput" class="reflection-area" placeholder="새롭게 알게된 사실과 느낀점을 기록하세요."></textarea>
+                <div class="capture-tip">📸 캡처: Win+Shift+S | Mac: Cmd+Shift+4</div>
+            </div>
+            <div class="erase-section">
+                <button class="erase-btn" onclick="eraseStepContent()">
+                    🗑️ 현재 단원 학습 내용 지우기<br>
+                    <span style="font-size:0.68rem; font-weight:600; opacity:0.7;">(배움노트·소감·퀴즈 기록)</span>
+                </button>
+            </div>
+        </aside>
+
+    </main>
+
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-content" id="modalContent"></div>
+    </div>
+
+    <div class="modal-overlay" id="customAlertModal" style="z-index: 9999;">
+        <div class="alert-box">
+            <div style="font-size: 3rem; margin-bottom: 10px;">🚫</div>
+            <h3 id="alertTitle" style="color: var(--apple-red); font-size: 1.5rem; margin-top: 0; margin-bottom: 15px; font-weight: 900;">접근 거부!</h3>
+            <div id="alertMessage" class="alert-message" style="font-size: 1.05rem; font-weight: 600; color: var(--text-main); margin-bottom: 25px; white-space: pre-line; word-break: keep-all;">메시지가 이곳에 표시됩니다.</div>
+            <button onclick="closeCustomAlert()" style="width: 100%; padding: 12px; background: var(--apple-red); color: white; border: none; border-radius: 12px; font-weight: 900; font-size: 1.1rem; cursor: pointer;">확인</button>
+        </div>
+    </div>
+    
+    <footer>
+        <div style="font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 4px;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 18px; height: 18px;">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                <line x1="12" y1="22.08" x2="12" y2="12"></line>
+            </svg>
+            데이터 비트박스
+        </div>
+        <div style="color: var(--apple-gray);">&copy; 중학교 정보 - 데이터 표현</div>
+    </footer>
+    <script src="./js/video_concept.js"></script>
+<style>
+        #bb-backdrop {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.65);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            z-index: 8400;
+        }
+        .sidebar-right { z-index: 8500 !important; position: relative !important; }
+        #bb-scene {
+            position: fixed; top: 50%; left: 50%;
+            transform: translate(-62%, -50%);
+            display: flex; align-items: flex-end; gap: 24px;
+            z-index: 8600;
+            animation: bbIn 0.5s cubic-bezier(0.16,1,0.3,1) forwards;
+        }
+        @keyframes bbIn { from{opacity:0;transform:translate(-62%,-46%)} to{opacity:1;transform:translate(-62%,-50%)} }
+        @keyframes bbOut { from{opacity:1} to{opacity:0;transform:translate(-62%,-46%)} }
+        .bb-scene-exit { animation: bbOut 0.3s ease-in forwards !important; }
+
+        #bb-bot {
+            width: 200px; flex-shrink: 0;
+            animation: bbBob 2.6s ease-in-out infinite;
+            /* 테마색(#748fd8)에 맞춘 그림자 색상 변경 */
+            filter:
+                drop-shadow(4px 4px 0px rgba(255,118,117,0.5))
+                drop-shadow(8px 8px 0px rgba(0,0,0,0.35));
+        }
+        @keyframes bbBob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+        @keyframes bbEye { 0%,88%,100%{opacity:1} 93%{opacity:0.05} }
+        .bb-eye { animation: bbEye 3.5s infinite; }
+
+        #bb-bubble {
+            background: #ffffff;
+            border-radius: 20px 20px 20px 4px;
+            padding: 26px 32px 22px;
+            box-shadow:
+                2px 2px 0 rgba(116,143,216,0.18),
+                4px 4px 0 rgba(116,143,216,0.12),
+                6px 6px 0 rgba(116,143,216,0.07),
+                0 20px 50px rgba(0,0,0,0.3);
+            border: 1.5px solid rgba(116,143,216,0.25);
+            position: relative; width: 600px; margin-bottom: 16px;
+        }
+        #bb-bubble::after {
+            content: ''; position: absolute; bottom: -13px; left: 32px;
+            border: 13px solid transparent; border-top-color: #ffffff;
+        }
+        #bb-topic {
+            font-size: 18px; font-weight: 900; color: #3b4d7c;
+            white-space: nowrap; margin-bottom: 16px; padding-bottom: 14px;
+            border-bottom: 2px solid rgba(116,143,216,0.2);
+            font-family: 'Apple SD Gothic Neo','Malgun Gothic','Nanum Gothic','Noto Sans KR',sans-serif;
+            letter-spacing: -0.02em;
+        }
+        #bb-story {
+            font-size: 16px; font-weight: 700; color: #1a1a1a;
+            line-height: 2.1; word-break: keep-all; white-space: nowrap;
+            min-height: 108px;
+            font-family: 'Apple SD Gothic Neo','Malgun Gothic','Nanum Gothic','Noto Sans KR',sans-serif;
+        }
+        #bb-story em { color: #4a65b8; font-style: normal; font-weight: 900; } /* 기존 #748fd8 -> 진한 남색으로 변경 */
+        #bb-story strong { color: #e84342; font-style: normal; font-weight: 900; } /* 기존 #ff7675 -> 진하고 뚜렷한 빨간색으로 변경 */
+       .bb-cursor {
+            display: inline-block; width: 2px; height: 0.88em;
+            background: #2c3e50; margin-left: 2px; 
+            vertical-align: middle; animation: bbBlink 0.65s infinite;
+        }
+        @keyframes bbBlink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+        #bb-btns { display: flex; gap: 10px; width: 530px; justify-content: flex-end; }
+        #bb-btn-start {
+            font-size: 15px !important; font-weight: 900 !important;
+            padding: 13px 28px !important; border-radius: 12px !important;
+            border: none !important; cursor: pointer !important;
+            background: #748fd8 !important; color: #fff !important;
+            box-shadow: 0 5px 0 #3b4d7c !important;
+            font-family: 'Apple SD Gothic Neo','Malgun Gothic','Nanum Gothic',sans-serif !important;
+            letter-spacing: -0.01em !important;
+        }
+        #bb-btn-skip {
+            font-size: 14px !important; font-weight: 700 !important;
+            padding: 13px 20px !important; border-radius: 12px !important;
+            border: 2px solid rgba(255,255,255,0.25) !important; cursor: pointer !important;
+            background: rgba(255,255,255,0.08) !important; color: rgba(255,255,255,0.7) !important;
+            font-family: 'Apple SD Gothic Neo','Malgun Gothic','Nanum Gothic',sans-serif !important;
+        }
+    </style>
+
+    <div id="bb-backdrop"></div>
+
+    <div id="bb-scene">
+        <div id="bb-bot">
+            <svg viewBox="0 0 90 115" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="bbG" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#a4b5e6"/><stop offset="100%" stop-color="#748fd8"/></linearGradient>
+                    <linearGradient id="bbGd" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#748fd8"/><stop offset="100%" stop-color="#3b4d7c"/></linearGradient>
+                    <linearGradient id="bbSG" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#0a101d"/><stop offset="100%" stop-color="#141c2f"/></linearGradient>
+                </defs>
+                <rect x="26" y="92" width="14" height="18" rx="5" fill="url(#bbGd)"/>
+                <rect x="50" y="92" width="14" height="18" rx="5" fill="url(#bbGd)"/>
+                <rect x="23" y="104" width="18" height="8" rx="4" fill="#3b4d7c"/>
+                <rect x="49" y="104" width="18" height="8" rx="4" fill="#3b4d7c"/>
+                <rect x="16" y="50" width="58" height="46" rx="13" fill="url(#bbG)"/>
+                <rect x="3" y="55" width="13" height="9" rx="4.5" fill="#ff7675"/>
+                <rect x="74" y="55" width="13" height="9" rx="4.5" fill="#ff7675"/>
+                <circle cx="3" cy="59" r="4" fill="#748fd8"/>
+                <circle cx="87" cy="59" r="4" fill="#748fd8"/>
+                <rect x="24" y="57" width="42" height="28" rx="7" fill="url(#bbSG)"/>
+                
+                <text x="45" y="70" text-anchor="middle" font-size="5" fill="#a4b5e6" font-family="monospace" font-weight="700">IMG → VIDEO</text>
+                <text x="45" y="78" text-anchor="middle" font-size="5" fill="#ff7675" font-family="monospace">FPS COMPRESS</text>
+                
+                <rect x="16" y="86" width="58" height="5" rx="2" fill="#3b4d7c"/>
+                <rect x="18" y="8" width="54" height="46" rx="15" fill="url(#bbG)"/>
+                <line x1="45" y1="8" x2="45" y2="0" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round"/>
+                <circle cx="45" cy="0" r="3.5" fill="#fbbf24"/>
+                <circle cx="45" cy="0" r="5.5" fill="rgba(251,191,36,0.25)"/>
+                <rect x="22" y="20" width="18" height="13" rx="5" fill="url(#bbSG)"/>
+                <rect x="50" y="20" width="18" height="13" rx="5" fill="url(#bbSG)"/>
+                <rect class="bb-eye" x="25" y="23" width="5" height="7" rx="1.5" fill="#a4b5e6"/>
+                <rect class="bb-eye" x="32" y="23" width="5" height="7" rx="1.5" fill="#ff7675" style="animation-delay:.15s"/>
+                <rect class="bb-eye" x="53" y="23" width="5" height="7" rx="1.5" fill="#a4b5e6" style="animation-delay:.08s"/>
+                <rect class="bb-eye" x="60" y="23" width="5" height="7" rx="1.5" fill="#ff7675" style="animation-delay:.2s"/>
+                <rect x="26" y="37" width="38" height="11" rx="4" fill="url(#bbSG)"/>
+                
+                <text x="45" y="46" text-anchor="middle" font-size="5.5" fill="#a4b5e6" font-family="monospace" font-weight="700">🎞️ → 01</text>
+                
+                <circle cx="18" cy="28" r="4" fill="#3b4d7c"/><circle cx="18" cy="28" r="2" fill="#0a101d"/>
+                <circle cx="72" cy="28" r="4" fill="#3b4d7c"/><circle cx="72" cy="28" r="2" fill="#0a101d"/>
+            </svg>
+        </div>
+
+        <div style="display:flex;flex-direction:column;align-items:flex-start;">
+            <div id="bb-bubble">
+                <div id="bb-topic">📌 동영상이 컴퓨터 속에서 어떻게 표현될까?</div>
+                <div id="bb-story"><span class="bb-cursor"></span></div>
+            </div>
+            <div id="bb-btns">
+                <button id="bb-btn-skip" onclick="bbClose()">건너뛰기</button>
+                <button id="bb-btn-start" onclick="bbClose()">학습 시작 ▶</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 🌟 동영상 단원 핵심 개념 추출 대사
+        const bbLines = [
+            { plain:'▪동영상은 수많은 사진들이 빠르게 지나가는 잔상 효과를 이용해.', html:'▪동영상은 수많은 사진들이 빠르게 지나가는 <em>잔상 효과</em>를 이용해.' },
+            { plain:'▪동영상을 이루는 한 장 한 장의 사진을 프레임(Frame)이라고 불러.', html:'▪동영상을 이루는 한 장 한 장의 사진을 <em>프레임(Frame)</em>이라고 불러.' },
+            { plain:'▪1초에 사진을 몇 장씩 보여줄지 결정하는 게 바로 FPS(프레임률)야.', html:'▪1초에 사진을 몇 장씩 보여줄지 결정하는 게 바로 <strong>FPS(프레임률)</strong>야.' },
+            { plain:'▪파일 용량을 줄이기 위해 중복 데이터를 지우는 압축 과정도 꼭 필요해.', html:'▪파일 용량을 줄이기 위해 중복 데이터를 지우는 <em>압축</em> 과정도 꼭 필요해.<br>' },
+           { plain:'➤ 그럼 직접 동영상이 디지털로 변환되는 원리를 탐구해볼까?', html:'<em>➤ 그럼 직접 동영상이 디지털로 변환되는 원리를 탐구해볼까?</em>' },
+
+        ];
+        let bbLi=0, bbCi=0, bbTm=null;
+        const bbEl=document.getElementById('bb-story');
+
+        function bbType(){
+            const cur=bbLines[bbLi];
+            if(bbCi<cur.plain.length){
+                const done=bbLines.slice(0,bbLi).map(l=>l.html).join('<br>');
+                bbEl.innerHTML=(done?done+'<br>':'')+cur.plain.slice(0,bbCi+1)+'<span class="bb-cursor"></span>';
+                bbCi++; bbTm=setTimeout(bbType,26);
+            } else {
+                bbLi++; bbCi=0;
+                if(bbLi<bbLines.length) bbTm=setTimeout(bbType,320);
+                else bbEl.innerHTML=bbLines.map(l=>l.html).join('<br>');
+            }
+        }
+
+        function bbClose(){
+            if(bbTm)clearTimeout(bbTm);
+            const s=document.getElementById('bb-scene');
+            const b=document.getElementById('bb-backdrop');
+            s.classList.add('bb-scene-exit');
+            setTimeout(()=>{s.style.display='none';b.style.display='none';},300);
+        }
+
+        const btnS=document.getElementById('bb-btn-start');
+        const btnSk=document.getElementById('bb-btn-skip');
+        btnS.addEventListener('mouseenter',()=>{btnS.style.setProperty('background','#8aa1e0','important');btnS.style.setProperty('transform','translateY(-2px)','important');btnS.style.setProperty('box-shadow','0 7px 0 #3b4d7c','important');});
+        btnS.addEventListener('mouseleave',()=>{btnS.style.setProperty('background','#748fd8','important');btnS.style.setProperty('transform','translateY(0)','important');btnS.style.setProperty('box-shadow','0 5px 0 #3b4d7c','important');});
+        btnS.addEventListener('mousedown',()=>{btnS.style.setProperty('transform','translateY(4px)','important');btnS.style.setProperty('box-shadow','0 1px 0 #3b4d7c','important');});
+        btnS.addEventListener('mouseup',()=>{btnS.style.setProperty('transform','translateY(-2px)','important');btnS.style.setProperty('box-shadow','0 7px 0 #3b4d7c','important');});
+        btnSk.addEventListener('mouseenter',()=>{btnSk.style.setProperty('background','rgba(255,255,255,0.18)','important');btnSk.style.setProperty('color','rgba(255,255,255,0.95)','important');});
+        btnSk.addEventListener('mouseleave',()=>{btnSk.style.setProperty('background','rgba(255,255,255,0.08)','important');btnSk.style.setProperty('color','rgba(255,255,255,0.7)','important');});
+
+        window.addEventListener('load',()=>setTimeout(bbType,600));
+    </script>
+<script src="./js/search_data.js"></script> 
+<script src="./js/concept_common.js"></script>
+</body>
+</html>
