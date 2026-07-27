@@ -46,9 +46,7 @@ function updateNumberResult() {
     for (let i = 0; i < 16; i++) {
         if (bulbStates[i] === 1) decValue += Math.pow(2, i);
     }
-    document.getElementById('decimal-text').innerText = decValue;
 
-    // 이진수 수식 계산 (켜진 전구만, 괄호로 묶기)
     const box = document.getElementById('bin-formula-box');
     if (box) {
         const expHTML = ['2<sup>0</sup>','2<sup>1</sup>','2<sup>2</sup>','2<sup>3</sup>',
@@ -57,9 +55,7 @@ function updateNumberResult() {
                          '2<sup>12</sup>','2<sup>13</sup>','2<sup>14</sup>','2<sup>15</sup>'];
         const terms = [];
         for (let i = 15; i >= 0; i--) {
-            if (bulbStates[i] === 1) {
-                terms.push(`(1 × ${expHTML[i]})`);
-            }
+            if (bulbStates[i] === 1) terms.push(`(1 × ${expHTML[i]})`);
         }
         if (terms.length === 0) {
             box.innerHTML = '<span style="color:#aaa;font-weight:600;">전구를 켜면 수식이 나타납니다</span>';
@@ -67,7 +63,7 @@ function updateNumberResult() {
             const formula = terms.join(' <span style="color:#64748b;font-weight:700;">+</span> ');
             box.innerHTML = formula +
                 ' <span style="color:#64748b;font-weight:700;"> = </span>' +
-                `<span style="color:#0284c7;font-size:1.05rem;font-weight:900;">${decValue}</span>`;
+                `<span style="color:#0071e3;font-size:1.4rem;font-weight:900;">${decValue}</span>`;
         }
     }
 
@@ -199,14 +195,13 @@ window.cycleDecBulb = function(idx) {
 };
 
 function updateDecResult() {
-    // 10진수 값 계산 (8자리, 인덱스 7이 최고자리)
     let decVal = 0;
     for (let i = 0; i < 8; i++) {
         decVal += decBulbValues[i] * Math.pow(10, i);
     }
     const display = [...decBulbValues].reverse().join('');
-    document.getElementById('binary-text').innerText = display.replace(/^0+/, '') || '0';
-    document.getElementById('decimal-text').innerText = decVal.toLocaleString('ko-KR');
+    const dtd = document.getElementById('decimal-text-dec');
+    if (dtd) dtd.innerText = display.replace(/^0+/, '') || '0';
 }
 
 function updateDecPostits() {
@@ -240,7 +235,6 @@ function updateDecFormula() {
     for (let i = 7; i >= 0; i--) {
         const v = decBulbValues[i];
         if (v > 0) {
-            // 각 항을 괄호로 묶어 표시
             terms.push(`(<span style="color:#ea580c;font-weight:900;">${v}</span> × ${expHTML[i]})`);
             total += v * Math.pow(10, i);
         }
@@ -248,18 +242,16 @@ function updateDecFormula() {
 
     if (terms.length === 0) {
         box.innerHTML = '<span style="color:#aaa;font-weight:600;">전구를 클릭하면 수식이 나타납니다</span>';
-        // decimal-text-dec 초기화
         const dtd = document.getElementById('decimal-text-dec');
         if (dtd) dtd.innerText = '0';
         return;
     }
 
-    const formula = terms.join(' <span style="color:#64748b; font-weight:700;">+</span> ');
+    const formula = terms.join(' <span style="color:#64748b;font-weight:700;">+</span> ');
     box.innerHTML = formula +
-        ' <span style="color:#64748b; font-weight:700;"> = </span>' +
-        `<span style="color:#c2410c;font-size:1.05rem;font-weight:900;">${total.toLocaleString('ko-KR')}</span>`;
+        ' <span style="color:#64748b;font-weight:700;"> = </span>' +
+        `<span style="color:#c2410c;font-size:1.4rem;font-weight:900;">${total.toLocaleString('ko-KR')}</span>`;
 
-    // result-dec-row 업데이트
     const dtd = document.getElementById('decimal-text-dec');
     if (dtd) dtd.innerText = total.toLocaleString('ko-KR');
 }

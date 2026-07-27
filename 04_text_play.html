@@ -2,371 +2,904 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>Digital BitBox - AI 방탈출 미션</title>
+    <title>암호해독 요원 · 문자 데이터 실습</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&family=JetBrains+Mono:wght@700;900&display=swap" rel="stylesheet">
     <style>
-        /* 테마 컬러 및 시스템 변수 */
         :root {
-            --apple-blue: #0A84FF; --apple-gray: #86868b;
-            --apple-pink: #FF375F; --apple-red: #FF453A; 
-            --bg-dark: #09090B; --bg-panel: #1C1C1E;
+            --apple-blue: #0A84FF;
+            --apple-gray: #86868b;
+            --apple-pink: #FF375F;
+            --apple-red: #FF453A;
+            --bg-dark: #09090B;
+            --bg-panel: #1C1C1E;
             --success-green: #30D158;
             --terminal-bg: #000000;
             --terminal-green: #39FF14;
             --cyber-gold: #FFD60A;
+            --locked-opacity: 0.28;
         }
 
         * { box-sizing: border-box; }
-        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #48484A; border-radius: 10px; }
 
-        html, body { margin: 0; padding: 0; height: 100vh; font-family: 'Inter', sans-serif; background-color: var(--bg-dark); color: #F2F2F7; display: flex; flex-direction: column; overflow: hidden;
+        html, body {
+            margin: 0; padding: 0; height: 100vh;
+            font-family: 'Inter', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+            background-color: var(--bg-dark); color: #F2F2F7;
+            display: flex; flex-direction: column; overflow: hidden;
             padding-top: 46px;
         }
 
-        /* 배경 효과 (어두운 방탈출 테마) */
-        body { background-image: radial-gradient(circle at 10% 10%, rgba(10, 132, 255, 0.05) 0%, transparent 50%), radial-gradient(circle at 90% 90%, rgba(57, 255, 20, 0.05) 0%, transparent 50%);
-        padding-top: 46px;
-    }
+        body {
+            background-image:
+                radial-gradient(circle at 10% 10%, rgba(10,132,255,0.06) 0%, transparent 50%),
+                radial-gradient(circle at 90% 90%, rgba(57,255,20,0.05) 0%, transparent 50%);
+        }
 
-        /* 교실 상태 알림판 테두리 효과 */
         body::after {
             content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            pointer-events: none; box-shadow: inset 0 0 0 0 transparent;
-            transition: box-shadow 0.4s ease-in-out; z-index: 9999;
+            pointer-events: none; transition: box-shadow 0.4s ease-in-out; z-index: 9999;
         }
-        body.status-help::after { box-shadow: inset 0 0 0 24px rgba(255, 69, 58, 0.6); }
-        body.status-done::after { box-shadow: inset 0 0 0 24px rgba(48, 209, 88, 0.6); }
+        body.status-done::after { box-shadow: inset 0 0 0 24px rgba(48,209,88,0.6); }
 
-        /* 상태 컨트롤러 */
-        .status-controller { 
-            position: fixed; bottom: 30px; left: 30px; display: flex; gap: 10px; z-index: 6000; 
-            background: rgba(28, 28, 30, 0.8); padding: 12px; border-radius: 20px; border: 1px solid #3A3A3C; backdrop-filter: blur(10px);
-        }
-        .status-btn { padding: 8px 16px; border-radius: 14px; font-weight: 900; font-size: 0.95rem; border: none; background: #2C2C2E; color: #F2F2F7; cursor: pointer; transition: 0.2s; }
-        .status-btn:hover { background: #3A3A3C; transform: translateY(-3px); }
-        .status-btn.btn-help:hover { color: var(--apple-red); }
-        .status-btn.btn-done:hover { color: var(--success-green); }
-
-        /* 메인 레이아웃 */
-        main { display: flex; width: 100%; height: 100%; }
-
-        /* ⭐ 좌측: AI 모니터 영역 */
-        .left-game-panel {
-            flex: 2; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            padding: 40px; position: relative;
-        }
-
-        .cyber-title {
-            color: var(--apple-blue); font-size: 2.2rem; font-weight: 900; letter-spacing: 2px; margin-bottom: 5px; font-family: 'Inter', sans-serif; text-shadow: 0 0 15px rgba(10, 132, 255, 0.6); text-align: center;
-        }
-        .story-subtitle { font-size: 1rem; color: #AEAEB2; margin-bottom: 30px; font-weight: 600; text-align: center; }
-
-        .monitor-layout { display: flex; align-items: center; justify-content: center; gap: 30px; width: 100%; max-width: 1000px; }
-
-        .monitor-wrapper { display: flex; flex-direction: column; align-items: center; flex: 1; min-width: 400px; }
-
-        /* 모니터 디자인 */
-        .monitor-frame {
-            background: #1C1C1E; padding: 20px; border-radius: 16px; border: 2px solid #3A3A3C;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 20px rgba(10, 132, 255, 0.2); width: 100%; position: relative;
-        }
-        .monitor-screen {
-            background: var(--terminal-bg); height: 350px; border-radius: 8px; padding: 25px; 
-            text-align: left; overflow-y: auto; display: flex; flex-direction: column; position: relative;
-        }
-        .monitor-screen::after {
-            content: " "; display: block; position: absolute; top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%); z-index: 2; background-size: 100% 4px; pointer-events: none;
-        }
-
-        .binary-output {
-            font-family: 'JetBrains Mono', monospace; font-size: 1.3rem; color: var(--terminal-green); text-shadow: 0 0 5px rgba(57, 255, 20, 0.5); 
-            word-wrap: break-word; line-height: 1.6; z-index: 3;
-        }
-        .sys-msg { color: var(--apple-blue); }
-        .cursor { display: inline-block; width: 12px; height: 1.3rem; background: var(--terminal-green); animation: blink 1s step-end infinite; vertical-align: middle; margin-left: 5px; }
-        @keyframes blink { 50% { opacity: 0; } }
-
-        /* ⭐ 모니터 옆 스토리 팁 상자 (방탈출 힌트 쪽지) */
-        .tip-box-3d {
-            display: flex; flex-direction: column; justify-content: center;
-            background: rgba(255, 214, 10, 0.1); border: 2px dashed var(--cyber-gold); border-radius: 12px; padding: 25px; 
-            width: 300px; flex-shrink: 0; text-align: left;
-            cursor: pointer; position: relative; backdrop-filter: blur(5px);
-        }
-        .tip-title { font-weight: 900; color: var(--cyber-gold); margin-bottom: 12px; font-size: 1.2rem; display: flex; align-items: center; gap: 8px;}
-        .tip-text { font-size: 1rem; color: #E5E5EA; line-height: 1.6; font-weight: 400; word-break: keep-all;}
-        .highlight-text { color: #000; font-weight: 800; background: var(--cyber-gold); padding: 2px 6px; border-radius: 4px; display: inline-block; margin-top: 5px;}
-
-        .status-display {
-            margin-top: 25px; color: #8E8E93; font-weight: 800; font-size: 1rem; background: #1C1C1E; padding: 12px 25px; border-radius: 20px; border: 1px solid #3A3A3C;
-        }
-        .highlight-data { color: var(--apple-pink); font-family: 'JetBrains Mono'; font-size: 1.3rem; margin-left: 10px; }
-
-        /* ⭐ 우측: 방탈출 퀴즈 영역 */
-        .right-quest-panel {
-            flex: 1; background: #121214; border-left: 1px solid #3A3A3C; display: flex; flex-direction: column; padding: 40px 30px; overflow-y: auto; min-width: 450px; box-shadow: -10px 0 30px rgba(0,0,0,0.5);
-        }
-
-        .quest-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .quest-title { font-size: 1.5rem; font-weight: 900; color: #FFFFFF; display: flex; align-items: center; gap: 10px;}
-        .quest-title span { background: var(--apple-red); font-size: 0.8rem; padding: 4px 8px; border-radius: 6px; letter-spacing: 1px; }
-        #scoreBoard { background: rgba(10, 132, 255, 0.2); color: var(--apple-blue); border: 1px solid var(--apple-blue); padding: 6px 15px; border-radius: 12px; font-weight: 900; font-size: 1.1rem; font-family: 'JetBrains Mono';}
-
-        .story-briefing { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px; font-size: 0.95rem; color: #D1D1D6; line-height: 1.5; margin-bottom: 25px; border-left: 5px solid var(--apple-blue); }
-
-        /* ⭐ 훨씬 더 굵고 돋보이는 입력창 설계 */
-        .type-input { 
-            width: 100%; min-height: 90px; padding: 15px; border-radius: 16px; 
-            border: 4px solid var(--apple-blue); /* 테두리를 두껍게 */
-            background: #1C1C1E; font-size: 1.8rem; font-weight: 900; 
-            color: var(--terminal-green); text-align: center; 
-            transition: 0.3s; cursor: text !important; outline: none; margin-bottom: 25px; 
+        /* ── 공통 네비바 ── */
+        #dbb-topnav {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 99999;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 9px 22px;
+            background: rgba(255,255,255,0.13);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(232,244,255,0.2);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.18);
             font-family: 'Inter', sans-serif;
-            box-shadow: 0 0 25px rgba(10, 132, 255, 0.3), inset 0 0 10px rgba(0,0,0,0.8);
         }
-        .type-input:focus { border-color: var(--success-green); box-shadow: 0 0 30px rgba(48, 209, 88, 0.4), inset 0 0 10px rgba(0,0,0,0.8); background: #121214; }
-        .type-input::placeholder { color: #636366; font-family: 'Inter'; font-weight: 800; font-size: 1.4rem;}
-
-        .clue-box { background: rgba(57, 255, 20, 0.05); border: 2px dashed var(--terminal-green); padding: 15px; border-radius: 12px; margin-bottom: 25px; text-align: center; }
-        .clue-title { font-size: 0.9rem; font-weight: 800; color: var(--terminal-green); margin-bottom: 10px; letter-spacing: 1px;}
-        .clue-words { font-weight: 900; color: #FFFFFF; font-size: 1.15rem; line-height: 1.6; word-spacing: 15px;}
-
-        .quiz-box { 
-            font-size: 1.05rem; line-height: 1.8; color: #AEAEB2; font-weight: 600; 
-            background: #1C1C1E; padding: 20px 25px; border-radius: 12px; border: 1px solid #3A3A3C; 
-            margin-bottom: 15px; transition: 0.3s;
+        #dbb-topnav a.dbb-btn {
+            display: inline-flex; align-items: center; gap: 5px;
+            font-size: 0.72rem; font-weight: 700; text-decoration: none;
+            padding: 6px 14px; border-radius: 20px;
+            border: 1.5px solid rgba(232,244,255,0.35);
+            color: #E8F4FF; background: rgba(232,244,255,0.08);
+            transition: all 0.18s ease; white-space: nowrap;
         }
-        .quiz-box:hover { border-color: #636366; background: #2C2C2E; transform: translateX(3px); }
-        .quiz-box strong { color: #E5E5EA; }
-
-        /* 빈칸 입력상자 */
-        .blank { 
-            box-sizing: border-box; display: inline-block; width: 95px; height: 36px; 
-            background: #09090B; border: 2px solid #48484A; 
-            border-radius: 6px; vertical-align: middle; padding: 0 10px;
-            text-align: center; line-height: 30px; 
-            font-size: 1.1rem; font-weight: 900; color: var(--apple-blue); 
-            margin: 0 6px; transition: all 0.2s ease; outline: none;
+        #dbb-topnav a.dbb-btn:hover {
+            background: rgba(232,244,255,0.15);
+            border-color: rgba(232,244,255,0.6);
+            transform: translateY(-1px);
         }
-        .blank:focus { border-color: var(--apple-blue); box-shadow: 0 0 0 3px rgba(10, 132, 255, 0.2); width: 115px; }
-        .blank.correct { background: rgba(48, 209, 88, 0.2); color: var(--success-green); border-color: var(--success-green); }
-        .blank:disabled { opacity: 1; }
+        #dbb-topnav .dbb-title {
+            font-size: 0.78rem; font-weight: 700; color: #E8F4FF; opacity: 0.9;
+        }
 
-        /* 완료 모달 창 */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(10px); z-index: 9000; align-items: center; justify-content: center; }
-        .modal-content { background: #1C1C1E; padding: 40px; border-radius: 24px; width: 450px; text-align: center; border: 1px solid #3A3A3C; box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 30px rgba(10, 132, 255, 0.3); color: #F2F2F7; }
-        .modal-content h2 { color: var(--apple-blue); font-weight: 900; font-size: 2rem; margin-bottom: 10px;}
-        .modal-content p { color: #AEAEB2; line-height: 1.6; margin-bottom: 25px; font-size: 1.1rem;}
+        /* ── 메인 레이아웃: 3분할 ── */
+        main {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1.5fr;
+            grid-template-rows: 1fr 1fr;
+            width: 100%; height: 100%;
+            gap: 0;
+        }
+
+        /* ── 패널 공통 ── */
+        .panel {
+            border: 1px solid #2A2A2C;
+            padding: 22px 24px;
+            display: flex; flex-direction: column;
+            overflow: hidden;
+            position: relative;
+            transition: opacity 0.4s ease, filter 0.4s ease;
+        }
+
+        /* 잠금 상태 */
+        .panel.locked {
+            opacity: var(--locked-opacity);
+            pointer-events: none;
+            filter: grayscale(0.6);
+        }
+        .panel.locked::before {
+            content: '🔒 이전 미션을 완료하면 열립니다';
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+            background: rgba(0,0,0,0.85); color: #636366;
+            padding: 12px 20px; border-radius: 12px; font-weight: 800;
+            font-size: 0.85rem; white-space: nowrap; z-index: 10;
+            border: 1px solid #3A3A3C;
+            pointer-events: none;
+        }
+
+        /* 잠금 해제 펄스 */
+        @keyframes unlockPulse {
+            0% { box-shadow: 0 0 0 0 rgba(48,209,88,0.6); }
+            70% { box-shadow: 0 0 0 14px rgba(48,209,88,0); }
+            100% { box-shadow: 0 0 0 0 rgba(48,209,88,0); }
+        }
+        .panel.just-unlocked { animation: unlockPulse 0.8s ease; }
+
+        /* ── 패널 배치 ── */
+        #panel-m1 {
+            grid-column: 1; grid-row: 1;
+            border-right: none; border-bottom: none;
+            background: rgba(10,132,255,0.03);
+        }
+        #panel-m2 {
+            grid-column: 1; grid-row: 2;
+            border-right: none;
+            background: rgba(57,255,20,0.02);
+        }
+        #panel-m3 {
+            grid-column: 2 / 4; grid-row: 1 / 3;
+            background: rgba(255,214,10,0.02);
+            overflow-y: auto;
+        }
+
+        /* ── 패널 헤더 ── */
+        .panel-header {
+            display: flex; align-items: center; gap: 10px;
+            margin-bottom: 14px;
+        }
+        .mission-badge {
+            font-size: 0.7rem; font-weight: 900; letter-spacing: 1px;
+            padding: 4px 10px; border-radius: 8px; white-space: nowrap;
+        }
+        .badge-m1 { background: rgba(10,132,255,0.2); color: var(--apple-blue); border: 1px solid rgba(10,132,255,0.4); }
+        .badge-m2 { background: rgba(57,255,20,0.15); color: var(--terminal-green); border: 1px solid rgba(57,255,20,0.35); }
+        .badge-m3 { background: rgba(255,214,10,0.15); color: var(--cyber-gold); border: 1px solid rgba(255,214,10,0.35); }
+
+        .panel-title {
+            font-size: 0.95rem; font-weight: 800; color: #E5E5EA;
+        }
+        .check-icon {
+            margin-left: auto; font-size: 1.2rem;
+            opacity: 0; transition: opacity 0.3s;
+        }
+        .check-icon.visible { opacity: 1; }
+
+        /* ── 미션1: 한글↔영어 가로 비교 ── */
+        .compare-wrap {
+            display: flex; gap: 10px; flex: 1; min-height: 0;
+        }
+        .compare-col {
+            flex: 1; display: flex; flex-direction: column; gap: 8px;
+        }
+        .compare-label {
+            font-size: 0.72rem; font-weight: 800; letter-spacing: 1px;
+            padding: 5px 10px; border-radius: 8px; text-align: center;
+        }
+        .label-en { background: rgba(10,132,255,0.15); color: var(--apple-blue); }
+        .label-ko { background: rgba(255,214,10,0.15); color: var(--cyber-gold); }
+
+        .char-input-wrap {
+            display: flex; align-items: center; justify-content: center;
+            gap: 6px; padding: 8px;
+            background: #121214; border-radius: 10px;
+            border: 1.5px solid #3A3A3C;
+        }
+        .char-display {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.8rem; font-weight: 900; text-align: center;
+            background: transparent; border: none; outline: none;
+            width: 60px; color: #F2F2F7; cursor: pointer;
+        }
+        .char-display.en-char { color: var(--apple-blue); }
+        .char-display.ko-char { color: var(--cyber-gold); }
+
+        .bit-screen {
+            flex: 1; background: #000; border-radius: 8px;
+            padding: 10px; overflow-y: auto; min-height: 80px;
+            position: relative; border: 1px solid #2A2A2C;
+        }
+        .bit-screen::after {
+            content: ''; display: block; position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(rgba(0,0,0,0) 50%, rgba(0,0,0,0.2) 50%);
+            background-size: 100% 4px; pointer-events: none; border-radius: 8px;
+        }
+        .bit-text {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem; line-height: 1.7;
+            word-break: break-all; position: relative; z-index: 1;
+        }
+        .bit-en { color: var(--apple-blue); }
+        .bit-ko { color: var(--cyber-gold); }
+        .bit-count {
+            font-size: 0.68rem; font-weight: 800; text-align: center;
+            padding: 5px; border-radius: 6px; margin-top: 6px;
+        }
+        .count-en { background: rgba(10,132,255,0.15); color: var(--apple-blue); }
+        .count-ko { background: rgba(255,214,10,0.15); color: var(--cyber-gold); }
+
+        /* 미션1 질문 */
+        .m1-question {
+            margin-top: 12px; background: #1C1C1E; border-radius: 10px;
+            padding: 12px 14px; border: 1px solid #3A3A3C; font-size: 0.82rem; color: #AEAEB2;
+            line-height: 1.6;
+        }
+        .m1-question strong { color: #E5E5EA; }
+
+        .mini-blank {
+            box-sizing: border-box; display: inline-block;
+            width: 72px; height: 28px;
+            background: #09090B; border: 2px solid #48484A;
+            border-radius: 6px; vertical-align: middle; padding: 0 8px;
+            text-align: center; line-height: 24px;
+            font-size: 0.95rem; font-weight: 900; color: var(--apple-blue);
+            margin: 0 4px; outline: none; transition: all 0.2s;
+        }
+        .mini-blank:focus { border-color: var(--apple-blue); box-shadow: 0 0 0 2px rgba(10,132,255,0.2); width: 86px; }
+        .mini-blank.correct { background: rgba(48,209,88,0.15); color: var(--success-green); border-color: var(--success-green); }
+
+        /* ── 미션2 ── */
+        .m2-grid {
+            display: flex; flex-direction: column; gap: 8px; flex: 1; overflow-y: auto;
+        }
+        .m2-card {
+            background: #121214; border-radius: 10px; padding: 11px 14px;
+            border: 1px solid #2A2A2C; font-size: 0.82rem; color: #AEAEB2;
+            line-height: 1.6; transition: border-color 0.2s;
+        }
+        .m2-card:hover { border-color: #48484A; }
+        .m2-card strong { color: #E5E5EA; }
+
+        /* 힌트 토글 */
+        .hint-toggle {
+            display: inline-flex; align-items: center; gap: 4px;
+            font-size: 0.7rem; font-weight: 800; color: #636366;
+            background: #1C1C1E; border: 1px solid #3A3A3C;
+            border-radius: 6px; padding: 3px 8px; cursor: pointer;
+            margin-top: 7px; transition: all 0.15s; user-select: none;
+        }
+        .hint-toggle:hover { color: var(--cyber-gold); border-color: rgba(255,214,10,0.4); background: rgba(255,214,10,0.06); }
+        .hint-toggle.open { color: var(--cyber-gold); border-color: rgba(255,214,10,0.4); background: rgba(255,214,10,0.06); }
+        .hint-box {
+            display: none; margin-top: 7px;
+            background: rgba(255,214,10,0.07); border: 1px dashed rgba(255,214,10,0.35);
+            border-radius: 8px; padding: 8px 10px;
+            font-size: 0.76rem; color: #D1D1D6; line-height: 1.6;
+        }
+        .hint-box.open { display: block; }
+        .hint-box .hint-ans {
+            display: inline-block; margin-top: 5px;
+            background: var(--cyber-gold); color: #000;
+            font-weight: 900; border-radius: 4px; padding: 1px 7px;
+            font-size: 0.78rem; letter-spacing: 0.5px;
+        }
+
+        /* ── 미션3 ── */
+        .m3-story {
+            background: rgba(255,214,10,0.05); border: 1px dashed rgba(255,214,10,0.3);
+            border-radius: 12px; padding: 14px 16px; margin-bottom: 16px;
+            font-size: 0.83rem; color: #D1D1D6; line-height: 1.65;
+        }
+        .m3-story-title { font-weight: 900; color: var(--cyber-gold); margin-bottom: 8px; font-size: 0.88rem; }
+
+        .decode-input {
+            width: 100%; padding: 12px 16px; border-radius: 12px;
+            border: 2.5px solid #3A3A3C;
+            background: #121214; font-size: 1.1rem; font-weight: 700;
+            color: var(--terminal-green); outline: none;
+            transition: border-color 0.2s;
+            font-family: 'JetBrains Mono', monospace;
+            margin-bottom: 14px;
+        }
+        .decode-input:focus { border-color: var(--apple-blue); }
+        .decode-input::placeholder { color: #3A3A3C; font-size: 0.9rem; font-weight: 500; font-family: 'Inter', sans-serif; }
+
+        .clue-strip {
+            background: rgba(57,255,20,0.06); border: 1.5px dashed rgba(57,255,20,0.3);
+            border-radius: 10px; padding: 10px 14px; margin-bottom: 14px;
+            font-size: 0.8rem;
+        }
+        .clue-strip-title { color: var(--terminal-green); font-weight: 800; margin-bottom: 6px; letter-spacing: 0.5px; font-size: 0.75rem; }
+        .clue-words { color: #E5E5EA; font-weight: 700; letter-spacing: 6px; font-family: 'JetBrains Mono'; font-size: 0.85rem; }
+
+        .quiz-item {
+            background: #1C1C1E; border-radius: 10px; padding: 14px 16px;
+            border: 1px solid #2A2A2C; margin-bottom: 10px;
+            font-size: 0.85rem; color: #AEAEB2; line-height: 1.7;
+            transition: border-color 0.2s;
+        }
+        .quiz-item:hover { border-color: #48484A; }
+        .quiz-item strong { color: #E5E5EA; }
+        .quiz-num {
+            font-weight: 900; color: var(--cyber-gold);
+            font-family: 'JetBrains Mono'; font-size: 0.78rem;
+            margin-bottom: 4px; display: block; letter-spacing: 1px;
+        }
+
+        .std-blank {
+            box-sizing: border-box; display: inline-block;
+            width: 90px; height: 30px;
+            background: #09090B; border: 2px solid #48484A;
+            border-radius: 6px; vertical-align: middle; padding: 0 8px;
+            text-align: center; line-height: 26px;
+            font-size: 0.92rem; font-weight: 900; color: var(--apple-blue);
+            margin: 0 4px; outline: none; transition: all 0.2s;
+        }
+        .std-blank:focus { border-color: var(--apple-blue); box-shadow: 0 0 0 2px rgba(10,132,255,0.2); }
+        .std-blank.correct { background: rgba(48,209,88,0.15); color: var(--success-green); border-color: var(--success-green); }
+
+        /* 점수 표시 */
+        .score-bar {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 14px; gap: 12px;
+        }
+        .score-track {
+            flex: 1; height: 6px; background: #2C2C2E; border-radius: 10px; overflow: hidden;
+        }
+        .score-fill {
+            height: 100%; background: var(--success-green); border-radius: 10px;
+            transition: width 0.5s ease; width: 0%;
+        }
+        .score-label {
+            font-family: 'JetBrains Mono'; font-size: 0.85rem; font-weight: 900;
+            color: var(--success-green); white-space: nowrap;
+        }
+
+        /* 모달 */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(12px);
+            z-index: 9000; align-items: center; justify-content: center;
+        }
+        .modal-content {
+            background: #1C1C1E; padding: 40px; border-radius: 24px; width: 460px;
+            text-align: center; border: 1px solid #3A3A3C;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 40px rgba(48,209,88,0.2);
+            color: #F2F2F7;
+        }
+        .modal-content h2 { color: var(--success-green); font-weight: 900; font-size: 1.8rem; margin-bottom: 10px; }
+        .modal-content p { color: #AEAEB2; line-height: 1.7; margin-bottom: 25px; font-size: 1rem; }
+
+        /* 미션 완료 배지 (패널 헤더에 표시) */
+        @keyframes badgeAppear { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .check-icon.visible { animation: badgeAppear 0.3s ease; }
+
+        /* 미션1 대기 커서 깜박임 */
+        @keyframes bitBlink { 50% { opacity: 0; } }
+        .bit-cursor { animation: bitBlink 1s step-end infinite; }
+
+        /* 미션1 대기 커서 깜박임 */
+        @keyframes bitBlink { 50% { opacity: 0; } }
+        .bit-cursor { animation: bitBlink 1s step-end infinite; }
+
+        /* 잘못된 입력 흔들림 */
+        @keyframes shakeInput {
+            0%,100% { transform: translateX(0); }
+            20% { transform: translateX(-6px); }
+            40% { transform: translateX(6px); }
+            60% { transform: translateX(-4px); }
+            80% { transform: translateX(4px); }
+        }
+        .char-input-wrap.shake-wrap { animation: shakeInput 0.35s ease; }
+
+        /* 활성 패널 테두리 강조 */
+        .panel.active-panel { border-color: #3A3A3C; }
+        #panel-m1.active-panel { box-shadow: inset 0 0 0 1px rgba(10,132,255,0.3); }
+        #panel-m2.active-panel { box-shadow: inset 0 0 0 1px rgba(57,255,20,0.25); }
+        #panel-m3.active-panel { box-shadow: inset 0 0 0 1px rgba(255,214,10,0.25); }
     </style>
 </head>
 <body>
-<!-- ✅ DATA BITBOX 공통 네비바 -->
-<style>
-#dbb-topnav {
-    position: fixed; top: 0; left: 0; right: 0; z-index: 99999;
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 9px 22px;
-    background: rgba(255,255,255,0.13);
-    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(232,244,255,0.2);
-    box-shadow: 0 2px 20px rgba(0,0,0,0.18);
-    font-family: 'Noto Sans KR','Pretendard','Inter',sans-serif;
-    box-sizing: border-box;
-}
-#dbb-topnav a.dbb-btn {
-    display: inline-flex; align-items: center; gap: 5px;
-    font-size: 0.72rem; font-weight: 700; letter-spacing: 0.3px;
-    text-decoration: none;
-    padding: 6px 14px; border-radius: 20px;
-    border: 1.5px solid rgba(232,244,255,0.35);
-    color: #E8F4FF;
-    background: rgba(232,244,255,0.08);
-    transition: all 0.18s ease;
-    white-space: nowrap;
-}
-#dbb-topnav a.dbb-btn:hover {
-    background: rgba(232,244,255,0.15);
-    border-color: rgba(232,244,255,0.6);
-    box-shadow: 0 0 14px rgba(232,244,255,0.2);
-    transform: translateY(-1px);
-}
-#dbb-topnav .dbb-title {
-    font-size: 0.78rem; font-weight: 700;
-    color: #E8F4FF;
-    letter-spacing: 0.3px;
-    opacity: 0.9;
-}
 
-</style>
+<!-- 네비바 -->
 <div id="dbb-topnav">
     <div style="display:flex;gap:9px;align-items:center;">
         <a class="dbb-btn" href="index.html">← 메인으로</a>
         <a class="dbb-btn" href="04_text.html">📖 개념으로</a>
     </div>
-    <span class="dbb-title">🎮 문자의 디지털 표현 · 활용 실습</span>
+    <span class="dbb-title">🔐 암호해독 요원 · 문자 데이터 해독 실습</span>
 </div>
-<!-- /네비바 -->
 
+<main>
 
-    
-    <main>
-        <div class="left-game-panel">
-            <div class="cyber-title">Digital BitBox</div>
-            <div class="story-subtitle">⚠️ 방탈출 시스템 가동. 문자를 입력하여 AI의 잠금을 해제하세요.</div>
-            
-            <div class="monitor-layout">
-                <div class="monitor-wrapper">
-                    <div class="monitor-frame">
-                        <div class="monitor-screen" id="monitorScreen">
-                            <div class="binary-output">
-                                <span class="sys-msg">[SYSTEM] 데이터 유저 환영합니다.<br>[SYSTEM] 입력된 데이터가 이진수(0과 1)로 변환되어 출력됩니다.</span><br><br>
-                                <span id="binaryText"></span><span class="cursor"></span>
-                            </div>
-                        </div>
-                    </div>
+    <!-- ════════════════════════════════
+         패널 M1: 한글 vs 영어 비트 수 비교
+    ════════════════════════════════ -->
+    <div class="panel active-panel" id="panel-m1">
+        <div class="panel-header">
+            <span class="mission-badge badge-m1">MISSION 01</span>
+            <span class="panel-title">비트 수 비교 해독</span>
+            <span class="check-icon" id="check-m1">✅</span>
+        </div>
+
+        <!-- 가로 비교 영역 -->
+        <div class="compare-wrap">
+            <!-- 영어 컬럼 -->
+            <div class="compare-col">
+                <div class="compare-label label-en">🔤 영어 입력</div>
+                <div class="char-input-wrap">
+                    <input class="char-display en-char" id="en-input" maxlength="1"
+                        oninput="filterEnInput(this)" placeholder="A" autocomplete="off" inputmode="text">
                 </div>
-
-                <div class="tip-box-3d" onclick="document.getElementById('typeInput').focus()">
-                    <div class="tip-title">📝 탈출을 위한 비밀 쪽지</div>
-                    <div class="tip-text">
-                        데이터 유저님, 잘 들으세요! 이 방을 나가려면 컴퓨터가 글자를 어떻게 읽는지 알아야 해요.<br><br>
-                        우측 입력창에 <strong>영어 'A'</strong>를 입력하고, <strong>한글 '가'</strong>를 입력하여 0과 1의 개수를 비교해보세요.<br><br>
-                        글자 종류가 많은 한글은 <strong>UTF-8</strong> 규칙에 따라 영어(8비트)보다 3배나 큰 <strong>24비트(3바이트)</strong> 공간을 사용한답니다!<br>
-                        <span class="highlight-text">힌트: 8비트의 3배는 몇 비트?</span>
-                    </div>
+                <div class="bit-screen" id="en-screen">
+                    <div class="bit-text bit-en" id="en-bits"></div>
                 </div>
+                <div class="bit-count count-en" id="en-count">— 비트</div>
             </div>
 
-            <div class="status-display">
-                현재 입력한 문자: <span class="highlight-data" id="current-char">없음</span>
+            <!-- 구분선 -->
+            <div style="display:flex;align-items:center;font-size:1.2rem;color:#48484A;padding-top:32px;">⇔</div>
+
+            <!-- 한글 컬럼 -->
+            <div class="compare-col">
+                <div class="compare-label label-ko">🔡 한글 입력</div>
+                <div class="char-input-wrap">
+                    <input class="char-display ko-char" id="ko-input" maxlength="1"
+                        oninput="filterKoInput(this)" placeholder="가" autocomplete="off" inputmode="text">
+                </div>
+                <div class="bit-screen" id="ko-screen">
+                    <div class="bit-text bit-ko" id="ko-bits"></div>
+                </div>
+                <div class="bit-count count-ko" id="ko-count">— 비트</div>
             </div>
         </div>
 
-        <div class="right-quest-panel">
-            <div class="quest-header">
-                <div class="quest-title">방탈출 자물쇠 🚪 <span>LOCKED</span></div>
-                <div id="scoreBoard">해제율: <span id="currentScore">0</span>%</div>
-            </div>
-
-            <div class="story-briefing">
-                <strong>[미션 목표]</strong><br>
-                아래 거대한 입력창에 데이터를 자유롭게 입력해 보세요. AI가 문자를 어떻게 0과 1로 바꾸는지 원리를 파악하고, 4개의 자물쇠(빈칸)를 모두 풀어 방에서 탈출하세요!
-            </div>
-
-            <input type="text" id="typeInput" class="type-input" placeholder="데이터 입력 (여기를 클릭하세요!)" oninput="updateBinaryScreen()" autocomplete="off">
-
-            <div class="clue-box">
-                <div class="clue-title">🔑 자물쇠 힌트 조각 (아래 암호를 해독해 빈칸에 입력하세요)</div>
-                <div class="clue-words">24 다릅니다 같습니다 숫자 커집니다</div>
-            </div>
-
-            <div class="quiz-box">1. 영문자 'A'와 한글 '가'를 각각 입력해 모니터를 관찰하세요. 영문자는 8개의 비트(0과 1)로 표현되지만, 문자의 종류가 방대한 한글은 <input type="text" class="blank" data-answer="24" autocomplete="off"> 개의 비트로 길게 변환됩니다.</div>
-            
-            <div class="quiz-box">2. 대문자 'A'와 소문자 'a'를 입력했을 때 모니터에 출력되는 이진수 값은 완전히 <input type="text" class="blank" data-answer="다릅니다" autocomplete="off">. (컴퓨터는 대소문자를 구분합니다.)</div>
-            
-            <div class="quiz-box">3. 단어 사이에 띄어쓰기(스페이스바)를 입력해 보세요. 눈에 보이지 않는 공백조차도 컴퓨터에게는 고유한 <input type="text" class="blank" data-answer="숫자" autocomplete="off"> (이진수)로 변환되어 저장됩니다.</div>
-            
-            <div class="quiz-box">4. 우리가 입력하는 텍스트 데이터가 길어지면 길어질수록, 컴퓨터 메모리에 보관해야 하는 이진수(0과 1)의 양도 당연히 <input type="text" class="blank" data-answer="커집니다" autocomplete="off">.</div>
-        </div>
-    </main>
-
-    <div class="modal-overlay" id="modalOverlay">
-        <div class="modal-content">
-            <div style="font-size:4rem; margin-bottom:15px; text-shadow: 0 0 20px rgba(48,209,88,0.8);">🔓🏃‍♂️</div>
-            <h2 style="color:var(--success-green);">방탈출 성공!</h2>
-            <p>축하합니다, 데이터 유저님!<br>문자가 0과 1로 변환되는 원리를 완벽하게 파악하여 굳게 닫혀있던 AI의 문을 열었습니다.</p>
-            <button onclick="closeModal()" style="width:100%; padding:15px; background:var(--success-green); color:#000; border:none; border-radius:12px; font-weight:900; font-size:1.1rem; cursor:pointer;">게임 종료</button>
+        <!-- 질문 -->
+        <div class="m1-question">
+            <strong>📌 관찰 결과를 채워보세요</strong><br>
+            영문자 1글자는 <strong>8비트</strong>이지만, 한글 1글자는
+            <input type="text" class="mini-blank" id="m1-blank" data-answer="24" autocomplete="off" placeholder="?"> 비트입니다.
+            한글이 영어보다 <strong>3배 더 많은</strong> 비트를 사용하는 이유는
+            표현해야 할 글자의 종류(문자 집합)가 훨씬 많기 때문입니다.
         </div>
     </div>
 
-    <script>
-        // --- 상태 컨트롤 ---
-        function setStatus(status) {
-            document.body.className = ''; 
-            if(status === 'help') document.body.classList.add('status-help');
-            if(status === 'done') document.body.classList.add('status-done');
+    <!-- ════════════════════════════════
+         패널 M2: 대소문자 · 공백 해독 (처음엔 잠금)
+    ════════════════════════════════ -->
+    <div class="panel locked" id="panel-m2">
+        <div class="panel-header">
+            <span class="mission-badge badge-m2">MISSION 02</span>
+            <span class="panel-title">문자 코드 정밀 해독</span>
+            <span class="check-icon" id="check-m2">✅</span>
+        </div>
+
+        <div class="m2-grid">
+
+            <div class="m2-card">
+                <span class="quiz-num">Q1</span>
+                대문자 <strong>'A'</strong>(<span style="font-family:'JetBrains Mono';color:var(--apple-blue);font-size:0.78rem;">01000001</span>)와
+                소문자 <strong>'a'</strong>(<span style="font-family:'JetBrains Mono';color:var(--apple-blue);font-size:0.78rem;">01100001</span>)의
+                이진수 값은 서로
+                <input type="text" class="mini-blank" data-answer="다릅니다" data-alts="다르다|달라요|달라|틀립니다|틀리다|다름" data-panel="m2" autocomplete="off" placeholder="?">
+                — 컴퓨터는 대소문자를 다른 문자로 구분합니다.
+                <br>
+                <span class="hint-toggle" onclick="toggleHint(this)">💡 힌트 보기</span>
+                <div class="hint-box">
+                    두 이진수를 비교하면 <span style="font-family:'JetBrains Mono';color:var(--apple-blue);">01000001</span> ≠ <span style="font-family:'JetBrains Mono';color:var(--apple-blue);">01100001</span><br>
+                    같은가요, 다른가요?
+                    <br><span class="hint-ans">다릅니다</span>
+                </div>
+            </div>
+
+            <div class="m2-card">
+                <span class="quiz-num">Q2</span>
+                눈에 보이지 않는 <strong>스페이스바(공백)</strong>도 컴퓨터에게는 고유한
+                <input type="text" class="mini-blank" data-answer="이진수" data-alts="이진법|2진수|이진|2진법|숫자|이진수값" data-panel="m2" autocomplete="off" placeholder="?">
+                로 저장됩니다. (공백 = <span style="font-family:'JetBrains Mono';color:var(--apple-blue);">00100000</span>)
+                <br>
+                <span class="hint-toggle" onclick="toggleHint(this)">💡 힌트 보기</span>
+                <div class="hint-box">
+                    공백도 <span style="font-family:'JetBrains Mono';color:var(--apple-blue);">00100000</span>이라는 숫자로 저장됩니다.<br>
+                    0과 1로 이루어진 이 숫자 체계를 무엇이라고 부를까요?
+                    <br><span class="hint-ans">이진수</span>
+                </div>
+            </div>
+
+            <div class="m2-card">
+                <span class="quiz-num">Q3</span>
+                입력하는 텍스트가 길어질수록 저장해야 할 이진수의 양도
+                <input type="text" class="mini-blank" data-answer="커집니다" data-alts="커진다|커져요|커짐|늘어납니다|늘어난다|많아집니다|많아진다" data-panel="m2" autocomplete="off" placeholder="?">
+                <br>
+                <span class="hint-toggle" onclick="toggleHint(this)">💡 힌트 보기</span>
+                <div class="hint-box">
+                    'A' = 8비트, 'AB' = 16비트, 'ABC' = 24비트 …<br>
+                    글자가 늘어날수록 필요한 비트의 양은 어떻게 될까요?
+                    <br><span class="hint-ans">커집니다</span>
+                </div>
+            </div>
+
+            <div class="m2-card">
+                <span class="quiz-num">Q4</span>
+                <strong>"A가"</strong> (영어 1글자 + 한글 1글자)를 저장하면 총
+                <input type="text" class="mini-blank" data-answer="32" data-panel="m2" autocomplete="off" placeholder="?">
+                비트가 됩니다.
+                <br>
+                <span class="hint-toggle" onclick="toggleHint(this)">💡 힌트 보기</span>
+                <div class="hint-box">
+                    영어 1글자 = 8비트, 한글 1글자 = 24비트<br>
+                    8 + 24 = ?
+                    <br><span class="hint-ans">32</span>
+                </div>
+            </div>
+
+            <div class="m2-card">
+                <span class="quiz-num">Q5</span>
+                UTF-8에서 한글이 영어보다 더 많은 비트를 사용하는 이유는,
+                표현해야 할 <input type="text" class="mini-blank" data-answer="문자" data-panel="m2" autocomplete="off" placeholder="?">의
+                종류(문자 집합)가 훨씬 많기 때문입니다.
+                <br>
+                <span class="hint-toggle" onclick="toggleHint(this)">💡 힌트 보기</span>
+                <div class="hint-box">
+                    영어 알파벳은 52종(대소문자), 한글 음절은 11,172종입니다.<br>
+                    더 많은 종류의 ( )를 담으려면 더 많은 비트가 필요합니다.
+                    <br><span class="hint-ans">문자</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ════════════════════════════════
+         패널 M3: 최종 암호 해독 (잠금)
+    ════════════════════════════════ -->
+    <div class="panel locked" id="panel-m3">
+        <div class="panel-header">
+            <span class="mission-badge badge-m3">MISSION 03</span>
+            <span class="panel-title">최종 암호 해독 — FINAL DECODE</span>
+            <span class="check-icon" id="check-m3">✅</span>
+        </div>
+
+        <!-- 점수 바 -->
+        <div class="score-bar">
+            <div class="score-track"><div class="score-fill" id="score-fill"></div></div>
+            <div class="score-label">해독 <span id="m3-score">0</span>/3</div>
+        </div>
+
+        <!-- 스토리 브리핑 -->
+        <div class="m3-story">
+            <div class="m3-story-title">📡 해독팀 긴급 브리핑</div>
+            탐사선 BITBOX-7이 수신한 암호 신호의 마지막 구간입니다.
+            신호는 6개의 이진수 블록으로 구성되어 있으며, 각 블록이 어떤 알파벳인지 아직 알 수 없습니다.
+            아래 <strong>실시간 변환기</strong>에 알파벳을 입력하면 이진수로 변환됩니다.
+            변환된 이진수와 신호를 비교해 암호를 해독하세요.
+        </div>
+
+        <!-- BITBOX 아스키 이진수 표 — 이진수만 표시, 알파벳 숨김 -->
+        <div style="background:#000;border:1px solid #2A2A2C;border-radius:10px;padding:12px 14px;margin-bottom:14px;overflow-x:auto;">
+            <div style="font-size:0.7rem;font-weight:800;color:#636366;letter-spacing:1px;margin-bottom:8px;">📋 수신된 암호 신호 — 6개 블록</div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                <div style="text-align:center;">
+                    <div style="font-family:'JetBrains Mono';font-size:0.72rem;color:var(--apple-blue);line-height:1.8;">01000010</div>
+                    <div style="font-size:0.7rem;color:#3A3A3C;font-weight:700;">[ 1 ]</div>
+                </div>
+                <div style="text-align:center;">
+                    <div style="font-family:'JetBrains Mono';font-size:0.72rem;color:var(--apple-blue);line-height:1.8;">01001001</div>
+                    <div style="font-size:0.7rem;color:#3A3A3C;font-weight:700;">[ 2 ]</div>
+                </div>
+                <div style="text-align:center;">
+                    <div style="font-family:'JetBrains Mono';font-size:0.72rem;color:var(--apple-blue);line-height:1.8;">01010100</div>
+                    <div style="font-size:0.7rem;color:#3A3A3C;font-weight:700;">[ 3 ]</div>
+                </div>
+                <div style="text-align:center;">
+                    <div style="font-family:'JetBrains Mono';font-size:0.72rem;color:var(--apple-blue);line-height:1.8;">01000010</div>
+                    <div style="font-size:0.7rem;color:#3A3A3C;font-weight:700;">[ 4 ]</div>
+                </div>
+                <div style="text-align:center;">
+                    <div style="font-family:'JetBrains Mono';font-size:0.72rem;color:var(--apple-blue);line-height:1.8;">01001111</div>
+                    <div style="font-size:0.7rem;color:#3A3A3C;font-weight:700;">[ 5 ]</div>
+                </div>
+                <div style="text-align:center;">
+                    <div style="font-family:'JetBrains Mono';font-size:0.72rem;color:var(--apple-blue);line-height:1.8;">01011000</div>
+                    <div style="font-size:0.7rem;color:#3A3A3C;font-weight:700;">[ 6 ]</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 실시간 변환기: 이진수 입력 → 알파벳 결과 표시 -->
+        <div style="margin-bottom:14px;">
+            <div style="font-size:0.72rem;font-weight:800;color:#636366;letter-spacing:0.5px;margin-bottom:6px;">
+                🔬 실시간 변환기 — 이진수(8자리)를 입력하면 알파벳으로 해독됩니다
+            </div>
+            <input type="text" class="decode-input" id="m3-decode-input"
+                placeholder="이진수 8자리 입력 (예: 01000010)"
+                oninput="renderM3Decode()" maxlength="8">
+            <div id="m3-decode-out"
+                style="background:#000;border-radius:8px;padding:10px 14px;min-height:42px;
+                       font-family:'JetBrains Mono';font-size:1.1rem;word-break:break-all;
+                       line-height:1.8;color:var(--terminal-green);
+                       border:1px solid #2A2A2C;display:flex;align-items:center;gap:12px;"></div>
+        </div>
+
+        <!-- 퀴즈 3개 -->
+        <div class="quiz-item">
+            <span class="quiz-num">BLOCK A — 이진수 → 글자</span>
+            암호 신호 [1]번 블록
+            <span style="font-family:'JetBrains Mono';color:var(--apple-blue);font-size:0.82rem;">01000010</span>이
+            나타내는 알파벳은?
+            <input type="text" class="std-blank" data-answer="B" data-panel="m3" autocomplete="off" placeholder="?">
+            <br>
+            <span class="hint-toggle" onclick="toggleHint(this)">💡 힌트 보기</span>
+            <div class="hint-box">
+                위 변환기에 <span style="font-family:'JetBrains Mono';color:var(--apple-blue);">01000010</span>을 입력해 보세요.<br>
+                오른쪽에 어떤 알파벳이 나타나나요?
+                <br><span class="hint-ans">B</span>
+            </div>
+        </div>
+
+        <div class="quiz-item">
+            <span class="quiz-num">BLOCK B — 이진수 마지막 4비트</span>
+            알파벳 <strong>'X'</strong>의 아스키 이진수
+            <span style="font-family:'JetBrains Mono';color:var(--apple-blue);font-size:0.82rem;">01011000</span>에서
+            마지막 4비트는?
+            <input type="text" class="std-blank" data-answer="1000" data-panel="m3" autocomplete="off" placeholder="?">
+            <br>
+            <span class="hint-toggle" onclick="toggleHint(this)">💡 힌트 보기</span>
+            <div class="hint-box">
+                <span style="font-family:'JetBrains Mono';color:var(--apple-blue);">0101 <strong>1000</strong></span><br>
+                8자리 이진수에서 뒤에서 4자리를 읽어보세요.
+                <br><span class="hint-ans">1000</span>
+            </div>
+        </div>
+
+        <div class="quiz-item">
+            <span class="quiz-num">BLOCK C — 비트 계산</span>
+            "BITBOX" 전체(영어 6글자)를 아스키 이진수로 저장하면 총
+            <input type="text" class="std-blank" data-answer="48" data-panel="m3" autocomplete="off" placeholder="?">
+            비트입니다. (글자 수 × 8비트)
+            <br>
+            <span class="hint-toggle" onclick="toggleHint(this)">💡 힌트 보기</span>
+            <div class="hint-box">
+                영어 알파벳 1글자 = 8비트<br>
+                BITBOX는 6글자 → 6 × 8 = ?
+                <br><span class="hint-ans">48</span>
+            </div>
+        </div>
+    </div>
+
+</main>
+
+<!-- 완료 모달 -->
+<div class="modal-overlay" id="modalOverlay">
+    <div class="modal-content">
+        <div style="font-size:3.5rem;margin-bottom:12px;">🔓📡</div>
+        <h2>암호 해독 완료!</h2>
+        <p>
+            탁월한 분석 능력으로 BITBOX-7의 신호를 완전히 해독했습니다.<br>
+            영어·한글 문자 데이터의 <strong>비트 표현 원리</strong>를<br>
+            성공적으로 파악하였습니다.
+        </p>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+            <button onclick="closeModal()"
+                style="width:100%;padding:14px;background:var(--success-green);
+                       color:#000;border:none;border-radius:12px;font-weight:900;
+                       font-size:1rem;cursor:pointer;">
+                ✅ 해독 완료 — 종료
+            </button>
+            <button onclick="resetAll()"
+                style="width:100%;padding:12px;
+                       background:rgba(10,132,255,0.2);
+                       color:#FFFFFF;
+                       border:1px solid rgba(10,132,255,0.5);
+                       border-radius:12px;
+                       font-weight:900;font-size:0.95rem;cursor:pointer;
+                       transition:all 0.2s;letter-spacing:0.5px;"
+                onmouseover="this.style.background='rgba(10,132,255,0.35)';this.style.borderColor='rgba(10,132,255,0.8)';"
+                onmouseout="this.style.background='rgba(10,132,255,0.2)';this.style.borderColor='rgba(10,132,255,0.5)';">
+                🔄 다시 하기
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    /* ── UTF-8 바이트 → 이진수 문자열 변환 ── */
+    const encoder = new TextEncoder();
+
+    function charToBits(char) {
+        const bytes = encoder.encode(char);
+        return Array.from(bytes).map(b => b.toString(2).padStart(8, '0'));
+    }
+
+    function textToBitsHTML(text, colorClass) {
+        if (!text) return '<span style="color:#48484A">입력 대기...</span>';
+        let html = '';
+        for (const ch of text) {
+            const byteGroups = charToBits(ch);
+            const isMultiByte = byteGroups.length > 1;
+            const color = isMultiByte ? 'var(--cyber-gold)' : 'var(--apple-blue)';
+            html += `<span style="color:${color}">${byteGroups.join('')}</span> `;
         }
+        return html;
+    }
 
-        // --- 모니터 시스템 연동 로직 (UTF-8 24비트 변환 적용) ---
-        const monitorDisplay = document.getElementById('binaryText');
-        const currentCharDisplay = document.getElementById('current-char');
-        const screenDiv = document.getElementById('monitorScreen');
+    /* ── 미션1: 입력 필터 ── */
+    const WAIT_HTML = '<span style="color:#6E6E73;font-size:0.75rem;">한 글자만 입력하세요<span class="bit-cursor">▋</span></span>';
 
-        function textToBinary(text) {
-            if (!text) return "<span class='sys-msg'>[대기 상태] 데이터를 입력하십시오...</span>";
-            
-            const encoder = new TextEncoder(); // UTF-8 변환
-            let binaryResult = "";
-            
-            for (let i = 0; i < text.length; i++) {
-                let char = text[i];
-                let bytes = encoder.encode(char); 
-                
-                if (bytes.length > 1) {
-                    // 한글 등 24비트 문자는 노란색으로 강조
-                    let binStr = Array.from(bytes).map(b => b.toString(2).padStart(8, '0')).join('');
-                    binaryResult += `<span style="color:var(--cyber-gold); font-weight:bold;">${binStr}</span> `;
-                } else {
-                    // 영어, 숫자, 공백 등은 8비트로 출력
-                    binaryResult += bytes[0].toString(2).padStart(8, '0') + " ";
-                }
+    function isEnglish(ch) { return /^[A-Za-z]$/.test(ch); }
+    function isKorean(ch)  { return /^[\uAC00-\uD7A3]$/.test(ch); }
+
+    function shakeWrap(input) {
+        const wrap = input.closest('.char-input-wrap');
+        wrap.classList.remove('shake-wrap');
+        void wrap.offsetWidth;
+        wrap.classList.add('shake-wrap');
+        setTimeout(() => wrap.classList.remove('shake-wrap'), 400);
+    }
+
+    function filterEnInput(input) {
+        if (input.value && !isEnglish(input.value)) { input.value = ''; shakeWrap(input); }
+        renderCompare();
+    }
+    function filterKoInput(input) {
+        if (input.value && !isKorean(input.value)) { input.value = ''; shakeWrap(input); }
+        renderCompare();
+    }
+
+    /* ── 미션1: 가로 비교 렌더 ── */
+    function renderCompare() {
+        const enVal = document.getElementById('en-input').value;
+        const koVal = document.getElementById('ko-input').value;
+
+        if (!enVal) {
+            document.getElementById('en-bits').innerHTML = WAIT_HTML;
+            document.getElementById('en-count').textContent = '— 비트';
+        } else {
+            const g = charToBits(enVal[0]);
+            document.getElementById('en-bits').innerHTML = g.map((b,i)=>`<span>Byte${i+1}: ${b}</span>`).join('<br>');
+            document.getElementById('en-count').textContent = `${g.length*8}비트 (${g.length}바이트)`;
+        }
+        if (!koVal) {
+            document.getElementById('ko-bits').innerHTML = WAIT_HTML;
+            document.getElementById('ko-count').textContent = '— 비트';
+        } else {
+            const g = charToBits(koVal[0]);
+            document.getElementById('ko-bits').innerHTML = g.map((b,i)=>`<span>Byte${i+1}: ${b}</span>`).join('<br>');
+            document.getElementById('ko-count').textContent = `${g.length*8}비트 (${g.length}바이트)`;
+        }
+    }
+
+    /* ── 힌트 토글 ── */
+    function toggleHint(btn) {
+        const box = btn.nextElementSibling;
+        const isOpen = box.classList.toggle('open');
+        btn.classList.toggle('open', isOpen);
+        btn.textContent = isOpen ? '🔼 힌트 닫기' : '💡 힌트 보기';
+    }
+
+    /* ── 미션3: 이진수 입력 → 알파벳 해독 ── */
+    function renderM3Decode() {
+        const val = document.getElementById('m3-decode-input').value.replace(/\s/g, '');
+        const out = document.getElementById('m3-decode-out');
+        if (!val) {
+            out.innerHTML = '<span style="color:#3A3A3C;font-size:0.8rem;">이진수 8자리를 입력하세요...</span>';
+            return;
+        }
+        // 8자리 단위로 끊어 알파벳 변환
+        const chunks = val.match(/.{1,8}/g) || [];
+        let html = '';
+        chunks.forEach(chunk => {
+            if (chunk.length === 8 && /^[01]+$/.test(chunk)) {
+                const code = parseInt(chunk, 2);
+                const ch = String.fromCharCode(code);
+                html += `<span style="color:#636366;font-size:0.72rem;">${chunk}</span>`
+                      + `<span style="color:var(--terminal-green);font-size:1.4rem;font-weight:900;margin:0 10px 0 6px;">→ ${ch}</span>`;
+            } else {
+                html += `<span style="color:var(--apple-red);font-size:0.8rem;">${chunk} (0과 1만 입력)</span>`;
             }
-            return binaryResult;
+        });
+        out.innerHTML = html || '<span style="color:#3A3A3C;">입력 대기...</span>';
+    }
+
+    /* ── 점수 관리 ── */
+    let m1Done = false, m2Done = false, m3Count = 0;
+    const M2_TOTAL = 5, M3_TOTAL = 3;
+    let m2Count = 0;
+
+    function updateM3Score() {
+        document.getElementById('m3-score').textContent = m3Count;
+        const pct = (m3Count / M3_TOTAL) * 100;
+        document.getElementById('score-fill').style.width = pct + '%';
+        if (m3Count === M3_TOTAL) {
+            document.getElementById('check-m3').classList.add('visible');
+            document.body.classList.add('status-done');
+            setTimeout(() => {
+                document.getElementById('modalOverlay').style.display = 'flex';
+            }, 600);
         }
+    }
 
-        function updateBinaryScreen() {
-            const inputVal = document.getElementById('typeInput').value;
-            currentCharDisplay.innerText = inputVal || "없음";
-            monitorDisplay.innerHTML = textToBinary(inputVal);
-            screenDiv.scrollTop = screenDiv.scrollHeight;
-        }
+    /* ── 잠금 해제 ── */
+    function unlock(panelId) {
+        const el = document.getElementById(panelId);
+        el.classList.remove('locked');
+        el.classList.add('just-unlocked', 'active-panel');
+        setTimeout(() => el.classList.remove('just-unlocked'), 900);
+    }
 
-        // --- 퀴즈 및 키보드 입력 이벤트 ---
-        let score = 0;
-        const totalQuestions = 4;
-        const inputs = document.querySelectorAll('.blank');
+    /* ── 빈칸 정답 체크 (다중 정답 지원) ── */
+    function checkAnswer(input) {
+        const typed = input.value.trim();
+        const main = input.getAttribute('data-answer');
+        const alts = (input.getAttribute('data-alts') || '').split('|').filter(Boolean);
+        const all = [main, ...alts];
+        return all.some(a => a === typed);
+    }
 
-        inputs.forEach(input => {
-            // 포커스 시 모니터 연동
-            input.addEventListener('focus', function() {
-                currentCharDisplay.innerText = this.value || "(분석 중...)";
-                monitorDisplay.innerHTML = textToBinary(this.value);
-            });
+    function attachBlankListeners() {
+        document.querySelectorAll('.mini-blank, .std-blank').forEach(input => {
+            input.addEventListener('input', function () {
+                if (this.classList.contains('correct')) return;
+                const panel = this.getAttribute('data-panel');
+                if (checkAnswer(this)) {
+                    this.classList.add('correct');
+                    this.disabled = true;
 
-            // 실시간 정답 체크
-            input.addEventListener('input', function() {
-                let currentVal = this.value;
-                currentCharDisplay.innerText = currentVal || "(분석 중...)";
-                monitorDisplay.innerHTML = textToBinary(currentVal);
-                screenDiv.scrollTop = screenDiv.scrollHeight;
-
-                if (!this.classList.contains('correct')) {
-                    if (currentVal.trim() === this.getAttribute('data-answer')) {
-                        this.classList.add('correct');
-                        this.disabled = true; 
-                        
-                        // 모니터에 로그 추가
-                        monitorDisplay.innerHTML += "<br><span style='color:var(--apple-blue);'>[자물쇠 해제 성공!]</span>";
-                        
-                        score += 25; 
-                        document.getElementById('currentScore').innerText = score;
-                        
-                        // 클리어 시 모달 호출
-                        if (score === 100) {
-                            setTimeout(() => {
-                                document.getElementById('modalOverlay').style.display = 'flex';
-                                setStatus('done'); 
-                            }, 600);
+                    if (this.id === 'm1-blank') {
+                        m1Done = true;
+                        document.getElementById('check-m1').classList.add('visible');
+                        unlock('panel-m2');
+                    } else if (panel === 'm2') {
+                        m2Count++;
+                        if (m2Count === M2_TOTAL && !m2Done) {
+                            m2Done = true;
+                            document.getElementById('check-m2').classList.add('visible');
+                            unlock('panel-m3');
                         }
+                    } else if (panel === 'm3') {
+                        m3Count++;
+                        updateM3Score();
                     }
                 }
             });
         });
+    }
 
-        function closeModal() { document.getElementById('modalOverlay').style.display = 'none'; }
-    </script>
+    /* ── 초기화 ── */
+    renderCompare();   // 빈 상태로 렌더 (대기 커서 표시)
+    attachBlankListeners();
+
+    function closeModal() {
+        document.getElementById('modalOverlay').style.display = 'none';
+    }
+
+    /* ── 다시 하기 ── */
+    function resetAll() {
+        document.getElementById('modalOverlay').style.display = 'none';
+        document.body.classList.remove('status-done');
+
+        // 미션1
+        document.getElementById('en-input').value = '';
+        document.getElementById('ko-input').value = '';
+        renderCompare();
+
+        // 미션3 변환기
+        const m3in = document.getElementById('m3-decode-input');
+        if (m3in) { m3in.value = ''; }
+        const m3out = document.getElementById('m3-decode-out');
+        if (m3out) { m3out.innerHTML = ''; }
+
+        // 힌트 모두 닫기
+        document.querySelectorAll('.hint-box.open').forEach(b => b.classList.remove('open'));
+        document.querySelectorAll('.hint-toggle.open').forEach(b => {
+            b.classList.remove('open');
+            b.textContent = '💡 힌트 보기';
+        });
+
+        // 빈칸 모두 초기화
+        document.querySelectorAll('.mini-blank, .std-blank').forEach(inp => {
+            inp.value = '';
+            inp.disabled = false;
+            inp.classList.remove('correct');
+        });
+
+        // 체크 아이콘 숨기기
+        document.querySelectorAll('.check-icon').forEach(el => el.classList.remove('visible'));
+
+        // 패널 잠금 복원
+        ['panel-m2','panel-m3'].forEach(id => {
+            const p = document.getElementById(id);
+            p.classList.add('locked');
+            p.classList.remove('active-panel','just-unlocked');
+        });
+
+        // 점수 초기화
+        m1Done = false; m2Done = false; m2Count = 0; m3Count = 0;
+        const scoreEl = document.getElementById('m3-score');
+        if (scoreEl) scoreEl.textContent = '0';
+        const fillEl = document.getElementById('score-fill');
+        if (fillEl) fillEl.style.width = '0%';
+    }
+</script>
 </body>
 </html>

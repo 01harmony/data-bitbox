@@ -18,10 +18,37 @@ function renderProgress(){
         segs.appendChild(seg);
     }
     cnt.textContent=`${done.length} / ${TOTAL}`;
-    cnt.style.color=done.length>0?STEP_COLORS[Math.max(...done)]:'rgba(255,255,255,0.3)';
+    // 카운터 색: 어두운 색 계열은 밝은 톤으로 가독성 확보
+    const CNT_COLORS={ 3:'#7ec3ff', 4:'#7ec3ff', 7:'#b8c0ff' };
+    const maxDone=done.length>0?Math.max(...done):0;
+    cnt.style.color=done.length>0?(CNT_COLORS[maxDone]||STEP_COLORS[maxDone]):'rgba(255,255,255,0.3)';
     document.querySelectorAll('.step-item').forEach(el=>{
         const s=parseInt(el.dataset.step);
-        el.classList.toggle('is-done',done.includes(s));
+        // STEP 7 번호 칩: 어두운 네이비 대신 밝은 페리윙클로 가독성 확보
+        if(s===7){
+            const num=el.querySelector('.step-num');
+            if(num){
+                num.style.color='#b8c0ff';
+                num.style.borderColor='#b8c0ff';
+            }
+        }
+        const isDone=done.includes(s);
+        el.classList.toggle('is-done',isDone);
+        // ✓ DONE 배지에 통과 점수 표시 (예: "✓ 100점")
+        const badge=el.querySelector('.done-badge');
+        if(badge){
+            const sc=localStorage.getItem('score_step'+s);
+            badge.textContent=(isDone && sc!==null)?`✓ ${sc}점`:'✓ DONE';
+            if(isDone){
+                // 배지 전용 색: 어두운 색 계열은 밝은 톤으로 가독성 확보
+                const BADGE_COLORS={ 3:'#7ec3ff', 4:'#7ec3ff', 7:'#b8c0ff' };
+                const bcol=BADGE_COLORS[s]||STEP_COLORS[s];
+                badge.style.color=bcol;
+                badge.style.fontWeight='900';
+                badge.style.fontSize='0.85rem';
+                badge.style.textShadow=`0 0 8px ${bcol}66`;
+            }
+        }
     });
 }
 renderProgress();

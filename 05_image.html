@@ -13,7 +13,7 @@
     <header>
         <div class="header-top">
             <div class="header-left">
-                <span class="target-badge">대상: 중학교 1~3학년</span>
+                <span class="target-badge">중학교 정보</span>
                 <h1 class="main-title" onclick="location.href='index.html'">데이터 비트박스</h1>
             </div>
             <div class="status-controller">
@@ -353,22 +353,22 @@
                             <div style="display: flex; gap: 15px; margin: 20px 0; text-align: center;">
                                 <div style="flex: 1; background: #f8f6ff; padding: 15px; border-radius: 12px; border: 1px dashed var(--multi-violet-light);">
                                     <b>1-Bit</b><br>
-                                    <button class="inline-reveal-btn violet" style="margin: 8px 0; font-size: 1.1rem; padding: 4px 15px;" onclick="revealInline(this, '<span style=\'font-size:1.4rem;\'>2색</span>', 'var(--multi-violet)')">❔</button>
+                                    <button class="inline-reveal-btn violet" data-label="2색" data-color="var(--multi-violet)" style="margin: 8px 0; font-size: 1.1rem; padding: 4px 15px;" onclick="revealInlineBit(this)">❔</button>
                                     <br><span style="font-size:0.85rem; color:#636e72;">(2¹)</span>
                                 </div>
                                 <div style="flex: 1; background: #f8f6ff; padding: 15px; border-radius: 12px; border: 1px dashed var(--multi-violet-light);">
                                     <b>2-Bit</b><br>
-                                    <button class="inline-reveal-btn violet" style="margin: 8px 0; font-size: 1.1rem; padding: 4px 15px;" onclick="revealInline(this, '<span style=\'font-size:1.4rem;\'>4색</span>', 'var(--multi-violet)')">❔</button>
+                                    <button class="inline-reveal-btn violet" data-label="4색" data-color="var(--multi-violet)" style="margin: 8px 0; font-size: 1.1rem; padding: 4px 15px;" onclick="revealInlineBit(this)">❔</button>
                                     <br><span style="font-size:0.85rem; color:#636e72;">(2²)</span>
                                 </div>
                                 <div style="flex: 1; background: #f8f6ff; padding: 15px; border-radius: 12px; border: 1px dashed var(--multi-violet-light);">
                                     <b>3-Bit</b><br>
-                                    <button class="inline-reveal-btn violet" style="margin: 8px 0; font-size: 1.1rem; padding: 4px 15px;" onclick="revealInline(this, '<span style=\'font-size:1.4rem;\'>8색</span>', 'var(--multi-violet)')">❔</button>
+                                    <button class="inline-reveal-btn violet" data-label="8색" data-color="var(--multi-violet)" style="margin: 8px 0; font-size: 1.1rem; padding: 4px 15px;" onclick="revealInlineBit(this)">❔</button>
                                     <br><span style="font-size:0.85rem; color:#636e72;">(2³)</span>
                                 </div>
                                 <div style="flex: 1; background: #fff0f5; padding: 15px; border-radius: 12px; border: 2px solid var((--multi-violet-light);">
                                     <b>8-Bit</b><br>
-                                    <button class="inline-reveal-btn" style="background: var(--multi-violet); color: white; border: none; box-shadow: 0 4px 10px rgba(255, 45, 85, 0.3); margin: 8px 0; font-size: 1.1rem; padding: 4px 15px;" onclick="revealInline(this, '<span style=\'font-size:1.4rem;\'>256색</span>', 'var(--apple-red)')">❔</button>
+                                    <button class="inline-reveal-btn" data-label="256색" data-color="var(--apple-red)" style="background: var(--multi-violet); color: white; border: none; box-shadow: 0 4px 10px rgba(255, 45, 85, 0.3); margin: 8px 0; font-size: 1.1rem; padding: 4px 15px;" onclick="revealInlineBit(this)">❔</button>
                                     <br><span style="font-size:0.85rem; color:#636e72;">(2⁸)</span>
                                 </div>
                             </div>

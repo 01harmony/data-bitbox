@@ -14,7 +14,7 @@
     <header>
         <div class="header-top">
             <div class="header-left">
-                <span class="target-badge">대상: 중학교 1~3학년</span>
+                <span class="target-badge">중학교 정보</span>
                 <h1 class="main-title" onclick="location.href='index.html'">데이터 비트박스</h1>
             </div>
             <div class="status-controller">
@@ -80,8 +80,16 @@
                                         <div class="bulb-wrap" id="bw-0" onclick="toggleBulb(0)"><div class="place-value" id="pv-0">2<sup>0</sup><br><small>1</small></div><div class="bulb" id="bulb-0">0</div></div>
                                     </div>
                                     <div class="result-display" id="result-display">
-                                        <div id="result-bin-row">이진수: <span id="binary-text">00000000 00000000</span><span style="font-size:0.7em;font-weight:800;">(2)</span> <br>➡ 십진수: <span id="decimal-text" class="highlight-dec">0</span></div>
-                                        <div id="result-dec-row" style="display:none;">입력값: <span id="decimal-text-dec" class="highlight-dec" style="color:#c2410c;">0</span></div>
+                                        <!-- 2진수 모드 결과 -->
+                                        <div id="result-bin-row">
+                                            <div style="font-size:0.85rem;font-weight:800;color:#475569;">이진수: <span id="binary-text">00000000 00000000</span><span style="font-size:0.7em;font-weight:800;">(2)</span></div>
+                                            <div style="margin-top:6px;font-size:0.82rem;font-weight:800;color:#1d4ed8;">십진수: <span id="bin-formula-box" style="font-size:0.82rem;font-weight:800;color:#1d4ed8;"><span style="color:#aaa;font-weight:600;">전구를 켜면 수식이 나타납니다</span></span></div>
+                                        </div>
+                                        <!-- 10진수 모드 결과 -->
+                                        <div id="result-dec-row" style="display:none;">
+                                            <div style="font-size:0.85rem;font-weight:800;color:#475569;">입력값: <span id="decimal-text-dec" style="color:#c2410c;font-weight:900;">0</span></div>
+                                            <div style="margin-top:6px;font-size:0.82rem;font-weight:800;color:#c2410c;">십진수: <span id="dec-formula-box" style="font-size:0.82rem;font-weight:800;color:#c2410c;"><span style="color:#aaa;font-weight:600;">전구를 클릭하면 수식이 나타납니다</span></span></div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -95,17 +103,9 @@
                                         <div class="postit" id="postit-11"><div class="mini-bulb-row"><span class="m-bulb on">1</span><span class="m-bulb on">1</span></div><div class="p-val">= 3</div></div>
                                     </div>
                                     <div style="margin-top:14px;font-size:0.8rem;color:#64748b;font-weight:700;text-align:center;line-height:1.6;">전구 2개 → <b>2<sup>2</sup> = 4가지</b> <br> 전구 16개 → <b>2<sup>16</sup> = 65,536가지</b></div>
-                                    <!-- 이진수 수식 박스 -->
-                                    <div id="bin-formula-box" style="margin-top:12px; background:#eff6ff; border:2px solid #bfdbfe; border-radius:12px; padding:10px 14px; font-size:0.82rem; font-weight:800; color:#1d4ed8; line-height:1.9; text-align:center;">
-                                        <span style="color:#aaa;font-weight:600;">전구를 켜면 수식이 나타납니다</span>
-                                    </div>
-                                    <div style="margin-top:6px;font-size:0.75rem;color:#64748b;font-weight:700;text-align:center;">👆 전구를 클릭하면 수식이 자동으로 계산돼요!</div>
                                 </div>
                                 <div id="postit-dec" style="display:none; flex-direction:column; gap:10px;">
-                                    <!-- 제목 -->
                                     <div style="font-size:0.9rem;font-weight:900;color:#c2410c;text-align:center;line-height:1.4;">📌 10진수 각 자리의 값<br><span style="font-size:0.72rem;color:#888;font-weight:600;">(켜진 자리값을 모두 더해요)</span></div>
-
-                                    <!-- 자리값 카드 4+4 두 줄 -->
                                     <div style="display:flex;flex-direction:column;gap:6px;align-items:center;width:100%;">
                                         <div style="display:flex;gap:6px;justify-content:center;">
                                             <div class="dec-postit" id="dpv-7"><div class="pv-exp">10<sup>7</sup></div><div class="pv-num">1,000만</div></div>
@@ -120,14 +120,6 @@
                                             <div class="dec-postit" id="dpv-0"><div class="pv-exp">10<sup>0</sup></div><div class="pv-num">1</div></div>
                                         </div>
                                     </div>
-
-                                    <!-- 수식 박스 -->
-                                    <div id="dec-formula-box" style="background:#fff7ed; border:2px solid #fed7aa; border-radius:12px; padding:10px 14px; font-size:0.85rem; font-weight:800; color:#c2410c; line-height:1.9; text-align:center;">
-                                        <span style="color:#aaa;font-weight:600;">전구를 클릭하면 수식이 나타납니다</span>
-                                    </div>
-
-                                    <!-- 안내 문구 -->
-                                    <div style="font-size:0.78rem;color:#64748b;font-weight:700;text-align:center;">👆 전구를 클릭해 숫자를 바꾸면 수식이 자동으로 계산돼요!</div>
                                 </div>
                             </div>
                         </div>

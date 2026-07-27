@@ -30,6 +30,20 @@ window.revealInline = function(btn, text, color = 'var(--teal-main)') {
     btn.parentNode.replaceChild(span, btn);
 };
 
+// data-label 속성 기반 버전 (HTML 이스케이프 문제 우회)
+window.revealInlineBit = function(btn) {
+    const label = btn.getAttribute('data-label') || '?';
+    const color = btn.getAttribute('data-color') || 'var(--teal-main)';
+    const span = document.createElement('span');
+    span.className = 'pop-anim revealed-text';
+    span.style.color = color;
+    span.style.borderColor = color;
+    span.style.fontWeight = '900';
+    span.style.fontSize = '1.4rem';
+    span.textContent = label;
+    btn.parentNode.replaceChild(span, btn);
+};
+
 // 🌟 [개별 기능] 1단계: 자율주행 자동차 및 신호등 애니메이션
 const sCanvas = document.getElementById('sourceCanvas');
 const sCtx = sCanvas ? sCanvas.getContext('2d', {willReadFrequently: true}) : null;
@@ -530,20 +544,38 @@ window.updateResultCanvas = function() {
         }
     }
 
-    // 슬라이더 최대값 라벨 동기화
+    // 슬라이더 최대값·최솟값 레이블 동기화
     const maxL = document.getElementById('sliderMaxLabel');
+    const minL = document.getElementById('sliderMinLabel');
     if (maxL) {
         if (currentMode === 'hd') maxL.textContent = '300×300 픽셀 (원본 고해상도)';
         else if (currentMode === 'photo' && uploadedPhotoImg) {
-            const origDim = Math.max(uploadedPhotoImg.width, uploadedPhotoImg.height);
             maxL.textContent = uploadedPhotoImg.width + '×' + uploadedPhotoImg.height + ' 픽셀 (원본 해상도)';
         } else {
-             // 최대 크기일 때의 실제 WxH 텍스트 표시
              let maxW, maxH;
              const ratio = currentW / currentH;
              if (currentW >= currentH) { maxW = sliderMax; maxH = Math.round(sliderMax / ratio); }
              else { maxH = sliderMax; maxW = Math.round(sliderMax * ratio); }
              maxL.textContent = maxW + '×' + maxH + ' 픽셀 (고해상도)';
+        }
+    }
+    // 최솟값 레이블: 실제 이미지 비율에 맞춰 유동적으로 표시
+    if (minL) {
+        const sliderMin = parseInt(document.getElementById('resSlider').min) || 4;
+        if (currentMode === 'hd') {
+            minL.textContent = sliderMin + '×' + sliderMin + ' 픽셀 (극저해상도)';
+        } else if (currentMode === 'photo' && uploadedPhotoImg) {
+            const ratio = uploadedPhotoImg.width / uploadedPhotoImg.height;
+            let minW, minH;
+            if (ratio >= 1) { minW = sliderMin; minH = Math.max(1, Math.round(sliderMin / ratio)); }
+            else { minH = sliderMin; minW = Math.max(1, Math.round(sliderMin * ratio)); }
+            minL.textContent = minW + '×' + minH + ' 픽셀 (극저해상도)';
+        } else {
+            const ratio = currentW / currentH;
+            let minW, minH;
+            if (currentW >= currentH) { minW = sliderMin; minH = Math.max(1, Math.round(sliderMin / ratio)); }
+            else { minH = sliderMin; minW = Math.max(1, Math.round(sliderMin * ratio)); }
+            minL.textContent = minW + '×' + minH + ' 픽셀 (극저해상도)';
         }
     }
     
@@ -585,6 +617,8 @@ window.updateResultCanvas = function() {
     resCanvas.height = internalH;
     resCanvas.style.width  = canvasDisplayW + 'px';
     resCanvas.style.height = canvasDisplayH + 'px';
+    // CSS 확대 시에도 픽셀이 선명하게 보이도록 (저해상도일수록 블록이 뚜렷하게)
+    resCanvas.style.imageRendering = 'pixelated';
 
     // ⚠️ canvas.width 재설정 시 컨텍스트 초기화 → 다시 설정
     rCtx.imageSmoothingEnabled = false;
@@ -626,17 +660,41 @@ window.updateResultCanvas = function() {
     // 최종: downCanvas(outW×outH) → resCanvas(internalW×internalH) 가득 채워 그리기
     rCtx.drawImage(downCanvas, 0, 0, outW, outH, 0, 0, internalW, internalH);
 
-    // 격자선 그리기 (저해상도일 때만)
-    if (Math.max(outW, outH) <= 30) {
-        rCtx.strokeStyle = 'rgba(0, 0, 0, 0.15)'; rCtx.lineWidth = 1;
-        const cellW = internalW / outW;
-        const cellH = internalH / outH;
-
-        for(let i=0; i<=outW; i++) {
-            rCtx.beginPath(); rCtx.moveTo(i*cellW, 0); rCtx.lineTo(i*cellW, internalH); rCtx.stroke();
-        }
-        for(let i=0; i<=outH; i++) {
-            rCtx.beginPath(); rCtx.moveTo(0, i*cellH); rCtx.lineTo(internalW, i*cellH); rCtx.stroke();
+    // 격자선 그리기 (32픽셀 이하 저해상도일 때만)
+    if (Math.max(outW, outH) <= 32) {
+        // photo 모드는 internalW=outW(4 등)로 작으므로 CSS 표시 크기 기준으로 별도 오버레이
+        if (currentMode === 'photo' && uploadedPhotoImg) {
+            // 격자용 오버레이 캔버스를 CSS 표시 크기로 새로 그림
+            const overlayCanvas = document.createElement('canvas');
+            overlayCanvas.width  = canvasDisplayW;
+            overlayCanvas.height = canvasDisplayH;
+            const oCtx = overlayCanvas.getContext('2d');
+            // 원본 이미지를 oW×oH로 다운샘플 후 오버레이 크기로 확대 (픽셀 블록 확인용)
+            const tmpCanvas = document.createElement('canvas');
+            tmpCanvas.width = outW; tmpCanvas.height = outH;
+            const tCtx = tmpCanvas.getContext('2d');
+            tCtx.imageSmoothingEnabled = false;
+            tCtx.drawImage(uploadedPhotoImg, 0, 0, uploadedPhotoImg.width, uploadedPhotoImg.height, 0, 0, outW, outH);
+            oCtx.imageSmoothingEnabled = false;
+            oCtx.drawImage(tmpCanvas, 0, 0, outW, outH, 0, 0, canvasDisplayW, canvasDisplayH);
+            // 격자선
+            oCtx.strokeStyle = 'rgba(0,0,0,0.35)'; oCtx.lineWidth = 1;
+            const cW = canvasDisplayW / outW;
+            const cH = canvasDisplayH / outH;
+            for(let i=0; i<=outW; i++) { oCtx.beginPath(); oCtx.moveTo(Math.round(i*cW)+0.5, 0); oCtx.lineTo(Math.round(i*cW)+0.5, canvasDisplayH); oCtx.stroke(); }
+            for(let i=0; i<=outH; i++) { oCtx.beginPath(); oCtx.moveTo(0, Math.round(i*cH)+0.5); oCtx.lineTo(canvasDisplayW, Math.round(i*cH)+0.5); oCtx.stroke(); }
+            // 오버레이를 실제 캔버스에 적용
+            resCanvas.width  = canvasDisplayW;
+            resCanvas.height = canvasDisplayH;
+            resCanvas.style.width  = canvasDisplayW + 'px';
+            resCanvas.style.height = canvasDisplayH + 'px';
+            resCanvas.getContext('2d').drawImage(overlayCanvas, 0, 0);
+        } else {
+            rCtx.strokeStyle = 'rgba(0, 0, 0, 0.25)'; rCtx.lineWidth = 1;
+            const cellW = internalW / outW;
+            const cellH = internalH / outH;
+            for(let i=0; i<=outW; i++) { rCtx.beginPath(); rCtx.moveTo(Math.round(i*cellW)+0.5, 0); rCtx.lineTo(Math.round(i*cellW)+0.5, internalH); rCtx.stroke(); }
+            for(let i=0; i<=outH; i++) { rCtx.beginPath(); rCtx.moveTo(0, Math.round(i*cellH)+0.5); rCtx.lineTo(internalW, Math.round(i*cellH)+0.5); rCtx.stroke(); }
         }
     }
 };

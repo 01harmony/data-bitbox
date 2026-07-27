@@ -165,6 +165,33 @@ function check(el) {
     const val = el.value.trim();
     const answer = el.getAttribute('data-answer');
     const answerAlt = el.getAttribute('data-answer-alt');
+
+    // 🌟 data-swap="true": 짝 단위 채점 — 같은 문항의 스왑 칸이 모두 채워지고
+    //    그 조합이 정답 집합과 정확히 일치할 때만(순서 무관) 두 칸을 동시에 정답 처리.
+    //    예: "0과 1" ✓, "1과 0" ✓ / "0과 0", "1과 1", 한 칸만 입력 ✗
+    if (el.getAttribute('data-swap') === 'true') {
+        const box = el.closest('.quiz-box');
+        if (!box) return;
+        const group = Array.from(box.querySelectorAll('input[data-swap="true"]'));
+        const values = group.map(p => p.value.trim());
+        if (values.some(v => v === '')) return; // 아직 짝이 완성되지 않음
+        const answers = group.map(p => p.getAttribute('data-answer'));
+        const isPairCorrect =
+            values.slice().sort().join('\u0000') === answers.slice().sort().join('\u0000');
+        if (isPairCorrect) {
+            group.forEach(p => {
+                if (!scored.has(p)) {
+                    p.classList.add('correct');
+                    p.disabled = true;
+                    scored.add(p);
+                    score += parseInt(p.getAttribute('data-score') || '10');
+                    correctAnswers++;
+                }
+            });
+        }
+        return;
+    }
+
     const isCorrect = val === answer || (answerAlt && val === answerAlt);
     if (isCorrect && !scored.has(el)) {
         el.classList.add('correct');
