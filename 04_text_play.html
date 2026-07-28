@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>암호해독 요원 · 문자 데이터 실습</title>
+    <title>방탈출 · 문자 데이터 해독 실습</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&family=JetBrains+Mono:wght@700;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -72,40 +72,56 @@
             font-size: 0.78rem; font-weight: 700; color: #E8F4FF; opacity: 0.9;
         }
 
-        /* ── 메인 레이아웃: 3분할 ── */
+        /* ── 스텝 인디케이터 ── */
+        .step-indicator {
+            display: flex; align-items: center; justify-content: center;
+            gap: 0; padding: 14px 0 0 0; flex-shrink: 0;
+        }
+        .step-node {
+            display: flex; flex-direction: column; align-items: center; gap: 5px;
+        }
+        .step-circle {
+            width: 36px; height: 36px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.75rem; font-weight: 900; letter-spacing: 0.5px;
+            border: 2px solid #3A3A3C; background: #1C1C1E; color: #636366;
+            transition: all 0.3s;
+        }
+        .step-circle.active { border-color: var(--apple-blue); color: var(--apple-blue); background: rgba(10,132,255,0.12); }
+        .step-circle.done   { border-color: var(--success-green); color: var(--success-green); background: rgba(48,209,88,0.12); }
+        .step-line {
+            width: 80px; height: 2px; background: #2A2A2C; margin-bottom: 20px; transition: background 0.3s;
+        }
+        .step-line.done { background: var(--success-green); }
+        .step-label {
+            font-size: 0.65rem; font-weight: 800; color: #636366; letter-spacing: 0.5px; white-space: nowrap;
+        }
+        .step-node.active .step-label { color: var(--apple-blue); }
+        .step-node.done .step-label   { color: var(--success-green); }
+
+        /* ── 메인 레이아웃: 스텝 방식 ── */
         main {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1.5fr;
-            grid-template-rows: 1fr 1fr;
+            display: flex; flex-direction: column;
             width: 100%; height: 100%;
-            gap: 0;
+            overflow: hidden;
         }
 
         /* ── 패널 공통 ── */
         .panel {
-            border: 1px solid #2A2A2C;
-            padding: 22px 24px;
+            border: 1px solid #3A3A3C;
+            padding: 28px 30px;
             display: flex; flex-direction: column;
-            overflow: hidden;
+            overflow: visible;
             position: relative;
             transition: opacity 0.4s ease, filter 0.4s ease;
+            border-radius: 18px;
+            background: #111113;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 1.5px 0 rgba(255,255,255,0.05) inset;
+            margin-top: 18px;
         }
 
-        /* 잠금 상태 */
-        .panel.locked {
-            opacity: var(--locked-opacity);
-            pointer-events: none;
-            filter: grayscale(0.6);
-        }
-        .panel.locked::before {
-            content: '🔒 이전 미션을 완료하면 열립니다';
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
-            background: rgba(0,0,0,0.85); color: #636366;
-            padding: 12px 20px; border-radius: 12px; font-weight: 800;
-            font-size: 0.85rem; white-space: nowrap; z-index: 10;
-            border: 1px solid #3A3A3C;
-            pointer-events: none;
-        }
+        /* 잠금 상태 — 스텝 방식에서는 미사용 (숨김으로 대체) */
+        .panel.locked { display: none !important; }
 
         /* 잠금 해제 펄스 */
         @keyframes unlockPulse {
@@ -115,22 +131,20 @@
         }
         .panel.just-unlocked { animation: unlockPulse 0.8s ease; }
 
-        /* ── 패널 배치 ── */
-        #panel-m1 {
-            grid-column: 1; grid-row: 1;
-            border-right: none; border-bottom: none;
-            background: rgba(10,132,255,0.03);
+        /* ── 패널 배치: 스텝 방식 ── */
+        .panel-wrap {
+            flex: 1; overflow-y: auto;
+            display: flex; flex-direction: column; align-items: center;
+            padding: 0 24px 24px 24px;
         }
-        #panel-m2 {
-            grid-column: 1; grid-row: 2;
-            border-right: none;
-            background: rgba(57,255,20,0.02);
+        .panel-wrap .panel {
+            width: 100%; max-width: min(820px, 90vw);
         }
-        #panel-m3 {
-            grid-column: 2 / 4; grid-row: 1 / 3;
-            background: rgba(255,214,10,0.02);
-            overflow-y: auto;
-        }
+        #panel-m2 { max-width: min(1060px, 94vw) !important; }
+        #panel-m1 { background: rgba(10,132,255,0.03); display: none; }
+        #panel-m2 { background: rgba(57,255,20,0.02);  display: none; }
+        #panel-m3 { background: rgba(255,214,10,0.02); display: none; overflow-y: unset; }
+        .panel.step-active { display: flex !important; }
 
         /* ── 패널 헤더 ── */
         .panel-header {
@@ -138,15 +152,15 @@
             margin-bottom: 14px;
         }
         .mission-badge {
-            font-size: 0.7rem; font-weight: 900; letter-spacing: 1px;
-            padding: 4px 10px; border-radius: 8px; white-space: nowrap;
+            font-size: 0.85rem; font-weight: 900; letter-spacing: 1px;
+            padding: 6px 14px; border-radius: 8px; white-space: nowrap;
         }
         .badge-m1 { background: rgba(10,132,255,0.2); color: var(--apple-blue); border: 1px solid rgba(10,132,255,0.4); }
         .badge-m2 { background: rgba(57,255,20,0.15); color: var(--terminal-green); border: 1px solid rgba(57,255,20,0.35); }
         .badge-m3 { background: rgba(255,214,10,0.15); color: var(--cyber-gold); border: 1px solid rgba(255,214,10,0.35); }
 
         .panel-title {
-            font-size: 0.95rem; font-weight: 800; color: #E5E5EA;
+            font-size: 1.15rem; font-weight: 800; color: #E5E5EA;
         }
         .check-icon {
             margin-left: auto; font-size: 1.2rem;
@@ -162,8 +176,8 @@
             flex: 1; display: flex; flex-direction: column; gap: 8px;
         }
         .compare-label {
-            font-size: 0.72rem; font-weight: 800; letter-spacing: 1px;
-            padding: 5px 10px; border-radius: 8px; text-align: center;
+            font-size: 0.9rem; font-weight: 800; letter-spacing: 1px;
+            padding: 7px 14px; border-radius: 8px; text-align: center;
         }
         .label-en { background: rgba(10,132,255,0.15); color: var(--apple-blue); }
         .label-ko { background: rgba(255,214,10,0.15); color: var(--cyber-gold); }
@@ -196,81 +210,98 @@
         }
         .bit-text {
             font-family: 'JetBrains Mono', monospace;
-            font-size: 0.8rem; line-height: 1.7;
+            font-size: 1rem; line-height: 1.8;
             word-break: break-all; position: relative; z-index: 1;
         }
         .bit-en { color: var(--apple-blue); }
         .bit-ko { color: var(--cyber-gold); }
         .bit-count {
-            font-size: 0.68rem; font-weight: 800; text-align: center;
-            padding: 5px; border-radius: 6px; margin-top: 6px;
+            font-size: 0.9rem; font-weight: 800; text-align: center;
+            padding: 7px; border-radius: 6px; margin-top: 6px;
         }
         .count-en { background: rgba(10,132,255,0.15); color: var(--apple-blue); }
         .count-ko { background: rgba(255,214,10,0.15); color: var(--cyber-gold); }
 
         /* 미션1 질문 */
         .m1-question {
-            margin-top: 12px; background: #1C1C1E; border-radius: 10px;
-            padding: 12px 14px; border: 1px solid #3A3A3C; font-size: 0.82rem; color: #AEAEB2;
-            line-height: 1.6;
+            margin-top: 16px; background: #1C1C1E; border-radius: 12px;
+            padding: 16px 20px; border: 1px solid #3A3A3C; font-size: 1rem; color: #AEAEB2;
+            line-height: 1.8;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.4), 0 1px 0 rgba(255,255,255,0.04) inset;
         }
         .m1-question strong { color: #E5E5EA; }
 
         .mini-blank {
             box-sizing: border-box; display: inline-block;
-            width: 72px; height: 28px;
+            width: 86px; height: 34px;
             background: #09090B; border: 2px solid #48484A;
-            border-radius: 6px; vertical-align: middle; padding: 0 8px;
-            text-align: center; line-height: 24px;
-            font-size: 0.95rem; font-weight: 900; color: var(--apple-blue);
-            margin: 0 4px; outline: none; transition: all 0.2s;
+            border-radius: 8px; vertical-align: middle; padding: 0 10px;
+            text-align: center; line-height: 30px;
+            font-size: 1.05rem; font-weight: 900; color: var(--apple-blue);
+            margin: 0 5px; outline: none; transition: all 0.2s;
         }
-        .mini-blank:focus { border-color: var(--apple-blue); box-shadow: 0 0 0 2px rgba(10,132,255,0.2); width: 86px; }
+        .mini-blank:focus { border-color: var(--apple-blue); box-shadow: 0 0 0 3px rgba(10,132,255,0.2); width: 100px; }
         .mini-blank.correct { background: rgba(48,209,88,0.15); color: var(--success-green); border-color: var(--success-green); }
 
         /* ── 미션2 ── */
         .m2-grid {
-            display: flex; flex-direction: column; gap: 8px; flex: 1; overflow-y: auto;
+            display: flex; flex-direction: column; gap: 16px; flex: 1;
         }
         .m2-card {
-            background: #121214; border-radius: 10px; padding: 11px 14px;
-            border: 1px solid #2A2A2C; font-size: 0.82rem; color: #AEAEB2;
-            line-height: 1.6; transition: border-color 0.2s;
+            background: #fdf8e1;
+            border-radius: 4px 12px 12px 12px;
+            padding: 20px 24px 18px 24px;
+            border-left: 4px solid #e6c840;
+            font-size: 1rem; color: #2a2a1a;
+            line-height: 1.85;
+            position: relative;
+            box-shadow: 3px 4px 14px rgba(0,0,0,0.45);
+            transform: rotate(-0.4deg);
+            transition: transform 0.2s, box-shadow 0.2s;
         }
-        .m2-card:hover { border-color: #48484A; }
-        .m2-card strong { color: #E5E5EA; }
+        .m2-card:nth-child(even) { transform: rotate(0.3deg); }
+        .m2-card:hover { transform: rotate(0deg) scale(1.01); box-shadow: 4px 6px 20px rgba(0,0,0,0.55); }
+        .m2-card::before { content: '📌'; position: absolute; top: -10px; left: 14px; font-size: 1.2rem; }
+        .m2-card strong { color: #1a1a00; font-size: 1.05rem; }
+        .m2-card .mini-blank { background: rgba(255,255,255,0.7); border-color: #b8a000; color: #8a5e00; }
+        .m2-card .mini-blank.correct { background: rgba(48,209,88,0.2); color: #1a6b00; border-color: #30D158; }
+        .m2-card .hint-toggle { background: rgba(230,200,64,0.2); border-color: rgba(180,150,0,0.4); color: #6b5200; }
+        .m2-card .hint-toggle:hover, .m2-card .hint-toggle.open { background: rgba(230,200,64,0.35); color: #3d2e00; }
+        .m2-card .hint-box { background: rgba(255,248,180,0.95); border-color: rgba(180,150,0,0.4); color: #3d2e00; }
+        .m2-card .quiz-num { color: #8a5e00; }
 
         /* 힌트 토글 */
         .hint-toggle {
             display: inline-flex; align-items: center; gap: 4px;
-            font-size: 0.7rem; font-weight: 800; color: #636366;
+            font-size: 0.85rem; font-weight: 800; color: #636366;
             background: #1C1C1E; border: 1px solid #3A3A3C;
-            border-radius: 6px; padding: 3px 8px; cursor: pointer;
-            margin-top: 7px; transition: all 0.15s; user-select: none;
+            border-radius: 6px; padding: 5px 12px; cursor: pointer;
+            margin-top: 10px; transition: all 0.15s; user-select: none;
         }
         .hint-toggle:hover { color: var(--cyber-gold); border-color: rgba(255,214,10,0.4); background: rgba(255,214,10,0.06); }
         .hint-toggle.open { color: var(--cyber-gold); border-color: rgba(255,214,10,0.4); background: rgba(255,214,10,0.06); }
         .hint-box {
-            display: none; margin-top: 7px;
+            display: none; margin-top: 10px;
             background: rgba(255,214,10,0.07); border: 1px dashed rgba(255,214,10,0.35);
-            border-radius: 8px; padding: 8px 10px;
-            font-size: 0.76rem; color: #D1D1D6; line-height: 1.6;
+            border-radius: 10px; padding: 12px 16px;
+            font-size: 0.95rem; color: #D1D1D6; line-height: 1.7;
         }
         .hint-box.open { display: block; }
         .hint-box .hint-ans {
-            display: inline-block; margin-top: 5px;
+            display: inline-block; margin-top: 6px;
             background: var(--cyber-gold); color: #000;
-            font-weight: 900; border-radius: 4px; padding: 1px 7px;
-            font-size: 0.78rem; letter-spacing: 0.5px;
+            font-weight: 900; border-radius: 4px; padding: 2px 10px;
+            font-size: 0.95rem; letter-spacing: 0.5px;
         }
 
         /* ── 미션3 ── */
         .m3-story {
-            background: rgba(255,214,10,0.05); border: 1px dashed rgba(255,214,10,0.3);
-            border-radius: 12px; padding: 14px 16px; margin-bottom: 16px;
-            font-size: 0.83rem; color: #D1D1D6; line-height: 1.65;
+            background: rgba(255,214,10,0.06); border: 1px dashed rgba(255,214,10,0.35);
+            border-radius: 14px; padding: 18px 22px; margin-bottom: 18px;
+            font-size: 1rem; color: #D1D1D6; line-height: 1.8;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.3), 0 1px 0 rgba(255,214,10,0.05) inset;
         }
-        .m3-story-title { font-weight: 900; color: var(--cyber-gold); margin-bottom: 8px; font-size: 0.88rem; }
+        .m3-story-title { font-weight: 900; color: var(--cyber-gold); margin-bottom: 10px; font-size: 1.05rem; }
 
         .decode-input {
             width: 100%; padding: 12px 16px; border-radius: 12px;
@@ -286,36 +317,38 @@
 
         .clue-strip {
             background: rgba(57,255,20,0.06); border: 1.5px dashed rgba(57,255,20,0.3);
-            border-radius: 10px; padding: 10px 14px; margin-bottom: 14px;
-            font-size: 0.8rem;
+            border-radius: 12px; padding: 14px 20px; margin-bottom: 16px;
+            font-size: 1rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
-        .clue-strip-title { color: var(--terminal-green); font-weight: 800; margin-bottom: 6px; letter-spacing: 0.5px; font-size: 0.75rem; }
-        .clue-words { color: #E5E5EA; font-weight: 700; letter-spacing: 6px; font-family: 'JetBrains Mono'; font-size: 0.85rem; }
+        .clue-strip-title { color: var(--terminal-green); font-weight: 800; margin-bottom: 8px; letter-spacing: 0.5px; font-size: 0.9rem; }
+        .clue-words { color: #E5E5EA; font-weight: 700; letter-spacing: 6px; font-family: 'JetBrains Mono'; font-size: 1rem; }
 
         .quiz-item {
-            background: #1C1C1E; border-radius: 10px; padding: 14px 16px;
-            border: 1px solid #2A2A2C; margin-bottom: 10px;
-            font-size: 0.85rem; color: #AEAEB2; line-height: 1.7;
-            transition: border-color 0.2s;
+            background: #1a1a1e; border-radius: 14px; padding: 18px 22px;
+            border: 1px solid #2A2A2C; margin-bottom: 12px;
+            font-size: 1rem; color: #C0C0CC; line-height: 1.85;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.35), 0 1px 0 rgba(255,255,255,0.04) inset;
         }
-        .quiz-item:hover { border-color: #48484A; }
-        .quiz-item strong { color: #E5E5EA; }
+        .quiz-item:hover { border-color: #48484A; box-shadow: 0 6px 20px rgba(0,0,0,0.5), 0 1px 0 rgba(255,255,255,0.04) inset; }
+        .quiz-item strong { color: #F0F0FA; font-size: 1.05rem; }
         .quiz-num {
             font-weight: 900; color: var(--cyber-gold);
-            font-family: 'JetBrains Mono'; font-size: 0.78rem;
-            margin-bottom: 4px; display: block; letter-spacing: 1px;
+            font-family: 'JetBrains Mono'; font-size: 0.9rem;
+            margin-bottom: 6px; display: block; letter-spacing: 1px;
         }
 
         .std-blank {
             box-sizing: border-box; display: inline-block;
-            width: 90px; height: 30px;
+            width: 100px; height: 34px;
             background: #09090B; border: 2px solid #48484A;
-            border-radius: 6px; vertical-align: middle; padding: 0 8px;
-            text-align: center; line-height: 26px;
-            font-size: 0.92rem; font-weight: 900; color: var(--apple-blue);
-            margin: 0 4px; outline: none; transition: all 0.2s;
+            border-radius: 8px; vertical-align: middle; padding: 0 10px;
+            text-align: center; line-height: 30px;
+            font-size: 1.05rem; font-weight: 900; color: var(--apple-blue);
+            margin: 0 5px; outline: none; transition: all 0.2s;
         }
-        .std-blank:focus { border-color: var(--apple-blue); box-shadow: 0 0 0 2px rgba(10,132,255,0.2); }
+        .std-blank:focus { border-color: var(--apple-blue); box-shadow: 0 0 0 3px rgba(10,132,255,0.2); }
         .std-blank.correct { background: rgba(48,209,88,0.15); color: var(--success-green); border-color: var(--success-green); }
 
         /* 점수 표시 */
@@ -338,17 +371,19 @@
         /* 모달 */
         .modal-overlay {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85); backdrop-filter: blur(12px);
+            background: rgba(0,0,0,0.75); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
             z-index: 9000; align-items: center; justify-content: center;
         }
         .modal-content {
-            background: #1C1C1E; padding: 40px; border-radius: 24px; width: 460px;
-            text-align: center; border: 1px solid #3A3A3C;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 40px rgba(48,209,88,0.2);
+            background: linear-gradient(145deg, #1a1a2e, #16213e, #0f3460);
+            padding: 48px 44px; border-radius: 28px; width: 480px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 30px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.05) inset, 0 0 60px rgba(10,132,255,0.1);
             color: #F2F2F7;
         }
-        .modal-content h2 { color: var(--success-green); font-weight: 900; font-size: 1.8rem; margin-bottom: 10px; }
-        .modal-content p { color: #AEAEB2; line-height: 1.7; margin-bottom: 25px; font-size: 1rem; }
+        .modal-content h2 { color: #fff; font-weight: 900; font-size: 2rem; margin-bottom: 14px; letter-spacing: -0.5px; }
+        .modal-content p { color: rgba(255,255,255,0.7); line-height: 1.8; margin-bottom: 30px; font-size: 1rem; white-space: nowrap; }
 
         /* 미션 완료 배지 (패널 헤더에 표시) */
         @keyframes badgeAppear { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
@@ -387,29 +422,67 @@
         <a class="dbb-btn" href="index.html">← 메인으로</a>
         <a class="dbb-btn" href="04_text.html">📖 개념으로</a>
     </div>
-    <span class="dbb-title">🔐 암호해독 요원 · 문자 데이터 해독 실습</span>
+    <span class="dbb-title">🔒 방탈출 · 문자 데이터 해독 실습</span>
 </div>
 
 <main>
 
+    <!-- ── 스텝 인디케이터 ── -->
+    <div class="step-indicator" id="stepIndicator">
+        <div class="step-node active" id="snode-m1">
+            <div class="step-circle active" id="scirc-m1">M1</div>
+            <div class="step-label">1단계 — 단서 발견</div>
+        </div>
+        <div class="step-line" id="sline-1"></div>
+        <div class="step-node" id="snode-m2">
+            <div class="step-circle" id="scirc-m2">M2</div>
+            <div class="step-label">2단계 — 쪽지 해독</div>
+        </div>
+        <div class="step-line" id="sline-2"></div>
+        <div class="step-node" id="snode-m3">
+            <div class="step-circle" id="scirc-m3">M3</div>
+            <div class="step-label">3단계 — 탈출!</div>
+        </div>
+    </div>
+
+    <div class="panel-wrap">
+
     <!-- ════════════════════════════════
          패널 M1: 한글 vs 영어 비트 수 비교
     ════════════════════════════════ -->
-    <div class="panel active-panel" id="panel-m1">
+    <div class="panel step-active" id="panel-m1">
         <div class="panel-header">
-            <span class="mission-badge badge-m1">MISSION 01</span>
-            <span class="panel-title">비트 수 비교 해독</span>
+            <span class="mission-badge badge-m1">🔍 1단계</span>
+            <span class="panel-title">단서 발견 — 비트의 비밀을 찾아라!</span>
             <span class="check-icon" id="check-m1">✅</span>
         </div>
+
+        <!-- 방탈출 스토리 -->
+        <div class="m3-story" style="background:rgba(10,132,255,0.06);border-color:rgba(10,132,255,0.3);margin-bottom:16px;">
+            <div class="m3-story-title" style="color:var(--apple-blue);">🚪 방에 갇혔어요!</div>
+            탈출하려면 먼저 이 방의 비밀을 알아야 해요.<br>
+            방 안 컴퓨터에 영문자와 한글을 입력하면 이진 코드가 표현돼요.<br>
+            각각 몇 비트로 저장되는지 확인하고, 빈칸을 채워야 다음 단계로 넘어갈 수 있어요!
+        </div>
+
+        <!-- 모니터 프레임 -->
+        <div style="background:#0d0d0f;border:3px solid #3a3a3c;border-radius:14px 14px 6px 6px;padding:16px 20px 20px;box-shadow:0 8px 32px rgba(0,0,0,0.6),0 0 0 1px rgba(255,255,255,0.04) inset;margin-bottom:6px;">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid #2a2a2c;">
+                <div style="width:10px;height:10px;border-radius:50%;background:#ff5f57;"></div>
+                <div style="width:10px;height:10px;border-radius:50%;background:#febc2e;"></div>
+                <div style="width:10px;height:10px;border-radius:50%;background:#28c840;"></div>
+                <div style="flex:1;text-align:center;font-size:0.72rem;color:#636366;font-family:'JetBrains Mono',monospace;letter-spacing:1px;">BITBOX · CHARACTER ENCODER</div>
+            </div>
 
         <!-- 가로 비교 영역 -->
         <div class="compare-wrap">
             <!-- 영어 컬럼 -->
             <div class="compare-col">
                 <div class="compare-label label-en">🔤 영어 입력</div>
-                <div class="char-input-wrap">
+                <div class="char-input-wrap" style="flex-direction:column;gap:0;">
                     <input class="char-display en-char" id="en-input" maxlength="1"
                         oninput="filterEnInput(this)" placeholder="A" autocomplete="off" inputmode="text">
+                    <span class="bit-cursor" id="en-cursor" style="display:block;width:40px;height:3px;background:var(--apple-blue);border-radius:2px;margin-top:2px;"></span>
                 </div>
                 <div class="bit-screen" id="en-screen">
                     <div class="bit-text bit-en" id="en-bits"></div>
@@ -423,15 +496,20 @@
             <!-- 한글 컬럼 -->
             <div class="compare-col">
                 <div class="compare-label label-ko">🔡 한글 입력</div>
-                <div class="char-input-wrap">
+                <div class="char-input-wrap" style="flex-direction:column;gap:0;">
                     <input class="char-display ko-char" id="ko-input" maxlength="1"
                         oninput="filterKoInput(this)" placeholder="가" autocomplete="off" inputmode="text">
+                    <span class="bit-cursor" id="ko-cursor" style="display:block;width:40px;height:3px;background:var(--cyber-gold);border-radius:2px;margin-top:2px;"></span>
                 </div>
                 <div class="bit-screen" id="ko-screen">
                     <div class="bit-text bit-ko" id="ko-bits"></div>
                 </div>
                 <div class="bit-count count-ko" id="ko-count">— 비트</div>
             </div>
+        </div>
+        </div><!-- /모니터 프레임 -->
+        <div style="display:flex;justify-content:center;margin-bottom:14px;">
+            <div style="width:60px;height:10px;background:#2a2a2c;border-radius:0 0 4px 4px;"></div>
         </div>
 
         <!-- 질문 -->
@@ -442,16 +520,36 @@
             한글이 영어보다 <strong>3배 더 많은</strong> 비트를 사용하는 이유는
             표현해야 할 글자의 종류(문자 집합)가 훨씬 많기 때문입니다.
         </div>
-    </div>
 
-    <!-- ════════════════════════════════
-         패널 M2: 대소문자 · 공백 해독 (처음엔 잠금)
+        <!-- 다음 단계 버튼 -->
+        <div style="display:flex;justify-content:flex-end;margin-top:20px;">
+            <button id="door-btn-m1" onclick="tryNextStep('m1')"
+                style="padding:14px 32px;border-radius:50px;
+                       border:2px solid rgba(255,255,255,0.1);
+                       background:rgba(255,255,255,0.05);
+                       color:rgba(255,255,255,0.3);
+                       font-size:1rem;font-weight:900;
+                       cursor:pointer;transition:all 0.3s;
+                       display:flex;align-items:center;gap:10px;
+                       letter-spacing:0.3px;"
+                title="빈칸을 채워야 다음 단계로 이동할 수 있어요">
+                <span id="door-icon-m1" style="font-size:1.3rem;">🔒</span> 다음 단계로
+            </button>
+        </div>
+    </div>
     ════════════════════════════════ -->
     <div class="panel locked" id="panel-m2">
         <div class="panel-header">
-            <span class="mission-badge badge-m2">MISSION 02</span>
-            <span class="panel-title">문자 코드 정밀 해독</span>
+            <span class="mission-badge badge-m2">📝 2단계</span>
+            <span class="panel-title">쪽지 해독 — 벽에 붙은 단서를 풀어라!</span>
             <span class="check-icon" id="check-m2">✅</span>
+        </div>
+
+        <!-- 방탈출 스토리 -->
+        <div class="m3-story" style="background:rgba(57,255,20,0.04);border-color:rgba(57,255,20,0.25);margin-bottom:16px;">
+            <div class="m3-story-title" style="color:var(--terminal-green);">📋 벽에 쪽지가 붙어 있어요!</div>
+            방 곳곳에 5장의 쪽지가 붙어있어요. 각 쪽지의 빈칸을 모두 채워야<br>
+            자물쇠가 있는 다음 방으로 넘어갈 수 있어요. 힌트 버튼을 눌러도 괜찮아요!
         </div>
 
         <div class="m2-grid">
@@ -474,7 +572,7 @@
 
             <div class="m2-card">
                 <span class="quiz-num">Q2</span>
-                눈에 보이지 않는 <strong>스페이스바(공백)</strong>도 컴퓨터에게는 고유한
+                눈에 보이지 않는 <strong>스페이스바(공백)</strong>도 컴퓨터에서는 고유한
                 <input type="text" class="mini-blank" data-answer="이진수" data-alts="이진법|2진수|이진|2진법|숫자|이진수값" data-panel="m2" autocomplete="off" placeholder="?">
                 로 저장됩니다. (공백 = <span style="font-family:'JetBrains Mono';color:var(--apple-blue);">00100000</span>)
                 <br>
@@ -528,6 +626,22 @@
             </div>
 
         </div>
+
+        <!-- 다음 단계 버튼 -->
+        <div style="display:flex;justify-content:flex-end;margin-top:20px;">
+            <button id="door-btn-m2" onclick="tryNextStep('m2')"
+                style="padding:14px 32px;border-radius:50px;
+                       border:2px solid rgba(255,255,255,0.1);
+                       background:rgba(255,255,255,0.05);
+                       color:rgba(255,255,255,0.3);
+                       font-size:1rem;font-weight:900;
+                       cursor:pointer;transition:all 0.3s;
+                       display:flex;align-items:center;gap:10px;
+                       letter-spacing:0.3px;"
+                title="쪽지를 모두 풀어야 다음 단계로 이동할 수 있어요">
+                <span id="door-icon-m2" style="font-size:1.3rem;">🔒</span> 다음 단계로
+            </button>
+        </div>
     </div>
 
     <!-- ════════════════════════════════
@@ -535,148 +649,151 @@
     ════════════════════════════════ -->
     <div class="panel locked" id="panel-m3">
         <div class="panel-header">
-            <span class="mission-badge badge-m3">MISSION 03</span>
-            <span class="panel-title">최종 암호 해독 — FINAL DECODE</span>
+            <span class="mission-badge badge-m3">🔓 3단계</span>
+            <span class="panel-title">자물쇠 해제 — 비밀번호를 완성하라!</span>
             <span class="check-icon" id="check-m3">✅</span>
-        </div>
-
-        <!-- 점수 바 -->
-        <div class="score-bar">
-            <div class="score-track"><div class="score-fill" id="score-fill"></div></div>
-            <div class="score-label">해독 <span id="m3-score">0</span>/3</div>
         </div>
 
         <!-- 스토리 브리핑 -->
         <div class="m3-story">
-            <div class="m3-story-title">📡 해독팀 긴급 브리핑</div>
-            탐사선 BITBOX-7이 수신한 암호 신호의 마지막 구간입니다.
-            신호는 6개의 이진수 블록으로 구성되어 있으며, 각 블록이 어떤 알파벳인지 아직 알 수 없습니다.
-            아래 <strong>실시간 변환기</strong>에 알파벳을 입력하면 이진수로 변환됩니다.
-            변환된 이진수와 신호를 비교해 암호를 해독하세요.
+            <div class="m3-story-title">🔒 드디어 자물쇠 앞에 섰어요!</div>
+            자물쇠에는 6자리 알파벳 비밀번호가 걸려 있어요.<br>
+            벽면에 새겨진 6개의 이진수 코드가 바로 비밀번호의 힌트예요!<br>
+            아래 <strong>실시간 변환기</strong>로 각 이진수를 알파벳으로 바꾸고, 6글자를 모두 맞히면 탈출 성공!
         </div>
 
-        <!-- BITBOX 아스키 이진수 표 — 이진수만 표시, 알파벳 숨김 -->
-        <div style="background:#000;border:1px solid #2A2A2C;border-radius:10px;padding:12px 14px;margin-bottom:14px;overflow-x:auto;">
-            <div style="font-size:0.7rem;font-weight:800;color:#636366;letter-spacing:1px;margin-bottom:8px;">📋 수신된 암호 신호 — 6개 블록</div>
-            <div style="display:flex;gap:10px;flex-wrap:wrap;">
-                <div style="text-align:center;">
-                    <div style="font-family:'JetBrains Mono';font-size:0.72rem;color:var(--apple-blue);line-height:1.8;">01000010</div>
-                    <div style="font-size:0.7rem;color:#3A3A3C;font-weight:700;">[ 1 ]</div>
+        <!-- 6개 블록 -->
+        <div style="background:linear-gradient(135deg,#0a0a0f,#0d1117);border:1.5px solid #1e3a5f;border-radius:16px;padding:18px 22px;margin-bottom:16px;box-shadow:0 4px 20px rgba(10,132,255,0.15),0 1px 0 rgba(255,255,255,0.04) inset;">
+            <div style="font-size:0.82rem;font-weight:800;color:#4a9eff;letter-spacing:2px;margin-bottom:14px;">🔑 벽면에 새겨진 이진수 코드 — 6개</div>
+            <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:10px;">
+                <div style="text-align:center;background:rgba(10,132,255,0.08);border:1px solid rgba(10,132,255,0.3);border-radius:10px;padding:12px 6px;">
+                    <div style="font-family:'JetBrains Mono';font-size:1rem;color:#5ac8fa;font-weight:900;letter-spacing:1px;line-height:1.6;">01000010</div>
+                    <div style="font-size:0.75rem;color:#4a9eff;font-weight:800;margin-top:4px;">[ 1 ]</div>
                 </div>
-                <div style="text-align:center;">
-                    <div style="font-family:'JetBrains Mono';font-size:0.72rem;color:var(--apple-blue);line-height:1.8;">01001001</div>
-                    <div style="font-size:0.7rem;color:#3A3A3C;font-weight:700;">[ 2 ]</div>
+                <div style="text-align:center;background:rgba(10,132,255,0.08);border:1px solid rgba(10,132,255,0.3);border-radius:10px;padding:12px 6px;">
+                    <div style="font-family:'JetBrains Mono';font-size:1rem;color:#5ac8fa;font-weight:900;letter-spacing:1px;line-height:1.6;">01001001</div>
+                    <div style="font-size:0.75rem;color:#4a9eff;font-weight:800;margin-top:4px;">[ 2 ]</div>
                 </div>
-                <div style="text-align:center;">
-                    <div style="font-family:'JetBrains Mono';font-size:0.72rem;color:var(--apple-blue);line-height:1.8;">01010100</div>
-                    <div style="font-size:0.7rem;color:#3A3A3C;font-weight:700;">[ 3 ]</div>
+                <div style="text-align:center;background:rgba(10,132,255,0.08);border:1px solid rgba(10,132,255,0.3);border-radius:10px;padding:12px 6px;">
+                    <div style="font-family:'JetBrains Mono';font-size:1rem;color:#5ac8fa;font-weight:900;letter-spacing:1px;line-height:1.6;">01010100</div>
+                    <div style="font-size:0.75rem;color:#4a9eff;font-weight:800;margin-top:4px;">[ 3 ]</div>
                 </div>
-                <div style="text-align:center;">
-                    <div style="font-family:'JetBrains Mono';font-size:0.72rem;color:var(--apple-blue);line-height:1.8;">01000010</div>
-                    <div style="font-size:0.7rem;color:#3A3A3C;font-weight:700;">[ 4 ]</div>
+                <div style="text-align:center;background:rgba(10,132,255,0.08);border:1px solid rgba(10,132,255,0.3);border-radius:10px;padding:12px 6px;">
+                    <div style="font-family:'JetBrains Mono';font-size:1rem;color:#5ac8fa;font-weight:900;letter-spacing:1px;line-height:1.6;">01000010</div>
+                    <div style="font-size:0.75rem;color:#4a9eff;font-weight:800;margin-top:4px;">[ 4 ]</div>
                 </div>
-                <div style="text-align:center;">
-                    <div style="font-family:'JetBrains Mono';font-size:0.72rem;color:var(--apple-blue);line-height:1.8;">01001111</div>
-                    <div style="font-size:0.7rem;color:#3A3A3C;font-weight:700;">[ 5 ]</div>
+                <div style="text-align:center;background:rgba(10,132,255,0.08);border:1px solid rgba(10,132,255,0.3);border-radius:10px;padding:12px 6px;">
+                    <div style="font-family:'JetBrains Mono';font-size:1rem;color:#5ac8fa;font-weight:900;letter-spacing:1px;line-height:1.6;">01001111</div>
+                    <div style="font-size:0.75rem;color:#4a9eff;font-weight:800;margin-top:4px;">[ 5 ]</div>
                 </div>
-                <div style="text-align:center;">
-                    <div style="font-family:'JetBrains Mono';font-size:0.72rem;color:var(--apple-blue);line-height:1.8;">01011000</div>
-                    <div style="font-size:0.7rem;color:#3A3A3C;font-weight:700;">[ 6 ]</div>
+                <div style="text-align:center;background:rgba(10,132,255,0.08);border:1px solid rgba(10,132,255,0.3);border-radius:10px;padding:12px 6px;">
+                    <div style="font-family:'JetBrains Mono';font-size:1rem;color:#5ac8fa;font-weight:900;letter-spacing:1px;line-height:1.6;">01011000</div>
+                    <div style="font-size:0.75rem;color:#4a9eff;font-weight:800;margin-top:4px;">[ 6 ]</div>
                 </div>
             </div>
         </div>
 
-        <!-- 실시간 변환기: 이진수 입력 → 알파벳 결과 표시 -->
-        <div style="margin-bottom:14px;">
-            <div style="font-size:0.72rem;font-weight:800;color:#636366;letter-spacing:0.5px;margin-bottom:6px;">
-                🔬 실시간 변환기 — 이진수(8자리)를 입력하면 알파벳으로 해독됩니다
+        <!-- 실시간 변환기 -->
+        <div style="background:linear-gradient(135deg,#001a0a,#001f12);border:1.5px solid rgba(57,255,20,0.4);border-radius:16px;padding:18px 22px;margin-bottom:18px;box-shadow:0 4px 20px rgba(57,255,20,0.1),0 1px 0 rgba(57,255,20,0.05) inset;">
+            <div style="font-size:0.88rem;font-weight:800;color:var(--terminal-green);letter-spacing:1px;margin-bottom:12px;">
+                🔬 실시간 변환기 — 이진수 8자리를 입력하면 알파벳으로 해독돼요
             </div>
             <input type="text" class="decode-input" id="m3-decode-input"
                 placeholder="이진수 8자리 입력 (예: 01000010)"
-                oninput="renderM3Decode()" maxlength="8">
+                oninput="renderM3Decode()" maxlength="8"
+                style="border-color:rgba(57,255,20,0.4);font-size:1.15rem;padding:14px 18px;">
             <div id="m3-decode-out"
-                style="background:#000;border-radius:8px;padding:10px 14px;min-height:42px;
-                       font-family:'JetBrains Mono';font-size:1.1rem;word-break:break-all;
-                       line-height:1.8;color:var(--terminal-green);
-                       border:1px solid #2A2A2C;display:flex;align-items:center;gap:12px;"></div>
+                style="background:#000;border-radius:10px;padding:14px 18px;min-height:52px;
+                       font-family:'JetBrains Mono';font-size:1.4rem;font-weight:900;
+                       word-break:break-all;line-height:1.8;color:var(--terminal-green);
+                       border:1px solid rgba(57,255,20,0.25);display:flex;align-items:center;gap:16px;
+                       box-shadow:inset 0 0 20px rgba(57,255,20,0.05);margin-top:10px;"></div>
         </div>
 
-        <!-- 퀴즈 3개 -->
+        <!-- 자물쇠 비밀번호 해독 -->
         <div class="quiz-item">
-            <span class="quiz-num">BLOCK A — 이진수 → 글자</span>
-            암호 신호 [1]번 블록
-            <span style="font-family:'JetBrains Mono';color:var(--apple-blue);font-size:0.82rem;">01000010</span>이
-            나타내는 알파벳은?
-            <input type="text" class="std-blank" data-answer="B" data-panel="m3" autocomplete="off" placeholder="?">
+            <span class="quiz-num">🔐 자물쇠 비밀번호 — 6글자를 완성하라!</span>
+            벽면의 이진수 코드 [1]~[6]번을 순서대로 해독해 6자리 비밀번호를 완성하세요.<br>
+            위 실시간 변환기에 이진수를 입력하면 어떤 알파벳인지 바로 확인할 수 있어요.<br>
+            6글자를 모두 맞히면 자물쇠가 열리고 탈출 성공!<br><br>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px;">
+                <div style="text-align:center;">
+                    <div style="font-family:'JetBrains Mono';font-size:0.8rem;color:#5ac8fa;margin-bottom:4px;">[ 1 ]</div>
+                    <input type="text" class="std-blank" data-answer="B" data-panel="m3-decode" autocomplete="off" placeholder="?" maxlength="1" style="width:52px;text-align:center;">
+                </div>
+                <div style="text-align:center;">
+                    <div style="font-family:'JetBrains Mono';font-size:0.8rem;color:#5ac8fa;margin-bottom:4px;">[ 2 ]</div>
+                    <input type="text" class="std-blank" data-answer="I" data-panel="m3-decode" autocomplete="off" placeholder="?" maxlength="1" style="width:52px;text-align:center;">
+                </div>
+                <div style="text-align:center;">
+                    <div style="font-family:'JetBrains Mono';font-size:0.8rem;color:#5ac8fa;margin-bottom:4px;">[ 3 ]</div>
+                    <input type="text" class="std-blank" data-answer="T" data-panel="m3-decode" autocomplete="off" placeholder="?" maxlength="1" style="width:52px;text-align:center;">
+                </div>
+                <div style="text-align:center;">
+                    <div style="font-family:'JetBrains Mono';font-size:0.8rem;color:#5ac8fa;margin-bottom:4px;">[ 4 ]</div>
+                    <input type="text" class="std-blank" data-answer="B" data-panel="m3-decode" autocomplete="off" placeholder="?" maxlength="1" style="width:52px;text-align:center;">
+                </div>
+                <div style="text-align:center;">
+                    <div style="font-family:'JetBrains Mono';font-size:0.8rem;color:#5ac8fa;margin-bottom:4px;">[ 5 ]</div>
+                    <input type="text" class="std-blank" data-answer="O" data-panel="m3-decode" autocomplete="off" placeholder="?" maxlength="1" style="width:52px;text-align:center;">
+                </div>
+                <div style="text-align:center;">
+                    <div style="font-family:'JetBrains Mono';font-size:0.8rem;color:#5ac8fa;margin-bottom:4px;">[ 6 ]</div>
+                    <input type="text" class="std-blank" data-answer="X" data-panel="m3-decode" autocomplete="off" placeholder="?" maxlength="1" style="width:52px;text-align:center;">
+                </div>
+            </div>
             <br>
             <span class="hint-toggle" onclick="toggleHint(this)">💡 힌트 보기</span>
             <div class="hint-box">
-                위 변환기에 <span style="font-family:'JetBrains Mono';color:var(--apple-blue);">01000010</span>을 입력해 보세요.<br>
-                오른쪽에 어떤 알파벳이 나타나나요?
-                <br><span class="hint-ans">B</span>
+                변환기에 코드 [1]번 <span style="font-family:'JetBrains Mono';color:var(--apple-blue);">01000010</span>을 입력하면 B가 나와요.<br>
+                나머지 코드도 차례대로 변환기에 입력해보세요!<br>
+                <span class="hint-ans">B · I · T · B · O · X</span>
             </div>
         </div>
 
-        <div class="quiz-item">
-            <span class="quiz-num">BLOCK B — 이진수 마지막 4비트</span>
-            알파벳 <strong>'X'</strong>의 아스키 이진수
-            <span style="font-family:'JetBrains Mono';color:var(--apple-blue);font-size:0.82rem;">01011000</span>에서
-            마지막 4비트는?
-            <input type="text" class="std-blank" data-answer="1000" data-panel="m3" autocomplete="off" placeholder="?">
+        <!-- 4단계: 비트 계산 -->
+        <div class="quiz-item" style="border-color:rgba(255,214,10,0.3);background:rgba(255,214,10,0.03);">
+            <span class="quiz-num" style="color:var(--cyber-gold);">⚡ 4단계 — 마지막 관문! 비트 계산</span>
+            탈출하기 전 마지막 확인! 방금 완성한 비밀번호(영어 6글자)를 아스키 이진수로 저장하면 총
+            <input type="text" class="std-blank" data-answer="48" data-panel="m3-decode" autocomplete="off" placeholder="?">
+            비트예요. (글자 수 × 8비트)
             <br>
             <span class="hint-toggle" onclick="toggleHint(this)">💡 힌트 보기</span>
-            <div class="hint-box">
-                <span style="font-family:'JetBrains Mono';color:var(--apple-blue);">0101 <strong>1000</strong></span><br>
-                8자리 이진수에서 뒤에서 4자리를 읽어보세요.
-                <br><span class="hint-ans">1000</span>
-            </div>
-        </div>
-
-        <div class="quiz-item">
-            <span class="quiz-num">BLOCK C — 비트 계산</span>
-            "BITBOX" 전체(영어 6글자)를 아스키 이진수로 저장하면 총
-            <input type="text" class="std-blank" data-answer="48" data-panel="m3" autocomplete="off" placeholder="?">
-            비트입니다. (글자 수 × 8비트)
-            <br>
-            <span class="hint-toggle" onclick="toggleHint(this)">💡 힌트 보기</span>
-            <div class="hint-box">
-                영어 알파벳 1글자 = 8비트<br>
-                BITBOX는 6글자 → 6 × 8 = ?
-                <br><span class="hint-ans">48</span>
-            </div>
+            <div class="hint-box">영어 1글자 = 8비트, 6글자 → 6 × 8 = ?<br><span class="hint-ans">48</span></div>
         </div>
     </div>
+
+    </div><!-- /.panel-wrap -->
 
 </main>
 
 <!-- 완료 모달 -->
 <div class="modal-overlay" id="modalOverlay">
     <div class="modal-content">
-        <div style="font-size:3.5rem;margin-bottom:12px;">🔓📡</div>
-        <h2>암호 해독 완료!</h2>
-        <p>
-            탁월한 분석 능력으로 BITBOX-7의 신호를 완전히 해독했습니다.<br>
-            영어·한글 문자 데이터의 <strong>비트 표현 원리</strong>를<br>
-            성공적으로 파악하였습니다.
-        </p>
-        <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="font-size:4rem;margin-bottom:16px;filter:drop-shadow(0 0 20px rgba(10,132,255,0.4));">🔓</div>
+        <h2>탈출 성공!</h2>
+        <p>자물쇠 비밀번호 <strong style="color:#60a5fa;font-family:'JetBrains Mono';">BITBOX</strong>를 완성해 방을 탈출했어요!</p>
+        <p style="margin-bottom:30px;">문자는 아스키코드와 유니코드를 통해 디지털로 표현돼요! 🎉</p>
+        <div style="display:flex;flex-direction:column;gap:12px;">
             <button onclick="closeModal()"
-                style="width:100%;padding:14px;background:var(--success-green);
-                       color:#000;border:none;border-radius:12px;font-weight:900;
-                       font-size:1rem;cursor:pointer;">
-                ✅ 해독 완료 — 종료
+                style="width:100%;padding:16px;
+                       background:linear-gradient(135deg,rgba(10,132,255,0.3),rgba(10,132,255,0.15));
+                       color:#60a5fa;border:1.5px solid rgba(10,132,255,0.5);
+                       border-radius:14px;font-weight:900;font-size:1rem;cursor:pointer;
+                       transition:all 0.2s;letter-spacing:0.3px;backdrop-filter:blur(8px);"
+                onmouseover="this.style.background='linear-gradient(135deg,rgba(10,132,255,0.5),rgba(10,132,255,0.3))';"
+                onmouseout="this.style.background='linear-gradient(135deg,rgba(10,132,255,0.3),rgba(10,132,255,0.15))';">
+                🔓 탈출 완료 — 종료
             </button>
             <button onclick="resetAll()"
-                style="width:100%;padding:12px;
-                       background:rgba(10,132,255,0.2);
-                       color:#FFFFFF;
-                       border:1px solid rgba(10,132,255,0.5);
-                       border-radius:12px;
-                       font-weight:900;font-size:0.95rem;cursor:pointer;
-                       transition:all 0.2s;letter-spacing:0.5px;"
-                onmouseover="this.style.background='rgba(10,132,255,0.35)';this.style.borderColor='rgba(10,132,255,0.8)';"
-                onmouseout="this.style.background='rgba(10,132,255,0.2)';this.style.borderColor='rgba(10,132,255,0.5)';">
-                🔄 다시 하기
+                style="width:100%;padding:14px;
+                       background:rgba(255,255,255,0.05);
+                       color:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.1);
+                       border-radius:14px;font-weight:700;font-size:0.95rem;cursor:pointer;
+                       transition:all 0.2s;"
+                onmouseover="this.style.background='rgba(255,255,255,0.1)';this.style.color='rgba(255,255,255,0.8)';"
+                onmouseout="this.style.background='rgba(255,255,255,0.05)';this.style.color='rgba(255,255,255,0.5)';">
+                🔄 다시 도전하기
             </button>
         </div>
     </div>
@@ -704,7 +821,7 @@
     }
 
     /* ── 미션1: 입력 필터 ── */
-    const WAIT_HTML = '<span style="color:#6E6E73;font-size:0.75rem;">한 글자만 입력하세요<span class="bit-cursor">▋</span></span>';
+    const WAIT_HTML = '<span style="color:#6E6E73;font-size:0.75rem;">한 글자를 입력하면 비트가 표현돼요.</span>';
 
     function isEnglish(ch) { return /^[A-Za-z]$/.test(ch); }
     function isKorean(ch)  { return /^[\uAC00-\uD7A3]$/.test(ch); }
@@ -730,6 +847,12 @@
     function renderCompare() {
         const enVal = document.getElementById('en-input').value;
         const koVal = document.getElementById('ko-input').value;
+
+        // 커서: 값 없으면 표시, 있으면 숨김
+        const enCursor = document.getElementById('en-cursor');
+        const koCursor = document.getElementById('ko-cursor');
+        if (enCursor) enCursor.style.display = enVal ? 'none' : 'block';
+        if (koCursor) koCursor.style.display = koVal ? 'none' : 'block';
 
         if (!enVal) {
             document.getElementById('en-bits').innerHTML = WAIT_HTML;
@@ -782,14 +905,12 @@
     }
 
     /* ── 점수 관리 ── */
-    let m1Done = false, m2Done = false, m3Count = 0;
-    const M2_TOTAL = 5, M3_TOTAL = 3;
-    let m2Count = 0;
+    let m1Done = false, m2Done = false, m3Done = false;
+    const M2_TOTAL = 5, M3_TOTAL = 7; // 6단계 해독 + 보너스 1
+    let m2Count = 0, m3Count = 0;
 
     function updateM3Score() {
-        document.getElementById('m3-score').textContent = m3Count;
-        const pct = (m3Count / M3_TOTAL) * 100;
-        document.getElementById('score-fill').style.width = pct + '%';
+        m3Count++;
         if (m3Count === M3_TOTAL) {
             document.getElementById('check-m3').classList.add('visible');
             document.body.classList.add('status-done');
@@ -799,12 +920,82 @@
         }
     }
 
-    /* ── 잠금 해제 ── */
+    /* ── 스텝 인디케이터 업데이트 ── */
+    function updateStepIndicator(doneMission) {
+        // doneMission: 'm1' | 'm2'
+        const map = { m1: 1, m2: 2 };
+        const num = map[doneMission];
+        // 완료된 스텝 표시
+        const doneCirc = document.getElementById('scirc-' + doneMission);
+        const doneNode = document.getElementById('snode-' + doneMission);
+        if (doneCirc) { doneCirc.classList.remove('active'); doneCirc.classList.add('done'); doneCirc.textContent = '✓'; }
+        if (doneNode) { doneNode.classList.remove('active'); doneNode.classList.add('done'); }
+        // 연결선 색 변경
+        const line = document.getElementById('sline-' + num);
+        if (line) line.classList.add('done');
+        // 다음 스텝 활성화
+        const nextId = doneMission === 'm1' ? 'm2' : 'm3';
+        const nextCirc = document.getElementById('scirc-' + nextId);
+        const nextNode = document.getElementById('snode-' + nextId);
+        if (nextCirc) nextCirc.classList.add('active');
+        if (nextNode) nextNode.classList.add('active');
+    }
+
+    /* ── 잠금 해제 → 스텝 전환 ── */
+    /* ── 🚪 다음 단계 버튼 클릭 처리 ── */
+    function tryNextStep(step) {
+        if (step === 'm1' && m1Done) {
+            unlock('panel-m2');
+        } else if (step === 'm2' && m2Done) {
+            unlock('panel-m3');
+        } else {
+            // 흔들림 효과
+            const btn = document.getElementById('door-btn-' + step);
+            if (btn) {
+                btn.style.animation = 'none';
+                btn.offsetWidth; // reflow
+                btn.style.animation = 'shakeInput 0.35s ease';
+                btn.title = '아직 모든 빈칸을 채우지 않았어요!';
+            }
+        }
+    }
+
+    /* ── 버튼 활성화 ── */
+    function activateDoorBtn(step) {
+        const btn = document.getElementById('door-btn-' + step);
+        const icon = document.getElementById('door-icon-' + step);
+        if (!btn) return;
+        // 아이콘 🔓로 변경
+        if (icon) icon.textContent = '🔓';
+        // 버튼 활성화 스타일
+        btn.style.background = 'linear-gradient(135deg,rgba(10,132,255,0.25),rgba(10,132,255,0.1))';
+        btn.style.borderColor = 'rgba(10,132,255,0.6)';
+        btn.style.color = '#60a5fa';
+        btn.style.boxShadow = '0 0 20px rgba(10,132,255,0.2)';
+        btn.title = '다음 단계로 이동할 수 있어요!';
+    }
+
     function unlock(panelId) {
+        const mId = panelId.replace('panel-', ''); // 'm2' | 'm3'
+        const prevId = mId === 'm2' ? 'panel-m1' : 'panel-m2';
+        const prevMId = mId === 'm2' ? 'm1' : 'm2';
+
+        // 현재 패널 숨기기
+        const prevEl = document.getElementById(prevId);
+        prevEl.classList.remove('step-active');
+
+        // 다음 패널 보이기
         const el = document.getElementById(panelId);
         el.classList.remove('locked');
-        el.classList.add('just-unlocked', 'active-panel');
+        el.classList.add('step-active', 'just-unlocked');
         setTimeout(() => el.classList.remove('just-unlocked'), 900);
+
+        // 인디케이터 업데이트
+        updateStepIndicator(prevMId);
+
+        // 스크롤 상단으로
+        const wrap = document.querySelector('.panel-wrap');
+        if (wrap) wrap.scrollTop = 0;
     }
 
     /* ── 빈칸 정답 체크 (다중 정답 지원) ── */
@@ -828,16 +1019,15 @@
                     if (this.id === 'm1-blank') {
                         m1Done = true;
                         document.getElementById('check-m1').classList.add('visible');
-                        unlock('panel-m2');
+                        activateDoorBtn('m1');
                     } else if (panel === 'm2') {
                         m2Count++;
                         if (m2Count === M2_TOTAL && !m2Done) {
                             m2Done = true;
                             document.getElementById('check-m2').classList.add('visible');
-                            unlock('panel-m3');
+                            activateDoorBtn('m2');
                         }
-                    } else if (panel === 'm3') {
-                        m3Count++;
+                    } else if (panel === 'm3-decode') {
                         updateM3Score();
                     }
                 }
@@ -886,19 +1076,44 @@
         // 체크 아이콘 숨기기
         document.querySelectorAll('.check-icon').forEach(el => el.classList.remove('visible'));
 
-        // 패널 잠금 복원
+        // 패널 스텝 초기화
         ['panel-m2','panel-m3'].forEach(id => {
             const p = document.getElementById(id);
             p.classList.add('locked');
-            p.classList.remove('active-panel','just-unlocked');
+            p.classList.remove('step-active','just-unlocked','active-panel');
+        });
+        document.getElementById('panel-m1').classList.add('step-active');
+
+        // 스텝 인디케이터 초기화
+        ['m1','m2','m3'].forEach(m => {
+            const circ = document.getElementById('scirc-' + m);
+            const node = document.getElementById('snode-' + m);
+            if (circ) { circ.classList.remove('active','done'); circ.textContent = m.toUpperCase(); }
+            if (node) { node.classList.remove('active','done'); }
+        });
+        document.getElementById('scirc-m1').classList.add('active');
+        document.getElementById('snode-m1').classList.add('active');
+        ['sline-1','sline-2'].forEach(id => {
+            const l = document.getElementById(id);
+            if (l) l.classList.remove('done');
         });
 
         // 점수 초기화
-        m1Done = false; m2Done = false; m2Count = 0; m3Count = 0;
-        const scoreEl = document.getElementById('m3-score');
-        if (scoreEl) scoreEl.textContent = '0';
-        const fillEl = document.getElementById('score-fill');
-        if (fillEl) fillEl.style.width = '0%';
+        m1Done = false; m2Done = false; m3Done = false;
+        m2Count = 0; m3Count = 0;
+
+        // 🚪 버튼 초기화
+        ['m1','m2'].forEach(s => {
+            const btn = document.getElementById('door-btn-' + s);
+            const icon = document.getElementById('door-icon-' + s);
+            if (btn) {
+                btn.style.background = 'rgba(255,255,255,0.05)';
+                btn.style.borderColor = 'rgba(255,255,255,0.1)';
+                btn.style.color = 'rgba(255,255,255,0.3)';
+                btn.style.boxShadow = 'none';
+            }
+            if (icon) icon.textContent = '🔒';
+        });
     }
 </script>
 </body>

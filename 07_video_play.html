@@ -90,7 +90,7 @@
             <span id="captionFrameLabel" style="font-size:0.82rem; font-weight:900; color:var(--secondary); white-space:nowrap;">📝 #1 프레임 자막</span>
             <span style="font-size:0.75rem; color:#475569; flex:1;">— 프레임마다 다른 자막 입력 가능</span>
             <label style="display:flex; align-items:center; gap:5px; font-size:0.78rem; color:#94A3B8; font-weight:700; cursor:pointer; white-space:nowrap;">🎨 자막색
-                <input type="color" id="captionColor" value="#ffffff"
+                <input type="color" id="captionColor" value="#000000"
                     style="width:28px; height:24px; padding:0; border:none; border-radius:4px; cursor:pointer;"
                     oninput="saveCaptionColorForFrame()">
             </label>
@@ -359,7 +359,7 @@
         // 인덱스 = 순서 그대로 (0,1,2...), 삭제하면 splice로 제거
         let frames = [];
         let frameCaptions      = ['']; // 프레임별 자막 텍스트
-        let frameCaptionColors = ['#ffffff']; // 프레임별 자막 색상
+        let frameCaptionColors = ['#000000']; // 프레임별 자막 색상
         let frameCaptionSizes  = [24];        // 프레임별 자막 크기(1~5단계, 기본=3)
         let currentFrame = 0;  // frames[] 인덱스
         let isDrawing = false, isEraser = false;
@@ -514,9 +514,9 @@
             const lbl = document.getElementById('captionFrameLabel');
             if (!ta) return;
             while (frameCaptions.length      <= currentFrame) frameCaptions.push('');
-            while (frameCaptionColors.length <= currentFrame) frameCaptionColors.push('#ffffff');
+            while (frameCaptionColors.length <= currentFrame) frameCaptionColors.push('#000000');
             ta.value = frameCaptions[currentFrame] || '';
-            if (cc)  cc.value = frameCaptionColors[currentFrame] || '#ffffff';
+            if (cc)  cc.value = frameCaptionColors[currentFrame] || '#000000';
             const sz = document.getElementById('captionSize');
             while (frameCaptionSizes.length <= currentFrame) frameCaptionSizes.push(24);
             if (sz)  sz.value = frameCaptionSizes[currentFrame] || 24;
@@ -527,7 +527,7 @@
         function saveCaptionColorForFrame() {
             const cc = document.getElementById('captionColor');
             if (!cc) return;
-            while (frameCaptionColors.length <= currentFrame) frameCaptionColors.push('#ffffff');
+            while (frameCaptionColors.length <= currentFrame) frameCaptionColors.push('#000000');
             frameCaptionColors[currentFrame] = cc.value;
         }
 
@@ -643,7 +643,7 @@
             if (!ok) return;
             frames = [makeBlankFrame()];
             frameCaptions      = [''];
-            frameCaptionColors = ['#ffffff'];
+            frameCaptionColors = ['#000000'];
             frameCaptionSizes  = [24];
             currentFrame = 0;
             dCtx.fillStyle = 'white'; dCtx.fillRect(0, 0, 450, 450);
@@ -812,7 +812,7 @@
                 
                 const text = frameCaptions[fi] || '';
                 if (text) {
-                    const col  = (frameCaptionColors && frameCaptionColors[fi]) || '#ffffff';
+                    const col  = (frameCaptionColors && frameCaptionColors[fi]) || '#000000';
                     const fpt  = (frameCaptionSizes  && frameCaptionSizes[fi])  || 24;
                     const fsz  = Math.round(fpt * 1.333);
                     pCtx.font      = fsz + "px 'Apple SD Gothic Neo', '맑은 고딕', 'Malgun Gothic', 'Noto Sans KR', sans-serif";
@@ -836,6 +836,10 @@
             status.innerHTML = "데이터를 조합하여 동영상을 만들고 있습니다...<br><span style='font-size:0.9rem; color:#94A3B8;'>(이 작업은 10초가 소요됩니다)</span>";
 
             if(audioPlayer.src) { audioPlayer.currentTime = 0; audioPlayer.play(); }
+
+            // 자막이 포함된 상태로 녹화되도록 startPreview() 명시적 재시작
+            clearInterval(previewInterval);
+            startPreview();
 
             const canvasStream = previewCanvas.captureStream(parseInt(currentFps)); 
             const tracks = canvasStream.getVideoTracks();
@@ -879,6 +883,8 @@
                 audioPlayer.pause();
             };
 
+            // 자막이 포함된 상태로 녹화되도록 미리보기 재시작
+            startPreview();
             recorder.start();
             setTimeout(() => recorder.stop(), 10000); 
         }
@@ -987,7 +993,7 @@
             frames[currentFrame] = dCtx.getImageData(0, 0, 450, 450);
             frames.push(makeBlankFrame());
             frameCaptions.push('');
-            frameCaptionColors.push('#ffffff');
+            frameCaptionColors.push('#000000');
             frameCaptionSizes.push(24);
             currentFrame = frames.length - 1;
             dCtx.fillStyle = 'white'; dCtx.fillRect(0, 0, 450, 450);
@@ -1012,7 +1018,7 @@
             frameCaptionColors.splice(i, 1);
             frameCaptionSizes.splice(i, 1);
             while (frameCaptions.length      < frames.length) frameCaptions.push('');
-            while (frameCaptionColors.length < frames.length) frameCaptionColors.push('#ffffff');
+            while (frameCaptionColors.length < frames.length) frameCaptionColors.push('#000000');
             while (frameCaptionSizes.length  < frames.length) frameCaptionSizes.push(24);
             if (currentFrame >= frames.length) currentFrame = frames.length - 1;
             undoStack = [];
@@ -1073,7 +1079,7 @@
                     // 자막
                     const text = frameCaptions[fi] || '';
                     if (text) {
-                        const col  = (frameCaptionColors && frameCaptionColors[fi]) || '#ffffff';
+                        const col  = (frameCaptionColors && frameCaptionColors[fi]) || '#000000';
                         const fpt  = (frameCaptionSizes  && frameCaptionSizes[fi])  || 24;
                         const fsz  = Math.round(fpt * 1.333);
                         octx.font      = fsz + "px 'Apple SD Gothic Neo', '맑은 고딕', 'Malgun Gothic', 'Noto Sans KR', sans-serif";
