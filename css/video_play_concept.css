@@ -3,7 +3,7 @@
             --secondary: #FF00E5; --text: #F8FAFC; --binary: #00FF66;
             --accent: #FCE205; --bubble-bg: rgba(0, 240, 255, 0.08);
         }
-        
+      
         /* 얇고 예쁜 스크롤바 설정 */
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: transparent; }

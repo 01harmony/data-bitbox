@@ -459,8 +459,14 @@ function updateTime() {
         isPlaying = false;
         clearInterval(timerInterval);
         setTimeout(() => {
-            alert(`게임 종료! 최종 점수: ${score}점\n최고의 플레이였습니다! 👏`);
-            location.reload();
+            const modal = document.getElementById('custom-modal');
+            modal.querySelector('h3').innerHTML = '🎮 게임 종료!';
+            modal.querySelector('p').innerHTML = `최종 점수: <span style="font-size:2rem;font-weight:900;color:#00f2fe;">${score}점</span><br><span style="font-size:0.95rem;color:#94a3b8;">최고의 플레이였습니다! 👏</span>`;
+            modal.querySelector('.btn-cancel').style.display = 'none';
+            modal.querySelector('.btn-confirm').innerText = '확인';
+            modal.style.display = 'flex';
+            void modal.offsetWidth;
+            modal.classList.add('show');
         }, 100);
     }
 }

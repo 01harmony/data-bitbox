@@ -907,7 +907,7 @@ window.updateVectorZoom = function() {
     const h = 200 / z;
     const x = 100 - w/2; 
     const y = 100 - h/2;
-    
+   
     document.getElementById('vectorSvg').setAttribute('viewBox', `${x} ${y} ${w} ${h}`);
 };
 

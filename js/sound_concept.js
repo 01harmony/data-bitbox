@@ -16,7 +16,7 @@ const stepDotMap = {
     'step4-quiz':     3
 };
 
-// 🌟 [추가 보정] 캔버스와 감싸는 영역을 250px로 자동 확장하여 위아래 숨통(여백) 확보!
+// 🌟 [추가 보정] 캔버스와 감싸는 영역을 250px로 자동 확장하여 위아래 여백 확보!
 document.addEventListener('DOMContentLoaded', () => {
     const dCanvas = document.getElementById('drawCanvas');
     if (dCanvas) { 
