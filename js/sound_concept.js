@@ -826,6 +826,108 @@ function setupQuantizationInputs() {
     }); 
 }
 
+// 🌟 [개별 기능] 마이크 녹음 (MediaRecorder API)
+let mediaRecorder = null;
+let recordedChunks = [];
+let recordingStream = null;
+
+// 🎙️ 마이크 고지 모달 열기/닫기
+window.openMicConsent = function() {
+    const modal = document.getElementById('micConsentModal');
+    if (modal) modal.style.display = 'flex';
+};
+window.closeMicConsent = function(agreed) {
+    const modal = document.getElementById('micConsentModal');
+    if (modal) modal.style.display = 'none';
+    if (agreed) startRecording();
+};
+
+function startRecording() {
+    navigator.mediaDevices.getUserMedia({ audio: true })
+            .then(function(stream) {
+                recordingStream = stream;
+                recordedChunks = [];
+                mediaRecorder = new MediaRecorder(stream);
+
+                mediaRecorder.ondataavailable = function(e) {
+                    if (e.data.size > 0) recordedChunks.push(e.data);
+                };
+
+                mediaRecorder.onstop = function() {
+                    // 스트림 종료
+                    recordingStream.getTracks().forEach(t => t.stop());
+
+                    const blob = new Blob(recordedChunks, { type: 'audio/webm' });
+                    const url  = URL.createObjectURL(blob);
+
+                    // 기존 업로드 모드와 동일하게 처리
+                    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+                    blob.arrayBuffer().then(function(ab) {
+                        audioCtx.decodeAudioData(ab, function(buffer) {
+                            originalAudioBuffer = buffer;
+
+                            // 컨트롤 활성화
+                            document.getElementById('uploadSliderGroup').style.opacity  = '1';
+                            document.getElementById('uploadSliderGroup').style.pointerEvents = 'auto';
+                            document.getElementById('uploadControlGroup').style.opacity = '1';
+                            document.getElementById('uploadControlGroup').style.pointerEvents = 'auto';
+
+                            const maxRate = Math.floor(buffer.sampleRate);
+                            const slider  = document.getElementById('uploadSampleSlider');
+                            slider.max   = maxRate;
+                            slider.value = maxRate;
+                            onUploadSliderChange();
+
+                            const qualityEl = document.getElementById('uploadQualityLabel');
+                            if (qualityEl) qualityEl.innerText = '🎙️ 녹음 완료 — 1초에 ' + maxRate.toLocaleString('ko-KR') + '번 측정';
+
+                            // 플레이어에 녹음 오디오 연결
+                            const player = document.getElementById('audioPlayer');
+                            player.src   = url;
+                            setupRealtimeVisualization(player);
+                            applyResampling();
+                        }, function() {
+                            if (typeof showCustomAlert === 'function')
+                                showCustomAlert("오류!", "녹음 파일을 읽는 데 실패했습니다. 다시 시도해주세요.");
+                        });
+                    });
+
+                    // 버튼 원래대로
+                    const btn = document.getElementById('recordBtn');
+                    if (btn) {
+                        btn.textContent = '🎙️ 녹음 시작';
+                        btn.style.background = '#d63031';
+                        btn.style.boxShadow  = '';
+                        btn.style.animation  = '';
+                    }
+                };
+
+                mediaRecorder.start();
+
+                // 버튼 → 녹음 중 상태
+                const btn = document.getElementById('recordBtn');
+                if (btn) {
+                    btn.textContent = '⏹️ 녹음 중지';
+                    btn.style.background = '#b71c1c';
+                    btn.style.boxShadow  = '0 0 0 4px rgba(214,48,49,0.3)';
+                    btn.style.animation  = 'recPulse 1s ease-in-out infinite';
+                }
+            })
+            .catch(function(err) {
+                if (typeof showCustomAlert === 'function')
+                    showCustomAlert("마이크 오류!", "마이크 접근 권한이 필요합니다.<br>브라우저 주소창의 🔒 아이콘을 클릭해 마이크를 허용해 주세요.");
+            });
+}
+
+window.toggleRecording = function() {
+    if (mediaRecorder && mediaRecorder.state === 'recording') {
+        mediaRecorder.stop();
+    } else {
+        openMicConsent();
+    }
+};
+
 window.checkLabInput = function(inp) { 
     const userVal = inp.value.trim(); const ansVal = inp.getAttribute('data-ans'); const totalRequiredInputs = currentMode === 'manual' ? (currentSampleCount + 1) * 2 : 0; 
     inp.classList.remove('input-error'); 

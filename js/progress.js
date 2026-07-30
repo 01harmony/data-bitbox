@@ -97,14 +97,12 @@ function openInfoModal(){
         <div style="text-align:left;font-size:0.85rem;line-height:1.7;color:rgba(240,244,255,0.6);">
             <p style="margin-top:0;">본 <b style="color:var(--mint)">'데이터 비트박스'</b>는 교육 목적으로 제작된 프로그램입니다.</p>
             <div style="background:rgba(255,255,255,0.04);padding:14px;border-radius:10px;margin-bottom:10px;border:1px solid rgba(0,245,196,0.1);">
-                <strong style="color:var(--mint)">1. 자체 제작 (100% Coding Art)</strong><br>
-                모든 인터랙티브 시각 자료는 CSS·JS Canvas API로 코드 드로잉한 순수 창작물입니다.
-                일부는 Google(Gemini) &amp; Claude 생성형 시각자료입니다.
+                <strong style="color:var(--mint)">1. 자체 제작</strong><br>
+                모든 인터랙티브 시각 자료는 생성형 AI(Google Gemini, Anthropic Claude)를 활용하여 자체 제작하였습니다.
             </div>
             <div style="background:rgba(255,255,255,0.04);padding:14px;border-radius:10px;border:1px solid rgba(191,90,242,0.1);">
                 <strong style="color:var(--violet)">2. 오픈소스 (Open Source)</strong><br>
-                • UI 아이콘: Google Material Icons (Apache 2.0)<br>
-                • 웹 폰트: Noto Sans KR, Orbitron, JetBrains Mono (OFL)
+                • 웹 폰트: Noto Sans KR, Orbitron, JetBrains Mono, Pretendard, Inter (OFL)
             </div>
         </div>`,
         buttonsHTML:`<button class="mbtn primary" onclick="closeModal()">확인했습니다</button>`

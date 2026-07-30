@@ -340,3 +340,9 @@ a, a *,
 [onclick], [onclick] * {
     cursor: pointer !important;
 }
+
+/* 🎙️ 녹음 중 pulse 애니메이션 */
+@keyframes recPulse {
+    0%, 100% { box-shadow: 0 0 0 3px rgba(214,48,49,0.4); }
+    50%       { box-shadow: 0 0 0 8px rgba(214,48,49,0.1); }
+}

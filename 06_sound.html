@@ -248,12 +248,15 @@
                             <div class="lab-panel" style="display:flex; flex-direction:column; gap:14px; align-items:stretch;">
                                 <input type="file" id="audioUpload" accept="audio/*" style="display:none;" onchange="handleAudioUpload(event)">
 
-                                <!-- 행1: [파일선택] [플레이어 flex:1] [용량] -->
+                                <!-- 행1: [파일선택] [녹음] [플레이어 flex:1] [용량] -->
                                 <div style="display:flex; align-items:center; gap:14px;">
                                     <!-- 파일선택 버튼 맨 왼쪽 고정 -->
                                     <button class="lab-action-btn" id="uploadFileBtn"
                                         style="background:var(--multi-violet); padding:10px 22px; font-size:1rem; white-space:nowrap; flex-shrink:0;"
                                         onclick="document.getElementById('audioUpload').click()">🎵 소리 파일 선택</button>
+                                    <button class="lab-action-btn" id="recordBtn"
+                                        style="background:#d63031; padding:10px 22px; font-size:1rem; white-space:nowrap; flex-shrink:0;"
+                                        onclick="toggleRecording()">🎙️ 녹음 시작</button>
                                     <audio id="audioPlayer" controls style="flex:1; min-width:300px; outline:none;"></audio>
                                     <!-- 용량 박스 맨 오른쪽 -->
                                     <div id="uploadSliderGroup" style="opacity:0.35; pointer-events:none; flex-shrink:0;">
@@ -261,6 +264,10 @@
                                             📦 용량 = <span id="uploadCapCalc">44,100 × 3비트 = 132,300비트/초</span>
                                         </div>
                                     </div>
+                                </div>
+                                <!-- 마이크 접근권한 고지 (정보통신망법 제22조의2) -->
+                                <div style="font-size:0.78rem; color:#888; font-weight:700; line-height:1.6; background:#f8f9fa; border-radius:8px; padding:7px 14px; border-left:3px solid #ced4da;">
+                                    🔒 [마이크 접근 안내] 녹음 기능은 소리의 디지털 변환 원리 체험 목적으로만 마이크를 사용하며, 녹음 데이터는 외부 서버로 전송되거나 저장되지 않습니다.
                                 </div>
 
                                 <!-- 행2: 표본화 | 구분선 | 비트심도 — align-items:stretch로 설명박스 높이 통일 -->
@@ -371,6 +378,26 @@
         </aside>
     </main>
     <div class="modal-overlay" id="modalOverlay"><div class="modal-content" id="modalContent"></div></div>
+    <!-- 🎙️ 마이크 접근권한 고지 모달 (정보통신망법 제22조의2) -->
+    <div class="modal-overlay" id="micConsentModal" style="z-index: 9998; display:none;">
+        <div class="alert-box" style="border-color: #d63031; box-shadow: 0 0 30px rgba(214,48,49,0.25); width: 440px;">
+            <div style="font-size: 2.5rem; margin-bottom: 10px;">🎙️</div>
+            <h3 style="color: #d63031;">마이크 접근 권한 안내</h3>
+            <div style="font-size: 0.95rem; font-weight: 700; color: #333; line-height: 1.9; text-align: left; margin-bottom: 22px;">
+                <div style="background:#fff5f5; border-radius:10px; padding:14px 16px; border-left:3px solid #d63031;">
+                    <div>• <b>사용 목적:</b> 소리의 디지털 변환 원리 체험 실습</div>
+                    <div>• 녹음 데이터는 기기 내 메모리에만 <b>임시 저장</b>되며,</div>
+                    <div>&nbsp;&nbsp;외부 서버로 <b>전송되거나 저장되지 않습니다.</b></div>
+                    <div>• 녹음 중지 즉시 데이터가 <b>초기화</b>됩니다.</div>
+                </div>
+            </div>
+            <div style="display:flex; gap:10px;">
+                <button onclick="closeMicConsent(false)" style="flex:1; padding:12px; background:white; color:#666; border:2px solid #ddd; border-radius:12px; font-weight:900; font-size:1rem; cursor:pointer;">취소</button>
+                <button onclick="closeMicConsent(true)" style="flex:1; padding:12px; background:#d63031; color:white; border:none; border-radius:12px; font-weight:900; font-size:1rem; cursor:pointer;">동의하고 녹음 시작</button>
+            </div>
+        </div>
+    </div>
+
     <div class="modal-overlay" id="customAlertModal" style="z-index: 9999;">
         <div class="alert-box" style="transition: border-color 0.3s, box-shadow 0.3s;">
             <div id="alertIcon" style="font-size: 3rem; margin-bottom: 10px;">🚫</div>
