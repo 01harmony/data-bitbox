@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>데이터 비트박스 - 학생용 링크 생성기</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+    background: #f5f6fa; margin: 0; padding: 32px 16px;
+    display: flex; justify-content: center;
+  }
+  .card {
+    width: 100%; max-width: 520px; background: #fff; border-radius: 16px;
+    padding: 32px 28px; box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  }
+  .badge {
+    display: inline-block; background: #0f766e; color: #fff; font-weight: 700;
+    font-size: 0.7rem; padding: 3px 10px; border-radius: 20px; margin-bottom: 10px;
+  }
+  h1 { font-size: 1.3rem; margin: 0 0 8px; color: #111; }
+  .desc { font-size: 0.85rem; color: #57534e; line-height: 1.6; margin: 0 0 22px; }
+  .desc b { color: #0f766e; }
+  label { display: block; font-size: 0.82rem; font-weight: 700; color: #333; margin-bottom: 6px; }
+  input {
+    width: 100%; padding: 11px 12px; border: 1.5px solid #e2e8f0; border-radius: 8px;
+    font-size: 0.88rem; margin-bottom: 16px; font-family: 'JetBrains Mono', monospace;
+  }
+  input:focus { outline: none; border-color: #0f766e; }
+  button.main-btn {
+    width: 100%; padding: 12px; border: none; border-radius: 8px;
+    background: #0f766e; color: #fff; font-size: 0.95rem; font-weight: 700;
+    cursor: pointer; transition: background 0.15s;
+  }
+  button.main-btn:hover { background: #115e59; }
+  .error { color: #b91c1c; font-size: 0.8rem; margin: -10px 0 14px; display: none; }
+  .result { display: none; margin-top: 20px; padding-top: 18px; border-top: 1px solid #e2e8f0; }
+  .result-label { font-size: 0.8rem; font-weight: 700; color: #0f766e; margin-bottom: 8px; }
+  .link-box {
+    background: #f0fdfa; border: 1px solid rgba(15,118,110,0.25); border-radius: 8px;
+    padding: 12px 14px; font-family: 'JetBrains Mono', monospace; font-size: 0.78rem;
+    color: #115e59; word-break: break-all; line-height: 1.6; margin-bottom: 10px;
+  }
+  button.copy-btn {
+    width: 100%; padding: 10px; border: 1.5px solid #0f766e; border-radius: 8px;
+    background: #fff; color: #0f766e; font-size: 0.85rem; font-weight: 700; cursor: pointer;
+  }
+  button.copy-btn:hover { background: #f0fdfa; }
+  .hint { font-size: 0.75rem; color: #a1a1aa; margin-top: 14px; line-height: 1.6; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <span class="badge">교사용</span>
+    <h1>학생에게 보낼 링크 만들기</h1>
+    <p class="desc">
+      1단계(Code.gs 배포)에서 확인한 <b>웹 앱 URL</b>과 <b>SECRET_KEY</b>를 아래에 입력하면,
+      학생들에게 나눠줄 링크가 자동으로 만들어져요. 이 페이지는 선생님만 한 번 쓰면 되고,
+      학생들에게는 아래에서 만들어진 링크만 공유하시면 됩니다.
+    </p>
+
+    <label for="ep">웹 앱 URL</label>
+    <input id="ep" placeholder="https://script.google.com/macros/s/.../exec">
+
+    <label for="sk">SECRET_KEY</label>
+    <input id="sk" placeholder="Code.gs에 넣은 SECRET_KEY와 동일한 값">
+
+    <div class="error" id="err"></div>
+
+    <button class="main-btn" onclick="generateLink()">링크 만들기</button>
+
+    <div class="result" id="result">
+      <div class="result-label">✅ 학생들에게 이 링크를 공유하세요</div>
+      <div class="link-box" id="linkOut"></div>
+      <button class="copy-btn" onclick="copyLink()">📋 복사하기</button>
+    </div>
+
+    <div class="hint">
+      * SECRET_KEY는 링크 안에 그대로 담기지만, 이건 원래도 공개 저장소(config.js)에
+      노출되던 값과 같은 수준이라 새로운 위험은 아니에요. 정말 민감한 값(ADMIN_SECRET,
+      교사 대시보드용)은 이 링크에 절대 들어가지 않습니다.
+    </div>
+  </div>
+
+<script>
+function generateLink() {
+    var ep = document.getElementById('ep').value.trim();
+    var sk = document.getElementById('sk').value.trim();
+    var errEl = document.getElementById('err');
+    errEl.style.display = 'none';
+
+    if (!ep || ep.indexOf('http') !== 0) {
+        errEl.textContent = '올바른 웹 앱 URL을 입력해주세요. (https://로 시작)';
+        errEl.style.display = 'block';
+        return;
+    }
+    if (!sk) {
+        errEl.textContent = 'SECRET_KEY를 입력해주세요.';
+        errEl.style.display = 'block';
+        return;
+    }
+
+    // 이 페이지와 같은 폴더의 index.html을 기준으로 링크 생성
+    // (파일명이 한글이라 브라우저가 주소를 퍼센트 인코딩할 수 있으므로, 파일명을 직접
+    //  매칭하지 않고 마지막 "/" 위치를 기준으로 폴더 경로만 잘라서 사용합니다)
+    var href = window.location.href;
+    var dir = href.substring(0, href.lastIndexOf('/') + 1);
+    var base = dir + 'index.html';
+    var url = base + '?ep=' + encodeURIComponent(ep) + '&sk=' + encodeURIComponent(sk);
+
+    document.getElementById('linkOut').textContent = url;
+    document.getElementById('result').style.display = 'block';
+}
+
+function copyLink() {
+    var text = document.getElementById('linkOut').textContent;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () {
+            alert('링크가 복사되었습니다!');
+        }).catch(function () {
+            fallbackCopy(text);
+        });
+    } else {
+        fallbackCopy(text);
+    }
+}
+
+function fallbackCopy(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); alert('링크가 복사되었습니다!'); }
+    catch (e) { alert('복사에 실패했어요. 직접 선택해서 복사해주세요.'); }
+    document.body.removeChild(ta);
+}
+</script>
+</body>
+</html>

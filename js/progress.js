@@ -2,26 +2,39 @@
 const TOTAL=7;
 const STEP_COLORS={ 1:'#00f5c4',2:'#00f5c4', 3:'#0a84ff',4:'#0a84ff', 5:'#bf5af2',6:'#bf5af2',7:'#4361ee' };
 function getCompleted(){ try{ return JSON.parse(localStorage.getItem('completedSteps')||'[]'); }catch{ return []; } }
+// 🌟 [추가] 상단 PROGRESS 바(불 켜짐)는 "100점 만점"인 단원만 인정하기 위한 헬퍼
+function getStepScore(i){
+    const v = localStorage.getItem('score_step'+i);
+    if(v===null) return null;
+    const n = parseInt(v,10);
+    return isNaN(n) ? null : n;
+}
+function isFullScore(i){ return getStepScore(i) === 100; }
+
 function renderProgress(){
     const done=getCompleted();
     const segs=document.getElementById('progSegs');
     const cnt=document.getElementById('progCount');
     if(!segs || !cnt) return;
     segs.innerHTML='';
+    // 🌟 [수정] 상단 진행 바(세그먼트/카운트)는 100점(만점)인 단원만 불이 들어오게 계산
+    const fullDone=[];
     for(let i=1;i<=TOTAL;i++){
+        const full=isFullScore(i);
+        if(full) fullDone.push(i);
         const seg=document.createElement('div');
-        seg.className='prog-seg'+(done.includes(i)?' done':'');
+        seg.className='prog-seg'+(full?' done':'');
         const col=STEP_COLORS[i];
-        if(done.includes(i)){
+        if(full){
             seg.style.background=col; seg.style.boxShadow=`0 0 10px ${col}`; seg.style.color=col;
         }
         segs.appendChild(seg);
     }
-    cnt.textContent=`${done.length} / ${TOTAL}`;
+    cnt.textContent=`${fullDone.length} / ${TOTAL}`;
     // 카운터 색: 어두운 색 계열은 밝은 톤으로 가독성 확보
     const CNT_COLORS={ 3:'#7ec3ff', 4:'#7ec3ff', 7:'#b8c0ff' };
-    const maxDone=done.length>0?Math.max(...done):0;
-    cnt.style.color=done.length>0?(CNT_COLORS[maxDone]||STEP_COLORS[maxDone]):'rgba(255,255,255,0.3)';
+    const maxDone=fullDone.length>0?Math.max(...fullDone):0;
+    cnt.style.color=fullDone.length>0?(CNT_COLORS[maxDone]||STEP_COLORS[maxDone]):'rgba(255,255,255,0.3)';
     document.querySelectorAll('.step-item').forEach(el=>{
         const s=parseInt(el.dataset.step);
         // STEP 7 번호 칩: 어두운 네이비 대신 밝은 페리윙클로 가독성 확보
@@ -32,6 +45,7 @@ function renderProgress(){
                 num.style.borderColor='#b8c0ff';
             }
         }
+        // 🌟 STEP 옆 배지(✓ N점)는 기존처럼 "채점 시도 여부" 기준 — 점수와 무관하게 항상 현재 점수를 그대로 보여줌
         const isDone=done.includes(s);
         el.classList.toggle('is-done',isDone);
         // ✓ DONE 배지에 통과 점수 표시 (예: "✓ 100점")
@@ -105,7 +119,7 @@ function openInfoModal(){
                 • 웹 폰트: Noto Sans KR, Orbitron, JetBrains Mono, Pretendard, Inter (OFL)
             </div>
         </div>`,
-        buttonsHTML:`<button class="mbtn primary" onclick="closeModal()">확인했습니다</button>`
+        buttonsHTML:`<button class="mbtn primary" onclick="closeModal()">확인</button>`
     });
 }
 const copyBtn = document.getElementById('copyBtn');

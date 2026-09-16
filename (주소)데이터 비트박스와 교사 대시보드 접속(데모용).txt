@@ -1,0 +1,19 @@
+* 교사 대시보드를 활용하지 않는 경우
+  - https://01harmony.github.io/data-bitbox/ 주소를 학생들에게 배포
+
+
+* 교사 대시보드를 활용하고자 하는 경우 
+  - <데이터 비트박스-교사용 대시보드 설치 가이드.pdf>를 참고하여 학생 배포 주소 생성 후 배포
+  - (설치 가이드 링크) https://drive.google.com/file/d/1sEkfYsiI53ktdfL6l1c7L0w4W58dOKyo/view?usp=sharing
+
+
+* 교사 대시보드 활용시 데모용 주소와 비밀값
+  - (주의) '데이터 비트박스' 저작자의 구글 시트로 학생용 데이터가 수집됩니다.
+  - 데모용 주소와 비밀값을 사용해 대시보드를 활용한 경우는 반드시 학생 데이터를 삭제하시기 바랍니다.
+  - 다음 데모용 주소를 교사 대시보드 연결에 사용하세요.
+
+Apps Script 웹 앱 URL: 
+https://script.google.com/macros/s/AKfycbxukOY8oIDe6UrbD4tqqg3cnzQ1bQUVUXcmnLmRMkhh4N8E09Yf6RSC8w54dSck1RSX/exec
+
+관리자 비밀값 (ADMIN_SECRET):
+bitbox-teacher-only

@@ -1,0 +1,2026 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>교사 대시보드 - 데이터 비트박스</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&family=JetBrains+Mono:wght@700;900&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
+<style>
+    :root {
+        --teal-main: #0f766e; --teal-light: #14b8a6; --teal-dark: #115e59;
+        --apple-blue: #0071e3; --apple-red: #ef4444; --success-green: #10b981;
+        --gold-main: #d97706;
+        --bg-pastel-gradient: linear-gradient(160deg, #f0fdfa 0%, #eef4ff 45%, #ffffff 100%);
+        --text-main: #1d1d1f; --text-sub: #57534e; --apple-gray: #86868b;
+        --card-white: #ffffff; --overlay: rgba(15,23,42,0.5);
+        /* 🌟 [추가] 입체감을 위한 그림자/그라데이션 토큰 */
+        --shadow-xs: 0 1px 2px rgba(15,23,42,0.05);
+        --shadow-sm: 0 3px 10px rgba(15,23,42,0.06), 0 1px 3px rgba(15,23,42,0.05);
+        --shadow-md: 0 10px 26px rgba(15,23,42,0.09), 0 3px 8px rgba(15,23,42,0.05);
+        --shadow-lg: 0 24px 60px rgba(15,23,42,0.16), 0 10px 20px rgba(15,23,42,0.08);
+        --shadow-teal: 0 8px 20px rgba(15,118,110,0.28), 0 2px 6px rgba(15,118,110,0.18);
+        --shadow-red: 0 8px 20px rgba(239,68,68,0.28), 0 2px 6px rgba(239,68,68,0.18);
+        --shadow-gold: 0 8px 20px rgba(217,119,6,0.28), 0 2px 6px rgba(217,119,6,0.18);
+        --grad-teal: linear-gradient(135deg, var(--teal-light) 0%, var(--teal-main) 100%);
+        --grad-teal-dark: linear-gradient(135deg, var(--teal-main) 0%, var(--teal-dark) 100%);
+        --grad-red: linear-gradient(135deg, #f87171 0%, var(--apple-red) 100%);
+        --grad-gold: linear-gradient(135deg, #f59e0b 0%, var(--gold-main) 100%);
+        --grad-card: linear-gradient(160deg, #ffffff 0%, #fbfdfd 100%);
+    }
+    * { box-sizing: border-box; }
+    html, body {
+        margin: 0; padding: 0; min-height: 100%;
+        font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+        background: var(--bg-pastel-gradient); background-attachment: fixed; color: var(--text-main);
+    }
+    header {
+        background: rgba(255,255,255,0.78); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+        border-bottom: 1px solid rgba(15,23,42,0.06); padding: 16px 30px;
+        display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 500;
+        box-shadow: 0 4px 20px rgba(15,23,42,0.04);
+    }
+    .header-left { display: flex; align-items: center; gap: 12px; }
+    .target-badge {
+        background: linear-gradient(135deg, #2d2d30 0%, #1d1d1f 100%); color: #fff; padding: 4px 10px;
+        border-radius: 8px; font-size: 0.72rem; font-weight: 800; box-shadow: var(--shadow-xs);
+    }
+    .main-title {
+        font-size: 1.25rem; font-weight: 900; margin: 0; cursor: pointer;
+        background: linear-gradient(135deg, var(--text-main) 0%, var(--teal-dark) 130%);
+        -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+        transition: 0.2s;
+    }
+    .main-title:hover { filter: brightness(1.15); }
+    .header-right { display: flex; align-items: center; gap: 10px; }
+    .hbtn {
+        padding: 8px 16px; border-radius: 20px; font-weight: 800; font-size: 0.8rem;
+        border: 1px solid rgba(15,23,42,0.08); background: linear-gradient(180deg, #ffffff 0%, #f7f8f9 100%);
+        color: var(--text-main); cursor: pointer; transition: 0.2s; box-shadow: var(--shadow-xs);
+    }
+    .hbtn:hover { transform: translateY(-2px); box-shadow: var(--shadow-sm); border-color: rgba(15,23,42,0.12); }
+    .hbtn:active { transform: translateY(0); box-shadow: var(--shadow-xs); }
+    .hbtn.danger { color: var(--apple-red); border-color: rgba(239,68,68,0.3); }
+    .hbtn.warn { color: var(--gold-main); border-color: rgba(217,119,6,0.35); }
+
+    main { max-width: 1200px; margin: 0 auto; padding: 30px 24px 80px; }
+
+    /* ── 설정(로그인) 화면 ── */
+    #setupScreen { display: flex; align-items: center; justify-content: center; min-height: 70vh; }
+    .setup-card {
+        position: relative; background: var(--grad-card); border-radius: 28px; padding: 44px 40px 40px;
+        width: 440px; max-width: 92vw; box-shadow: var(--shadow-lg); text-align: center;
+        border: 1px solid rgba(15,23,42,0.04); overflow: hidden;
+    }
+    .setup-card::before {
+        content: ''; position: absolute; top: 0; left: 0; right: 0; height: 6px;
+        background: linear-gradient(90deg, var(--teal-light), var(--apple-blue), var(--gold-main));
+    }
+    .setup-icon { font-size: 2.6rem; margin-bottom: 6px; filter: drop-shadow(0 6px 10px rgba(15,118,110,0.25)); }
+    .setup-card h2 { margin: 0 0 6px; font-size: 1.3rem; font-weight: 900; }
+    .setup-card p { color: var(--text-sub); font-size: 0.88rem; margin: 0 0 24px; line-height: 1.6; }
+    .field { text-align: left; margin-bottom: 16px; }
+    .field label { display: block; font-size: 0.78rem; font-weight: 800; color: var(--teal-dark); margin-bottom: 6px; }
+    .field input {
+        width: 100%; padding: 12px 14px; border-radius: 12px; border: 2px solid #e2e8f0;
+        font-size: 0.9rem; font-family: inherit; outline: none; transition: 0.2s; background: #fff;
+        box-shadow: inset 0 1px 3px rgba(15,23,42,0.04);
+    }
+    .field input:focus { border-color: var(--teal-main); box-shadow: inset 0 1px 3px rgba(15,23,42,0.04), 0 0 0 4px rgba(15,118,110,0.14); }
+    .setup-note {
+        background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border: 1px solid rgba(217,119,6,0.25); border-radius: 12px;
+        padding: 10px 14px; font-size: 0.75rem; color: #92400e; text-align: left; margin-bottom: 20px; line-height: 1.6;
+        box-shadow: var(--shadow-xs);
+    }
+    .primary-btn {
+        width: 100%; padding: 13px; background: var(--grad-teal); color: #fff; border: none;
+        border-radius: 14px; font-weight: 900; font-size: 1rem; cursor: pointer; transition: 0.2s;
+        box-shadow: var(--shadow-teal);
+    }
+    .primary-btn:hover { background: var(--grad-teal-dark); transform: translateY(-2px); box-shadow: 0 12px 26px rgba(15,118,110,0.34), 0 3px 8px rgba(15,118,110,0.2); }
+    .primary-btn:active { transform: translateY(0); }
+    .primary-btn:disabled { opacity: 0.6; cursor: default; transform: none; box-shadow: none; }
+    .setup-error { color: var(--apple-red); font-size: 0.82rem; font-weight: 700; margin-top: 12px; min-height: 1.2em; }
+
+    /* 🌟 [추가] 처음 사용 가이드 & 비밀값 찾기 안내 */
+    .setup-guide { text-align: left; margin: -6px 0 18px; }
+    .setup-guide summary {
+        cursor: pointer; font-weight: 800; font-size: 0.85rem; color: var(--teal-dark);
+        padding: 12px 14px; background: linear-gradient(135deg, #f0fdfa 0%, #e6fbf7 100%); border: 1px solid rgba(15,118,110,0.18);
+        border-radius: 12px; list-style: none; user-select: none; transition: 0.15s;
+    }
+    .setup-guide summary:hover { box-shadow: var(--shadow-xs); }
+    .setup-guide summary::-webkit-details-marker { display: none; }
+    .setup-guide summary::after { content: '자세히 보기 ▾'; float: right; color: var(--teal-main); font-weight: 700; font-size: 0.78rem; }
+    .setup-guide[open] summary::after { content: '접기 ▴'; }
+    .setup-guide[open] summary { border-radius: 12px 12px 0 0; }
+    .setup-guide-body {
+        background: #fff; border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 12px 12px;
+        padding: 16px 18px; font-size: 0.8rem; color: var(--text-main); line-height: 1.75;
+        box-shadow: var(--shadow-xs);
+    }
+    .setup-guide-body ol { margin: 0; padding-left: 20px; }
+    .setup-guide-body li { margin-bottom: 9px; }
+    .setup-guide-body li:last-child { margin-bottom: 0; }
+    .setup-guide-body b { color: var(--teal-dark); }
+    .setup-guide-body a { color: var(--apple-blue); font-weight: 800; text-decoration: underline; }
+    .setup-guide-body code {
+        background: #f1f5f9; padding: 1px 6px; border-radius: 6px; font-family: 'JetBrains Mono', monospace;
+        font-size: 0.76rem; color: var(--teal-dark); overflow-wrap: break-word; white-space: normal;
+    }
+    .secret-help { text-align: left; margin: -10px 0 16px; }
+    .secret-help summary {
+        cursor: pointer; font-size: 0.76rem; color: var(--apple-blue); font-weight: 700;
+        text-decoration: underline; list-style: none; display: inline-block;
+    }
+    .secret-help summary::-webkit-details-marker { display: none; }
+    .secret-help-body {
+        text-align: left; font-size: 0.77rem; color: var(--text-sub); line-height: 1.75;
+        background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px 14px; margin-top: 8px;
+    }
+    .secret-help-body b { color: var(--teal-dark); }
+    .secret-help-body code {
+        background: #eef2f7; padding: 1px 6px; border-radius: 6px; font-family: 'JetBrains Mono', monospace;
+        font-size: 0.74rem; color: var(--teal-dark); overflow-wrap: break-word; white-space: normal;
+    }
+
+    /* ── 대시보드 화면 ── */
+    #dashScreen { display: none; }
+    .stat-row { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+    .stat-card {
+        position: relative; flex: 1; min-width: 140px; background: var(--grad-card); border-radius: 20px;
+        padding: 18px 22px 18px 26px; box-shadow: var(--shadow-sm); border: 1px solid rgba(15,23,42,0.04);
+        overflow: hidden; transition: 0.2s;
+    }
+    .stat-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+    .stat-card::before {
+        content: ''; position: absolute; top: 0; left: 0; bottom: 0; width: 5px;
+        background: var(--teal-main);
+    }
+    .stat-card:nth-child(1)::before { background: var(--grad-teal); }
+    .stat-card:nth-child(2)::before { background: linear-gradient(180deg, #4da3f5, var(--apple-blue)); }
+    .stat-card:nth-child(3)::before { background: var(--grad-gold); }
+    .stat-card:nth-child(4)::before { background: linear-gradient(180deg, #34d399, var(--success-green)); }
+    .stat-card .num { font-size: 1.7rem; font-weight: 900; color: var(--teal-main); font-family: 'JetBrains Mono'; }
+    .stat-card .label { font-size: 0.78rem; color: var(--text-sub); font-weight: 700; margin-top: 2px; }
+
+    .toolbar { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
+    .toolbar input, .toolbar select {
+        padding: 10px 14px; border-radius: 12px; border: 2px solid #e2e8f0; font-size: 0.85rem;
+        font-family: inherit; outline: none; background: #fff; box-shadow: var(--shadow-xs); transition: 0.15s;
+    }
+    .toolbar input:focus, .toolbar select:focus { border-color: var(--teal-main); box-shadow: 0 0 0 3px rgba(15,118,110,0.12); }
+    #gradeFilterInput { flex: 1 1 132px; }
+    #classFilterInput { flex: 1 1 130px; }
+    #searchInput { flex: 0 0 225px; }
+    #unitFilter { flex: 1 1 142px; }
+    #fbFilter { flex: 1 1 155px; }
+    #rosterBtn, #classStatsOpenBtn { flex: 0 0 195px; width: 195px; }
+    .toolbar .spacer { flex: 1; }
+    .toolbar-btn {
+        padding: 10px 16px; border-radius: 12px; border: 2px solid #e2e8f0; background: linear-gradient(180deg, #ffffff 0%, #fafbfc 100%);
+        font-weight: 800; font-size: 0.82rem; cursor: pointer; color: var(--text-main);
+        white-space: nowrap; font-family: inherit; transition: 0.15s; box-shadow: var(--shadow-xs);
+    }
+    .toolbar-btn:hover { background: #f8fafc; border-color: var(--teal-light); color: var(--teal-dark); transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+    .toolbar-btn:active { transform: translateY(0); }
+    .toolbar-btn:disabled { opacity: 0.45; cursor: default; background: #fff; border-color: #e2e8f0; color: var(--text-main); transform: none; box-shadow: none; }
+    .toolbar-btn.accent { background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%); border-color: rgba(217,119,6,0.35); color: var(--gold-main); }
+    .toolbar-btn.accent:hover:not(:disabled) { background: #ffedd5; border-color: rgba(217,119,6,0.5); box-shadow: var(--shadow-gold); }
+    .toolbar-btn.accent:disabled { background: #fff; border-color: #e2e8f0; color: var(--apple-gray); }
+    .toolbar-btn.ghost { background: transparent; border-color: transparent; color: var(--apple-gray); text-decoration: underline; box-shadow: none; }
+    .toolbar-btn.ghost:hover { background: #f8fafc; color: var(--text-sub); transform: none; box-shadow: none; }
+
+    /* 🌟 [추가] 학생 소통 기능: 걱정 키워드 표시, 학생별 통합 뷰, 빠른 문구 */
+    .concern-flag { font-size: 0.85rem; }
+    .student-id:hover { text-decoration: underline; }
+    mark.hl-concern { background: #fef3c7; color: #92400e; padding: 0 2px; border-radius: 3px; font-weight: 700; }
+    .quick-phrase-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+    .quick-phrase-btn {
+        padding: 6px 12px; border-radius: 16px; border: 1px solid #e2e8f0; background: #f8fafc;
+        font-size: 0.78rem; cursor: pointer; color: var(--text-sub); font-weight: 700; font-family: inherit;
+        transition: 0.15s;
+    }
+    .quick-phrase-btn:hover { background: #ecfdf5; border-color: var(--teal-light); color: var(--teal-dark); box-shadow: var(--shadow-xs); }
+    .manage-link {
+        font-size: 0.72rem; color: var(--apple-blue); cursor: pointer; text-decoration: underline;
+        margin-left: auto; font-weight: 700;
+    }
+    .block-label-row { display: flex; align-items: center; margin-bottom: 6px; }
+    .roster-row {
+        display: flex; align-items: center; justify-content: space-between; padding: 10px 14px;
+        background: linear-gradient(135deg, #f8fafc 0%, #f2f6fa 100%); border-radius: 12px; margin-bottom: 8px;
+        border: 1px solid rgba(15,23,42,0.03); transition: 0.15s;
+    }
+    .roster-row:hover { box-shadow: var(--shadow-xs); }
+    .roster-row .roster-label { font-weight: 800; font-size: 0.88rem; }
+    .overview-row {
+        display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 8px;
+        border-bottom: 1px solid #f1f5f9; cursor: pointer; transition: 0.15s; border-radius: 10px;
+    }
+    .overview-row:hover { background: #f8fffe; box-shadow: var(--shadow-xs); }
+    .missing-id-row { padding: 8px 4px; border-bottom: 1px solid #f1f5f9; }
+
+    .table-wrap {
+        background: var(--grad-card); border-radius: 22px; overflow: hidden; box-shadow: var(--shadow-md);
+        border: 1px solid rgba(15,23,42,0.04);
+    }
+    /* 🌟 [수정] 표가 위쪽 통계 카드(평균 점수 박스 등)와 같은 폭으로 꽉 차도록 100%로
+       채우고, 각 칸은 <colgroup>에서 비율(%)로 폭을 나눠 적절한 간격을 갖게 함.
+       화면이 아주 좁을 때만 .table-scroll이 가로 스크롤을 담당함. */
+    .table-scroll { overflow-x: auto; }
+    table { width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 0.86rem; }
+    thead th {
+        text-align: left; padding: 14px 16px; background: linear-gradient(180deg, #fbfcfd 0%, #f5f7f9 100%); color: var(--text-sub);
+        font-weight: 800; font-size: 0.75rem; letter-spacing: 0.3px; border-bottom: 1px solid #eef2f6;
+        cursor: pointer; user-select: none; white-space: nowrap; transition: 0.15s;
+    }
+    thead th:hover { color: var(--teal-main); background: #f0fdfa; }
+    tbody tr { border-bottom: 1px solid #f1f5f9; cursor: pointer; transition: 0.15s; }
+    tbody tr:hover { background: #f8fffe; box-shadow: inset 3px 0 0 var(--teal-light); }
+    tbody tr:last-child { border-bottom: none; }
+    td { padding: 13px 16px; vertical-align: middle; }
+    .student-id { font-family: 'JetBrains Mono'; font-weight: 800; color: var(--teal-dark); }
+    .score-pill {
+        display: inline-block; padding: 3px 12px; border-radius: 20px; font-weight: 900;
+        font-size: 0.8rem; font-family: 'JetBrains Mono'; background: linear-gradient(135deg, #d1fae5 0%, #ecfdf5 100%);
+        color: var(--success-green); box-shadow: var(--shadow-xs);
+    }
+    .score-pill.low { background: linear-gradient(135deg, #fee2e2 0%, #fef2f2 100%); color: var(--apple-red); }
+    .fb-badge {
+        display: inline-flex; align-items: center; gap: 4px; font-size: 0.72rem; font-weight: 800;
+        padding: 3px 10px; border-radius: 20px; box-shadow: var(--shadow-xs);
+    }
+    .fb-badge.done { background: linear-gradient(135deg, #d1fae5 0%, #ecfdf5 100%); color: var(--success-green); }
+    .fb-badge.pending { background: linear-gradient(135deg, #ffedd5 0%, #fff7ed 100%); color: var(--gold-main); }
+    .fb-badge.read { background: linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%); color: var(--apple-blue); }
+    .fb-badge.unread { background: linear-gradient(135deg, #fee2e2 0%, #fef2f2 100%); color: var(--apple-red); }
+    .fb-badge.resubmit { background: linear-gradient(135deg, #ffedd5 0%, #fff7ed 100%); color: var(--gold-main); }
+    .resubmit-flag { font-size: 0.85rem; }
+
+    /* 📊 학급/학년 통계 모달 */
+    .stat-tabs { display: flex; gap: 6px; margin-bottom: 14px; }
+    .stat-tab-btn {
+        flex: 1; padding: 9px 10px; border-radius: 10px; border: 2px solid #e2e8f0; background: #fff;
+        font-weight: 800; font-size: 0.82rem; cursor: pointer; color: var(--text-sub); font-family: inherit; transition: 0.15s;
+    }
+    .stat-tab-btn:hover { border-color: var(--teal-light); box-shadow: var(--shadow-xs); }
+    .stat-tab-btn.active { background: var(--grad-teal); border-color: var(--teal-main); color: #fff; box-shadow: var(--shadow-teal); }
+    .stat-unit-select {
+        width: 100%; padding: 10px 14px; border-radius: 12px; border: 2px solid #e2e8f0; font-size: 0.84rem;
+        font-family: inherit; outline: none; background: #fff; margin-bottom: 16px; box-sizing: border-box;
+    }
+    .stat-unit-select:focus { border-color: var(--teal-main); box-shadow: 0 0 0 3px rgba(15,118,110,0.12); }
+    /* 🌟 [추가] 학생별 검색: 네이티브 <datalist>는 브라우저마다 클릭으로 안 열리는 경우가
+       있어서, 직접 만든 검색형 드롭다운으로 교체함(클릭/입력 모두 항상 동작). */
+    .stat-student-combo { position: relative; margin-bottom: 16px; }
+    .stat-student-combo .stat-unit-select { margin-bottom: 0; }
+    .stat-student-dropdown {
+        display: none; position: absolute; top: calc(100% + 6px); left: 0; right: 0; background: #fff;
+        border: 2px solid #e2e8f0; border-radius: 12px; max-height: 220px; overflow-y: auto; z-index: 20;
+        box-shadow: var(--shadow-lg);
+    }
+    .stat-student-dropdown.show { display: block; }
+    .stat-student-option {
+        padding: 10px 14px; font-size: 0.84rem; font-family: 'JetBrains Mono'; font-weight: 700;
+        cursor: pointer; color: var(--text-main);
+    }
+    .stat-student-option:hover, .stat-student-option.highlight { background: #f0fdfa; color: var(--teal-dark); }
+    .stat-student-option.empty {
+        color: var(--apple-gray); cursor: default; font-family: inherit; font-weight: 500; text-align: center;
+    }
+    .stat-student-option.empty:hover { background: transparent; }
+    .group-bar-row { margin-bottom: 14px; }
+    .group-bar-row.overall { margin-bottom: 18px; padding-bottom: 16px; border-bottom: 1px dashed #e2e8f0; }
+    .group-bar-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 5px; }
+    .group-bar-label { font-weight: 800; font-size: 0.86rem; color: var(--text-main); }
+    .group-bar-row.overall .group-bar-label { color: var(--teal-dark); }
+    .group-bar-meta { font-size: 0.74rem; color: var(--apple-gray); font-weight: 700; }
+    .group-bar-track { height: 10px; border-radius: 6px; background: #f1f5f9; overflow: hidden; box-shadow: inset 0 1px 3px rgba(15,23,42,0.06); }
+    .group-bar-fill { height: 100%; border-radius: 6px; background: linear-gradient(90deg, #34d399, var(--success-green)); transition: width 0.3s; }
+    .group-bar-fill.low { background: linear-gradient(90deg, #f87171, var(--apple-red)); }
+    .group-bar-fill.overall { background: var(--grad-teal); }
+    .group-bar-value { font-family: 'JetBrains Mono'; font-weight: 900; font-size: 0.86rem; color: var(--text-main); }
+    .stat-empty { text-align: center; color: var(--text-sub); font-size: 0.85rem; padding: 30px 0; }
+
+    /* 학생별 점수 변화 그래프 */
+    .trend-chart-wrap { padding: 2px 2px 14px; border-bottom: 1px solid #f1f5f9; margin-bottom: 10px; }
+    .trend-chart-empty { font-size: 0.78rem; color: var(--apple-gray); text-align: center; padding: 14px 0; }
+    .trend-line { fill: none; stroke: var(--teal-main); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+    .trend-ref { stroke: #e2e8f0; stroke-width: 1; }
+    .trend-axis { stroke: #e2e8f0; stroke-width: 1; }
+    .trend-point { fill: #fff; stroke: var(--success-green); stroke-width: 3; }
+    .trend-point.low { stroke: var(--apple-red); }
+    .trend-label { font-size: 9px; fill: var(--apple-gray); font-family: inherit; }
+    .trend-grid { stroke: #f1f5f9; stroke-width: 1; }
+    .trend-ylabel { font-size: 8px; fill: var(--apple-gray); font-family: inherit; }
+    /* 🌟 [수정] 점수/제출시각/피드백작성/데이터삭제/PIN초기화 칸은 가운데 정렬해서
+       보기 좋게 정리 (실제 폭 비율은 <colgroup>에서 지정) */
+    td.col-center, td.col-time, td.col-feedback, td.col-del, td.col-pin, td.col-check { text-align: center; }
+    thead th.col-center, thead th.col-time, thead th.col-feedback, thead th.col-del, thead th.col-pin, thead th.col-check {
+        text-align: center; white-space: normal; word-break: keep-all; line-height: 1.25;
+    }
+    thead th.col-del, thead th.col-pin, thead th.col-check { cursor: default; }
+    thead th.col-del:hover, thead th.col-pin:hover { color: var(--text-sub); }
+    /* 🌟 [추가] 학급/학년 일괄 선택용 체크박스 칸 */
+    .row-check, #selectAllCheckbox { width: 17px; height: 17px; cursor: pointer; accent-color: var(--teal-main); }
+    .row-del-btn, .row-pin-btn {
+        width: 30px; height: 30px; border-radius: 8px; border: none; background: transparent;
+        font-size: 0.95rem; cursor: pointer; transition: 0.15s;
+        display: inline-flex; align-items: center; justify-content: center;
+    }
+    .row-del-btn {
+        color: var(--apple-gray);
+    }
+    .row-del-btn:hover { background: #fef2f2; color: var(--apple-red); transform: scale(1.08); }
+    .row-pin-btn { color: var(--apple-gray); }
+    .row-pin-btn:hover { background: #fffbeb; color: var(--gold-main); transform: scale(1.08); }
+    .empty-state { text-align: center; padding: 60px 20px; color: var(--text-sub); }
+    .empty-state .icon { font-size: 2.4rem; margin-bottom: 10px; filter: drop-shadow(0 4px 8px rgba(15,23,42,0.1)); }
+
+    /* ── 상세/피드백 모달 ── */
+    .modal-overlay {
+        display: none; position: fixed; inset: 0; background: var(--overlay);
+        backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 9000;
+        align-items: center; justify-content: center; padding: 20px;
+    }
+    .detail-card {
+        position: relative; background: var(--grad-card); border-radius: 26px; width: 560px; max-width: 100%; max-height: 88vh;
+        overflow-y: auto; padding: 32px 30px; box-shadow: var(--shadow-lg); border: 1px solid rgba(15,23,42,0.04);
+    }
+    .detail-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 18px; }
+    .detail-top h3 { margin: 0 0 4px; font-size: 1.15rem; font-weight: 900; }
+    .detail-top .sub { color: var(--text-sub); font-size: 0.8rem; font-weight: 700; }
+    .close-x {
+        width: 34px; height: 34px; border-radius: 50%; border: none; background: #f1f5f9;
+        color: var(--text-sub); font-size: 1.1rem; cursor: pointer; flex-shrink: 0; transition: 0.15s;
+        box-shadow: var(--shadow-xs);
+    }
+    .close-x:hover { background: #e2e8f0; transform: rotate(90deg); }
+    .detail-block { margin-bottom: 18px; }
+    .detail-block .block-label { font-size: 0.76rem; font-weight: 900; color: var(--teal-dark); margin-bottom: 6px; }
+    .detail-block .block-body {
+        background: linear-gradient(135deg, #f8fafc 0%, #f3f6f9 100%); border-radius: 14px; padding: 14px 16px; font-size: 0.88rem;
+        line-height: 1.7; white-space: pre-wrap; word-break: break-word; color: var(--text-main);
+        min-height: 20px; box-shadow: inset 0 1px 3px rgba(15,23,42,0.04);
+    }
+    .detail-block .block-body.empty { color: #a1a1aa; font-style: italic; }
+    #feedbackInput {
+        width: 100%; min-height: 110px; padding: 14px 16px; border-radius: 14px; border: 2px solid #e2e8f0;
+        font-family: inherit; font-size: 0.88rem; resize: vertical; outline: none; line-height: 1.6;
+        box-shadow: inset 0 1px 3px rgba(15,23,42,0.04); transition: 0.15s;
+    }
+    #feedbackInput:focus { border-color: var(--teal-main); box-shadow: inset 0 1px 3px rgba(15,23,42,0.04), 0 0 0 3px rgba(15,118,110,0.12); }
+    .fb-meta { font-size: 0.72rem; color: var(--apple-gray); margin-top: 6px; }
+    .detail-actions { display: flex; gap: 10px; margin-top: 22px; }
+    .save-btn {
+        flex: 1; padding: 13px; background: var(--grad-teal); color: #fff; border: none; border-radius: 14px;
+        font-weight: 900; font-size: 0.95rem; cursor: pointer; box-shadow: var(--shadow-teal); transition: 0.2s;
+    }
+    .save-btn:hover { background: var(--grad-teal-dark); transform: translateY(-2px); box-shadow: 0 12px 26px rgba(15,118,110,0.34), 0 3px 8px rgba(15,118,110,0.2); }
+    .save-btn:active { transform: translateY(0); }
+    .save-btn:disabled { opacity: 0.6; cursor: default; transform: none; box-shadow: none; }
+    .resubmit-toggle-btn {
+        flex: 1; padding: 13px; border-radius: 14px; border: 2px solid #e2e8f0; background: #fff;
+        color: var(--text-sub); font-weight: 800; font-size: 0.9rem; cursor: pointer; transition: 0.15s;
+        font-family: inherit;
+    }
+    .resubmit-toggle-btn:hover { background: #f8fafc; border-color: var(--teal-light); box-shadow: var(--shadow-xs); }
+    .resubmit-toggle-btn.active { background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%); border-color: rgba(217,119,6,0.4); color: var(--gold-main); box-shadow: var(--shadow-xs); }
+    .resubmit-toggle-btn:disabled { opacity: 0.6; cursor: default; }
+
+    /* ── 전체 삭제 확인 모달 ── */
+    .danger-card {
+        position: relative; background: var(--grad-card); border-radius: 26px; width: 420px; max-width: 100%;
+        padding: 32px 30px; box-shadow: var(--shadow-lg); text-align: center; border: 1px solid rgba(15,23,42,0.04);
+    }
+    .danger-card .danger-icon { font-size: 2.4rem; margin-bottom: 10px; filter: drop-shadow(0 6px 10px rgba(239,68,68,0.25)); }
+    .danger-card h3 { margin: 0 0 10px; font-size: 1.15rem; font-weight: 900; color: var(--apple-red); }
+    .danger-card p { color: var(--text-sub); font-size: 0.86rem; line-height: 1.7; margin: 0 0 18px; text-align: left; }
+    .danger-card p b { color: var(--text-main); }
+    .danger-card .confirm-word-box { text-align: left; margin-bottom: 18px; }
+    .danger-card .confirm-word-box label { display: block; font-size: 0.78rem; font-weight: 800; color: var(--text-sub); margin-bottom: 6px; }
+    #deleteConfirmInput {
+        width: 100%; padding: 12px 14px; border-radius: 12px; border: 2px solid #e2e8f0;
+        font-size: 0.95rem; font-family: inherit; outline: none; text-align: center; letter-spacing: 1px;
+        box-shadow: inset 0 1px 3px rgba(15,23,42,0.04);
+    }
+    #deleteConfirmInput:focus { border-color: var(--apple-red); box-shadow: inset 0 1px 3px rgba(15,23,42,0.04), 0 0 0 3px rgba(239,68,68,0.12); }
+    .danger-actions { display: flex; gap: 10px; }
+    .danger-cancel-btn {
+        flex: 1; padding: 13px; background: #f1f5f9; color: var(--text-main); border: none; border-radius: 14px;
+        font-weight: 800; font-size: 0.92rem; cursor: pointer; transition: 0.15s;
+    }
+    .danger-cancel-btn:hover { background: #e2e8f0; }
+    .danger-confirm-btn {
+        flex: 1; padding: 13px; background: var(--grad-red); color: #fff; border: none; border-radius: 14px;
+        font-weight: 900; font-size: 0.92rem; cursor: pointer; box-shadow: var(--shadow-red); transition: 0.2s;
+    }
+    .danger-confirm-btn:disabled { opacity: 0.4; cursor: default; box-shadow: none; }
+    .danger-confirm-btn:not(:disabled):hover { background: linear-gradient(135deg, #ef4444, #dc2626); transform: translateY(-2px); }
+    /* 🌟 [추가] PIN 초기화는 "데이터 삭제"보다는 약한 조치라서 빨간색 대신 골드 톤으로 구분 */
+    .danger-confirm-btn.pin-reset-confirm { background: var(--grad-gold); box-shadow: var(--shadow-gold); }
+    .danger-confirm-btn.pin-reset-confirm:not(:disabled):hover { background: linear-gradient(135deg, #f59e0b, #b45309); }
+
+    #toast {
+        position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(20px);
+        background: linear-gradient(135deg, #2d2d30 0%, #1d1d1f 100%); color: #fff; padding: 12px 24px; border-radius: 30px; font-weight: 700;
+        font-size: 0.85rem; opacity: 0; pointer-events: none; transition: 0.3s; z-index: 9999;
+        box-shadow: var(--shadow-lg);
+    }
+    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    .spin {
+        display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.4);
+        border-top-color: #fff; border-radius: 50%; animation: sp 0.7s linear infinite; vertical-align: -2px;
+    }
+    @keyframes sp { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+    <header>
+        <div class="header-left">
+            <span class="target-badge">교사용</span>
+            <h1 class="main-title" onclick="location.href='index.html'">데이터 비트박스 · 대시보드</h1>
+        </div>
+        <div class="header-right" id="headerActions" style="display:none;">
+            <button class="hbtn" onclick="loadData(true)">🔄 새로고침</button>
+            <button class="hbtn warn" onclick="openPinResetAllConfirm()">🔑 전체 PIN 초기화</button>
+            <button class="hbtn danger" onclick="openDeleteConfirm()">🗑 전체 삭제</button>
+            <button class="hbtn danger" onclick="logout()">🔒 연결 해제</button>
+        </div>
+    </header>
+
+    <main>
+        <!-- 설정(연결) 화면 -->
+        <div id="setupScreen">
+            <div class="setup-card">
+                <div class="setup-icon">🗂️</div>
+                <h2>교사 대시보드 연결</h2>
+                <p>본인이 배포한 웹 앱 주소와 관리자 비밀값(ADMIN_SECRET)을 입력하세요.<br>이 브라우저에만 저장되며, 어떤 파일에도 기록되지 않습니다.</p>
+
+                <details class="setup-guide">
+                    <summary>📖 처음 사용하시나요?</summary>
+                    <div class="setup-guide-body">
+                        <ol>
+                            <li><a href="https://docs.google.com/spreadsheets/d/1iI_qSb49BjdzzqPoVj7RVRkwR7C52ePQBSTBWilP3oY/copy" target="_blank" rel="noopener">템플릿 시트 사본 만들기</a> 링크를 열고 <b>[사본 만들기]</b>를 클릭합니다. 구글 시트와 Apps Script 코드(Code.gs)가 한 번에 내 드라이브로 복사됩니다.</li>
+                            <li>복사된 시트에서 <b>[확장 프로그램] → [Apps Script]</b>를 열고, 코드 맨 위쪽의 <code>SECRET_KEY</code>와 <code>ADMIN_SECRET</code> 값을 각각 본인만의 값으로 바꾼 뒤 저장합니다.</li>
+                            <li>Apps Script 화면 오른쪽 위 <b>[배포] → [새 배포]</b>를 클릭하고, 유형에서 <b>웹 앱</b>을 선택합니다.</li>
+                            <li>"액세스 권한"을 반드시 <b>모든 사용자</b>로 설정한 뒤 <b>[배포]</b>를 클릭합니다. 권한 승인 창이 뜨면 허용해주세요.</li>
+                            <li>배포가 끝나면 나오는 <b>웹 앱 URL</b>을 복사해서, 아래 "Apps Script 웹 앱 URL" 칸에 붙여넣습니다.</li>
+                            <li>방금 Code.gs에 입력한 <code>ADMIN_SECRET</code> 값을 그대로, 아래 "관리자 비밀값" 칸에 입력합니다.</li>
+                            <li><b>[연결하기]</b>를 누르면 완료! 이 정보는 지금 사용 중인 브라우저에만 저장되므로, 다른 컴퓨터·다른 브라우저에서 열 땐 같은 방법으로 한 번 더 입력해주세요.</li>
+                        </ol>
+                    </div>
+                </details>
+
+                <div class="field">
+                    <label>Apps Script 웹 앱 URL</label>
+                    <input type="text" id="endpointInput" placeholder="https://script.google.com/macros/s/.../exec" autocomplete="off">
+                </div>
+                <div class="field">
+                    <label>관리자 비밀값 (ADMIN_SECRET)</label>
+                    <input type="password" id="adminSecretInput" placeholder="Code.gs의 ADMIN_SECRET과 동일한 값" autocomplete="off">
+                </div>
+
+                <details class="secret-help">
+                    <summary>🔑 관리자 비밀값을 잊어버렸어요</summary>
+                    <div class="secret-help-body">
+                        1. 데이터가 쌓이는 <b>구글 시트</b>를 엽니다.<br>
+                        2. <b>[확장 프로그램] → [Apps Script]</b>를 클릭합니다.<br>
+                        3. 왼쪽 파일 목록에서 <code>Code.gs</code>를 열고, 맨 위쪽에서 <code>const ADMIN_SECRET = "..."</code> 줄을 찾습니다.<br>
+                        4. 큰따옴표 <code>" "</code> 안의 값이 관리자 비밀값입니다. 그대로 복사해서 위 칸에 입력하세요.<br><br>
+                        값을 아예 새로 바꾸고 싶다면, 이 줄의 값을 원하는 문자열로 수정한 뒤 <b>[배포] → [배포 관리] → 연필 아이콘 → 버전: 새 버전</b>으로 다시 배포해야 적용됩니다.
+                    </div>
+                </details>
+
+                <div class="setup-note">⚠️ 학생 제출용 SECRET_KEY가 아닙니다. Code.gs 상단의 ADMIN_SECRET 값을 입력하세요.</div>
+
+                <button class="primary-btn" id="connectBtn" onclick="connect()">연결하기</button>
+                <div class="setup-error" id="setupError"></div>
+            </div>
+        </div>
+
+        <!-- 대시보드 화면 -->
+        <div id="dashScreen">
+            <div class="stat-row">
+                <div class="stat-card"><div class="num" id="statTotal">0</div><div class="label">전체 제출</div></div>
+                <div class="stat-card"><div class="num" id="statStudents">0</div><div class="label">참여 학생 수</div></div>
+                <div class="stat-card"><div class="num" id="statPending">0</div><div class="label">피드백 대기</div></div>
+                <div class="stat-card"><div class="num" id="statAvg">0</div><div class="label">평균 점수</div></div>
+            </div>
+
+            <div class="toolbar">
+                <select id="gradeFilterInput" onchange="renderTable()"><option value="">🎓 전체 학년</option></select>
+                <select id="classFilterInput" onchange="renderTable()"><option value="">🏫 전체 학급</option></select>
+                <input type="text" id="searchInput" placeholder="🔍 학번으로 검색 (예: 10101)" oninput="renderTable()">
+                <select id="unitFilter" onchange="renderTable()"><option value="">제출 단원 검색</option></select>
+                <select id="fbFilter" onchange="renderTable()">
+                    <option value="">피드백 작성 상태</option>
+                    <option value="pending">피드백 대기만</option>
+                    <option value="done">피드백 완료만</option>
+                </select>
+                <button class="toolbar-btn" id="rosterBtn" onclick="openRosterModal()">📋 학번 생성</button>
+            </div>
+            <div class="toolbar">
+                <button class="toolbar-btn" onclick="checkMissingStudents()">🔍 미제출 확인</button>
+                <button class="toolbar-btn ghost" id="bulkClearBtn" style="display:none;" onclick="clearSelection()">선택 해제</button>
+                <button class="toolbar-btn accent" id="bulkResubmitBtn" disabled onclick="openBulkResubmitConfirm()"
+                    title="한 번에 여러 명을 요청하면 한 명씩 순서대로 처리돼요.&#10;인원이 많을수록 시간이 조금 더 걸릴 수 있어요.">🔄 선택 재제출 요청</button>
+                <div class="spacer"></div>
+                <button class="toolbar-btn" id="classStatsOpenBtn" onclick="openClassStatsModal()">📊 학년/학급/학생별 통계</button>
+            </div>
+            <div style="font-size:0.76rem; color: var(--text-sub); margin: -10px 0 14px; padding: 0 2px;">
+                💡 학년·반으로 목록을 좁힌 뒤 표 왼쪽 <b>체크박스로 전체 선택</b>하면, 학급 전체에게 한 번에 재제출을 요청할 수 있어요.
+            </div>
+
+            <div class="table-wrap">
+                <div class="table-scroll">
+                <table id="dataTable">
+                    <colgroup>
+                        <col style="width:4%;">
+                        <col style="width:10%;">
+                        <col style="width:21%;">
+                        <col style="width:6%;">
+                        <col style="width:15%;">
+                        <col style="width:10%;">
+                        <col style="width:10%;">
+                        <col style="width:10%;">
+                        <col style="width:7%;">
+                        <col style="width:7%;">
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th class="col-check"><input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll(this.checked)" title="현재 목록 전체 선택/해제"></th>
+                            <th onclick="sortBy('studentId')">학번</th>
+                            <th onclick="sortBy('unitTitle')">단원</th>
+                            <th class="col-center" onclick="sortBy('score')">점수</th>
+                            <th class="col-time" onclick="sortBy('timestamp')">제출 시각</th>
+                            <th class="col-feedback" onclick="sortBy('feedback')">피드백 작성(교사)</th>
+                            <th class="col-feedback" onclick="sortBy('feedbackReadAt')">피드백 확인(학생)</th>
+                            <th class="col-feedback" onclick="sortBy('resubmitRequested')">재제출 요청</th>
+                            <th class="col-del">데이터 삭제</th>
+                            <th class="col-pin">PIN 초기화</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+                </div>
+                <div class="empty-state" id="emptyState" style="display:none;">
+                    <div class="icon">📭</div>
+                    아직 제출된 데이터가 없습니다.
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 상세/피드백 모달 -->
+    <div class="modal-overlay" id="detailModal">
+        <div class="detail-card">
+            <div class="detail-top">
+                <div>
+                    <h3 id="detailTitle">학번 - 단원</h3>
+                    <div class="sub" id="detailSub">제출 시각</div>
+                </div>
+                <button class="close-x" onclick="closeDetail()">✕</button>
+            </div>
+
+            <div class="detail-block">
+                <div class="block-label">📝 배움노트</div>
+                <div class="block-body" id="detailMemo"></div>
+            </div>
+            <div class="detail-block">
+                <div class="block-label">💬 배움활동 소감</div>
+                <div class="block-body" id="detailReflection"></div>
+            </div>
+            <div class="detail-block">
+                <div class="block-label-row">
+                    <div class="block-label">✏️ 선생님 피드백</div>
+                    <span class="manage-link" onclick="openPhraseManageModal()">문구 관리</span>
+                </div>
+                <div class="quick-phrase-row" id="quickPhraseRow"></div>
+                <textarea id="feedbackInput" placeholder="학생에게 남길 피드백을 입력하세요..."></textarea>
+                <div class="fb-meta" id="fbMeta"></div>
+            </div>
+
+            <div class="detail-actions">
+                <button class="resubmit-toggle-btn" id="resubmitToggleBtn" onclick="toggleResubmitRequest()">🔄 재제출 요청</button>
+                <button class="save-btn" id="saveFeedbackBtn" onclick="saveFeedback()">피드백 저장</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PIN 초기화 확인 모달 -->
+    <div class="modal-overlay" id="pinResetConfirmModal">
+        <div class="danger-card">
+            <div class="danger-icon">🔑</div>
+            <h3 style="color: var(--gold-main);">PIN 초기화</h3>
+            <p>
+                <b id="pinResetLabel"></b> 학생의 등록된 PIN을 초기화합니다.<br>
+                이 학생이 다음 번에 제출하거나 피드백을 확인할 때 <b>새로 입력하는 PIN</b>이 그대로 등록됩니다.<br>
+                (제출된 학습 기록·피드백은 삭제되지 않습니다.)
+            </p>
+            <div class="danger-actions">
+                <button class="danger-cancel-btn" onclick="closePinResetConfirm()">취소</button>
+                <button class="danger-confirm-btn pin-reset-confirm" id="pinResetConfirmBtn" onclick="confirmResetPin()">초기화</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 전체 학생 PIN 초기화 확인 모달 -->
+    <div class="modal-overlay" id="pinResetAllConfirmModal">
+        <div class="danger-card">
+            <div class="danger-icon">🔑</div>
+            <h3 style="color: var(--gold-main);">전체 학생 PIN 초기화</h3>
+            <p>
+                등록된 <b>모든 학생</b>의 PIN이 초기화됩니다.<br>
+                각 학생은 다음 번에 제출하거나 피드백을 확인할 때 <b>새로 입력하는 PIN</b>이 그대로 등록됩니다.<br>
+                (제출된 학습 기록·피드백은 삭제되지 않습니다.)
+            </p>
+            <div class="danger-actions">
+                <button class="danger-cancel-btn" onclick="closePinResetAllConfirm()">취소</button>
+                <button class="danger-confirm-btn pin-reset-confirm" id="pinResetAllConfirmBtn" onclick="confirmResetAllPins()">전체 초기화</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🌟 [추가] 학급/학년 일괄 재제출 요청 확인 모달 -->
+    <div class="modal-overlay" id="bulkResubmitConfirmModal">
+        <div class="danger-card">
+            <div class="danger-icon">🔄</div>
+            <h3 style="color: var(--gold-main);">선택한 학생들에게 재제출 요청</h3>
+            <p>
+                선택한 <b id="bulkResubmitCount">0건</b>에 대해 재제출을 요청합니다.<br>
+                학생이 다음에 학번·PIN으로 피드백을 확인할 때 재제출 요청 안내가 함께 보입니다.<br>
+                <span style="font-size:0.78rem; color:var(--text-sub);">💡 한 명씩 순서대로 처리되어, 인원이 많으면 완료까지 시간이 조금 걸릴 수 있어요.</span>
+            </p>
+            <div id="bulkResubmitList" style="max-height:140px; overflow-y:auto; background:#f8fafc; border-radius:12px; padding:10px 14px; margin-bottom:18px; font-size:0.8rem; color:var(--text-sub); text-align:left; line-height:1.8;"></div>
+            <div class="danger-actions">
+                <button class="danger-cancel-btn" onclick="closeBulkResubmitConfirm()">취소</button>
+                <button class="danger-confirm-btn pin-reset-confirm" id="bulkResubmitConfirmBtn" onclick="confirmBulkResubmit()">재제출 요청</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 개별 기록 삭제 확인 모달 -->
+    <div class="modal-overlay" id="rowDeleteConfirmModal">
+        <div class="danger-card">
+            <div class="danger-icon">🗑</div>
+            <h3>이 기록을 삭제할까요?</h3>
+            <p>
+                <b id="rowDeleteLabel"></b> 학생의 이 제출 기록(배움노트·소감·선생님 피드백 포함)이 삭제됩니다.<br>
+                <b>되돌릴 수 없습니다.</b>
+            </p>
+            <div class="danger-actions">
+                <button class="danger-cancel-btn" onclick="closeRowDeleteConfirm()">취소</button>
+                <button class="danger-confirm-btn" id="rowDeleteConfirmBtn" onclick="confirmDeleteRow()">삭제</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 전체 삭제 확인 모달 -->
+    <div class="modal-overlay" id="deleteConfirmModal">
+        <div class="danger-card">
+            <div class="danger-icon">⚠️</div>
+            <h3>전체 데이터 삭제</h3>
+            <p>
+                현재 저장된 <b id="deleteRowCount">0</b>건의 학생 제출/피드백 기록이 <b>모두</b> 삭제됩니다.<br>
+                이 작업은 <b>되돌릴 수 없습니다.</b> 계속하려면 아래 칸에 <b>전체삭제</b> 를 정확히 입력하세요.
+            </p>
+            <div class="confirm-word-box">
+                <label>확인을 위해 "전체삭제"를 입력하세요</label>
+                <input type="text" id="deleteConfirmInput" placeholder="전체삭제" autocomplete="off" oninput="checkDeleteConfirmInput()">
+            </div>
+            <div class="danger-actions">
+                <button class="danger-cancel-btn" onclick="closeDeleteConfirm()">취소</button>
+                <button class="danger-confirm-btn" id="deleteConfirmBtn" disabled onclick="confirmDeleteAll()">완전히 삭제</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 반 학번 생성 모달 (미제출 학생 확인용) -->
+    <div class="modal-overlay" id="rosterModal">
+        <div class="detail-card" style="width:480px;">
+            <div class="detail-top">
+                <div>
+                    <h3>📋 학번 생성</h3>
+                    <div class="sub">학년·반·번호 범위를 등록하세요<br>(서버에 저장되어 어떤 기기에서 열어도 같은 학번이 보여요)</div>
+                </div>
+                <button class="close-x" onclick="closeRosterModal()">✕</button>
+            </div>
+            <div id="rosterListWrap" style="margin-bottom:18px;"></div>
+            <div style="display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap; padding:14px; background:#f8fafc; border-radius:14px;">
+                <div style="margin:0;">
+                    <label style="display:block; font-size:0.75rem; font-weight:800; color:var(--teal-dark); margin-bottom:6px;">학년</label>
+                    <select id="rosterGradeInput" style="padding:10px; border-radius:10px; border:2px solid #e2e8f0; font-family:inherit; font-size:0.85rem;">
+                        <option value="1">1학년</option><option value="2">2학년</option><option value="3">3학년</option>
+                    </select>
+                </div>
+                <div style="margin:0;">
+                    <label style="display:block; font-size:0.75rem; font-weight:800; color:var(--teal-dark); margin-bottom:6px;">반</label>
+                    <input type="number" id="rosterClassInput" min="1" max="99" placeholder="예: 1" style="width:70px; padding:10px; border-radius:10px; border:2px solid #e2e8f0; font-family:inherit; font-size:0.85rem;">
+                </div>
+                <div style="margin:0;">
+                    <label style="display:block; font-size:0.75rem; font-weight:800; color:var(--teal-dark); margin-bottom:6px;">번호 범위</label>
+                    <div style="display:flex; align-items:center; gap:6px;">
+                        <input type="number" id="rosterStartInput" min="1" max="99" placeholder="1" style="width:56px; padding:10px; border-radius:10px; border:2px solid #e2e8f0; font-family:inherit; font-size:0.85rem;">
+                        <span style="color:var(--text-sub);">~</span>
+                        <input type="number" id="rosterEndInput" min="1" max="99" placeholder="28" style="width:56px; padding:10px; border-radius:10px; border:2px solid #e2e8f0; font-family:inherit; font-size:0.85rem;">
+                    </div>
+                </div>
+                <button class="save-btn" style="flex:0 0 auto; padding:11px 18px;" onclick="addRosterEntry()">추가</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 미제출 학생 확인 결과 모달 -->
+    <div class="modal-overlay" id="missingModal">
+        <div class="detail-card" style="width:440px;">
+            <div class="detail-top">
+                <div>
+                    <h3 id="missingTitle">미제출 확인</h3>
+                    <div class="sub" id="missingSub"></div>
+                </div>
+                <button class="close-x" onclick="closeMissingModal()">✕</button>
+            </div>
+            <div id="missingBody" style="max-height:340px; overflow-y:auto;"></div>
+        </div>
+    </div>
+
+    <!-- 학급/학년 통계 모달 -->
+    <div class="modal-overlay" id="classStatsModal">
+        <div class="detail-card" style="width:460px;">
+            <div class="detail-top">
+                <div>
+                    <h3 id="classStatsTitle">📊 학년/학급/학생별 통계</h3>
+                    <div class="sub" id="classStatsSub">평균 점수를 학년별 또는 반별로 비교해서 볼 수 있어요</div>
+                </div>
+                <button class="close-x" onclick="closeClassStatsModal()">✕</button>
+            </div>
+            <div class="stat-tabs">
+                <button class="stat-tab-btn" id="statTabGrade" onclick="switchClassStatsTab('grade')">🎓 학년별</button>
+                <button class="stat-tab-btn" id="statTabClass" onclick="switchClassStatsTab('class')">🏫 학급별</button>
+                <button class="stat-tab-btn" id="statTabStudent" onclick="switchClassStatsTab('student')">🙋 학생별</button>
+            </div>
+            <select class="stat-unit-select" id="classStatsUnitFilter" onchange="renderClassStats()">
+                <option value="">전체 단원 (모든 제출 기준)</option>
+            </select>
+            <div class="stat-student-combo" id="classStatsStudentWrap" style="display:none;">
+                <input type="text" class="stat-unit-select" id="classStatsStudentFilter"
+                    placeholder="🔍 학번 검색 또는 선택" autocomplete="off"
+                    oninput="onStudentSearchInput()" onfocus="openStudentDropdown()" onclick="openStudentDropdown()">
+                <div class="stat-student-dropdown" id="classStatsStudentDropdown"></div>
+            </div>
+            <div id="classStatsBody" style="max-height:360px; overflow-y:auto;"></div>
+        </div>
+    </div>
+
+    <!-- 학생별 통합 뷰 모달 -->
+    <div class="modal-overlay" id="overviewModal">
+        <div class="detail-card" style="width:520px;">
+            <div class="detail-top">
+                <div>
+                    <h3 id="overviewTitle">학번</h3>
+                    <div class="sub" id="overviewSub"></div>
+                </div>
+                <button class="close-x" onclick="closeStudentOverview()">✕</button>
+            </div>
+            <div id="overviewChart"></div>
+            <div id="overviewBody" style="max-height:400px; overflow-y:auto;"></div>
+        </div>
+    </div>
+
+    <!-- 피드백 빠른 문구 관리 모달 -->
+    <div class="modal-overlay" id="phraseManageModal">
+        <div class="detail-card" style="width:440px;">
+            <div class="detail-top">
+                <div>
+                    <h3>✏️ 빠른 문구 관리</h3>
+                    <div class="sub">한 줄에 하나씩 입력하세요 (서버에 저장되어 어떤 기기에서 열어도 같은 문구가 보여요)</div>
+                </div>
+                <button class="close-x" onclick="closePhraseManageModal()">✕</button>
+            </div>
+            <textarea id="phraseManageInput" style="width:100%; min-height:180px; padding:14px 16px; border-radius:14px; border:2px solid #e2e8f0; font-family:inherit; font-size:0.88rem; resize:vertical; outline:none; line-height:1.6; margin-bottom:16px; box-sizing:border-box;"></textarea>
+            <div class="detail-actions" style="margin-top:0;">
+                <button class="save-btn" id="phraseManageSaveBtn" onclick="savePhrasesFromManage()">저장</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast"></div>
+
+    <script>
+        let ENDPOINT = '';
+        let ADMIN_SECRET = '';
+        let allRows = [];
+        let sortKey = 'timestamp';
+        let sortDir = -1; // 최신순 기본
+        let currentDetail = null; // { studentId, unitId }
+        // 🌟 [추가] 학급/학년 단위 일괄 재제출 요청: 체크박스로 선택한 (학번+단원) 쌍의 집합
+        let selectedKeys = new Set();
+        let bulkResubmitTargets = [];
+        // 🌟 [추가] 학급/학년 통계 모달의 현재 탭('grade' 또는 'class')
+        let classStatsMode = 'grade';
+        // 🌟 [추가] 학생별 탭의 검색 드롭다운에 쓸 전체 학번 목록
+        let classStatsStudentIds = [];
+
+        const LS_ENDPOINT = 'bitbox_dash_endpoint';
+        const LS_SECRET = 'bitbox_dash_secret';
+
+        window.onload = function () {
+            renderQuickPhrases();
+            const savedEndpoint = localStorage.getItem(LS_ENDPOINT);
+            const savedSecret = localStorage.getItem(LS_SECRET);
+            if (savedEndpoint && savedSecret) {
+                document.getElementById('endpointInput').value = savedEndpoint;
+                document.getElementById('adminSecretInput').value = savedSecret;
+                connect();
+            }
+        };
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2200);
+        }
+
+        function connect() {
+            const endpoint = document.getElementById('endpointInput').value.trim();
+            const secret = document.getElementById('adminSecretInput').value.trim();
+            const errEl = document.getElementById('setupError');
+            errEl.textContent = '';
+
+            if (!endpoint || endpoint.indexOf('http') !== 0) {
+                errEl.textContent = '올바른 웹 앱 URL을 입력해주세요.';
+                return;
+            }
+            if (!secret) {
+                errEl.textContent = 'ADMIN_SECRET 값을 입력해주세요.';
+                return;
+            }
+
+            ENDPOINT = endpoint;
+            ADMIN_SECRET = secret;
+
+            const btn = document.getElementById('connectBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spin"></span> 연결 중...';
+
+            fetchList().then(() => {
+                localStorage.setItem(LS_ENDPOINT, endpoint);
+                localStorage.setItem(LS_SECRET, secret);
+                document.getElementById('setupScreen').style.display = 'none';
+                document.getElementById('dashScreen').style.display = 'block';
+                document.getElementById('headerActions').style.display = 'flex';
+            }).catch(err => {
+                errEl.textContent = err.message || '연결에 실패했습니다.';
+            }).finally(() => {
+                btn.disabled = false;
+                btn.innerHTML = '연결하기';
+            });
+        }
+
+        function fetchList() {
+            const url = ENDPOINT + '?action=list&secret=' + encodeURIComponent(ADMIN_SECRET);
+            return fetch(url)
+                .then(res => res.json())
+                .then(data => {
+                    if (!data.ok) {
+                        if (data.error === 'AUTH_FAILED') throw new Error('ADMIN_SECRET이 올바르지 않습니다. Code.gs 값과 다시 확인해주세요.');
+                        throw new Error(data.error || '알 수 없는 오류');
+                    }
+                    allRows = data.rows || [];
+                    populateUnitFilter();
+                    populateGradeFilter();
+                    populateClassFilter();
+                    renderStats();
+                    renderTable();
+                    fetchPhrases();
+                    fetchRoster();
+                })
+                .catch(err => {
+                    if (err instanceof TypeError) throw new Error('서버에 연결할 수 없습니다. URL과 인터넷 연결을 확인해주세요.');
+                    throw err;
+                });
+        }
+
+        function loadData(manual) {
+            fetchList().then(() => { if (manual) showToast('새로고침 완료'); })
+                .catch(err => showToast('불러오기 실패: ' + err.message));
+        }
+
+        function logout() {
+            localStorage.removeItem(LS_ENDPOINT);
+            localStorage.removeItem(LS_SECRET);
+            location.reload();
+        }
+
+        function populateUnitFilter() {
+            const sel = document.getElementById('unitFilter');
+            const cur = sel.value;
+            const units = [...new Set(allRows.map(r => r.unitTitle).filter(Boolean))];
+            sel.innerHTML = '<option value="">제출 단원 검색</option>' +
+                units.map(u => `<option value="${escapeHtml(u)}">${escapeHtml(u)}</option>`).join('');
+            sel.value = cur;
+        }
+
+        // 🌟 [추가] 학년/반 검색창을 <select>로 바꿔, 지우면 빈칸이 되는 대신
+        // "전체 학년"/"전체 반"이라는 명확한 기본값으로 항상 돌아오게 함.
+        // 실제 데이터에 있는 학년/반만 옵션으로 채워짐.
+        function populateGradeFilter() {
+            const sel = document.getElementById('gradeFilterInput');
+            const cur = sel.value;
+            const grades = [...new Set(allRows.map(r => getStudentGradePart(r.studentId)).filter(Boolean))]
+                .sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
+            sel.innerHTML = '<option value="">🎓 전체 학년</option>' +
+                grades.map(g => `<option value="${g}">${parseInt(g, 10)}학년</option>`).join('');
+            sel.value = cur;
+        }
+
+        function populateClassFilter() {
+            const sel = document.getElementById('classFilterInput');
+            const cur = sel.value;
+            const classes = [...new Set(allRows.map(r => getStudentClassPart(r.studentId)).filter(Boolean))]
+                .sort((a, b) => parseInt(a, 10) - parseInt(b, 10));
+            sel.innerHTML = '<option value="">🏫 전체 반</option>' +
+                classes.map(c => `<option value="${c}">${parseInt(c, 10)}반</option>`).join('');
+            sel.value = cur;
+        }
+
+        function renderStats() {
+            const total = allRows.length;
+            const students = new Set(allRows.map(r => r.studentId)).size;
+            const pending = allRows.filter(r => !r.feedback).length;
+            const avg = total ? (allRows.reduce((s, r) => s + (Number(r.score) || 0), 0) / total).toFixed(1) : '0';
+            document.getElementById('statTotal').textContent = total;
+            document.getElementById('statStudents').textContent = students;
+            document.getElementById('statPending').textContent = pending;
+            document.getElementById('statAvg').textContent = avg;
+        }
+
+        // ── 📊 학급/학년/학생 통계 ────────────────────────────────────────
+        function openClassStatsModal() {
+            const sel = document.getElementById('classStatsUnitFilter');
+            const cur = sel.value;
+            const units = [...new Set(allRows.map(r => r.unitTitle).filter(Boolean))];
+            sel.innerHTML = '<option value="">전체 단원 (모든 제출 기준)</option>' +
+                units.map(u => `<option value="${escapeHtml(u)}">${escapeHtml(u)}</option>`).join('');
+            sel.value = cur;
+
+            const stuInput = document.getElementById('classStatsStudentFilter');
+            const curStu = stuInput.value;
+            classStatsStudentIds = [...new Set(allRows.map(r => r.studentId).filter(Boolean))]
+                .sort((a, b) => String(a).localeCompare(String(b), undefined, { numeric: true }));
+            stuInput.value = classStatsStudentIds.includes(curStu) ? curStu : (classStatsStudentIds[0] || '');
+            closeStudentDropdown();
+
+            switchClassStatsTab(classStatsMode);
+            document.getElementById('classStatsModal').style.display = 'flex';
+        }
+
+        function closeClassStatsModal() {
+            document.getElementById('classStatsModal').style.display = 'none';
+            closeStudentDropdown();
+        }
+
+        function switchClassStatsTab(mode) {
+            classStatsMode = mode;
+            document.getElementById('statTabGrade').classList.toggle('active', mode === 'grade');
+            document.getElementById('statTabClass').classList.toggle('active', mode === 'class');
+            document.getElementById('statTabStudent').classList.toggle('active', mode === 'student');
+            document.getElementById('classStatsUnitFilter').style.display = mode === 'student' ? 'none' : '';
+            document.getElementById('classStatsStudentWrap').style.display = mode === 'student' ? '' : 'none';
+            if (mode !== 'student') closeStudentDropdown();
+            document.getElementById('classStatsSub').textContent = mode === 'student'
+                ? '학생 한 명을 골라 제출 이력과 점수 변화를 볼 수 있어요'
+                : '평균 점수를 학년별 또는 반별로 비교해서 볼 수 있어요';
+            renderClassStats();
+        }
+
+        // 🌟 [추가] 학생별 검색 드롭다운: 클릭하면 전체 학번을, 입력하면 일치하는 학번만 보여줌.
+        // 네이티브 <datalist>가 브라우저에 따라 클릭으로 안 열리는 문제를 피하려고 직접 구현함.
+        function renderStudentDropdown(filterText) {
+            const dd = document.getElementById('classStatsStudentDropdown');
+            const q = (filterText || '').trim().toLowerCase();
+            const matches = q ? classStatsStudentIds.filter(id => String(id).toLowerCase().includes(q)) : classStatsStudentIds;
+            if (!matches.length) {
+                dd.innerHTML = '<div class="stat-student-option empty">일치하는 학번이 없어요</div>';
+            } else {
+                dd.innerHTML = matches.map(id =>
+                    `<div class="stat-student-option" onmousedown='event.preventDefault(); selectStudentOption(${JSON.stringify(id)})'>${escapeHtml(id)}</div>`
+                ).join('');
+            }
+        }
+
+        function openStudentDropdown() {
+            // 포커스/클릭으로 열 때는 검색어와 상관없이 항상 전체 학번 목록을 보여줌
+            // (기존 <select>를 눌렀을 때와 같은 느낌 — 목록을 훑어볼 수 있어야 함).
+            renderStudentDropdown('');
+            document.getElementById('classStatsStudentDropdown').classList.add('show');
+        }
+
+        function closeStudentDropdown() {
+            document.getElementById('classStatsStudentDropdown').classList.remove('show');
+        }
+
+        function onStudentSearchInput() {
+            const val = document.getElementById('classStatsStudentFilter').value;
+            renderStudentDropdown(val);
+            document.getElementById('classStatsStudentDropdown').classList.add('show');
+            renderClassStats();
+        }
+
+        function selectStudentOption(id) {
+            document.getElementById('classStatsStudentFilter').value = id;
+            closeStudentDropdown();
+            renderClassStats();
+        }
+
+        document.addEventListener('click', function (e) {
+            const wrap = document.getElementById('classStatsStudentWrap');
+            if (wrap && !wrap.contains(e.target)) closeStudentDropdown();
+        });
+
+        function renderClassStats() {
+            const body = document.getElementById('classStatsBody');
+
+            if (classStatsMode === 'student') {
+                renderStudentStats(body);
+                return;
+            }
+
+            const unit = document.getElementById('classStatsUnitFilter').value;
+            const rows = unit ? allRows.filter(r => r.unitTitle === unit) : allRows;
+
+            if (!rows.length) {
+                body.innerHTML = '<div class="stat-empty">해당 조건에 맞는 제출 데이터가 없어요.</div>';
+                return;
+            }
+
+            const avgOf = list => (list.reduce((s, r) => s + (Number(r.score) || 0), 0) / list.length);
+            const overallAvg = avgOf(rows);
+
+            // 그룹 키: 학년별이면 "1", 반별이면 "1-01" (학년+반) 형태로 묶어서 숫자 순 정렬
+            const groups = new Map();
+            rows.forEach(r => {
+                const g = getStudentGradePart(r.studentId);
+                const c = getStudentClassPart(r.studentId);
+                if (!g) return;
+                const key = classStatsMode === 'grade' ? g : `${g}-${c}`;
+                if (!groups.has(key)) groups.set(key, []);
+                groups.get(key).push(r);
+            });
+
+            const entries = [...groups.entries()].sort((a, b) => {
+                const [ag, ac] = a[0].split('-'); const [bg, bc] = b[0].split('-');
+                if (ag !== bg) return parseInt(ag, 10) - parseInt(bg, 10);
+                return parseInt(ac || '0', 10) - parseInt(bc || '0', 10);
+            });
+
+            const barRow = (label, avg, count, extraClass) => {
+                const low = avg < 70;
+                return `<div class="group-bar-row ${extraClass || ''}">
+                    <div class="group-bar-head">
+                        <span class="group-bar-label">${escapeHtml(label)}</span>
+                        <span class="group-bar-value">${avg.toFixed(1)}점</span>
+                    </div>
+                    <div class="group-bar-track">
+                        <div class="group-bar-fill ${extraClass === 'overall' ? 'overall' : (low ? 'low' : '')}" style="width:${Math.max(0, Math.min(100, avg))}%;"></div>
+                    </div>
+                    <div class="group-bar-meta">제출 ${count}건</div>
+                </div>`;
+            };
+
+            let html = barRow('전체 평균', overallAvg, rows.length, 'overall');
+            html += entries.map(([key, list]) => {
+                const [g, c] = key.split('-');
+                const label = classStatsMode === 'grade' ? `${parseInt(g, 10)}학년` : `${parseInt(g, 10)}학년 ${parseInt(c, 10)}반`;
+                return barRow(label, avgOf(list), list.length);
+            }).join('');
+
+            body.innerHTML = html;
+        }
+
+        // 🌟 [추가] 학급/학년 통계 모달의 "학생별" 탭: 고른 학생 한 명의 전체 제출
+        // 이력과 점수 변화 그래프를 학생별 통합 뷰(openStudentOverview)와 같은 방식으로 보여줌.
+        function renderStudentStats(body) {
+            const studentId = document.getElementById('classStatsStudentFilter').value.trim();
+            if (!studentId) {
+                body.innerHTML = '<div class="stat-empty">학번을 검색하거나 목록에서 선택해주세요.</div>';
+                return;
+            }
+            const rows = allRows.filter(r => String(r.studentId) === String(studentId))
+                .sort((a, b) => (new Date(b.timestamp).getTime() || 0) - (new Date(a.timestamp).getTime() || 0));
+            if (!rows.length) {
+                body.innerHTML = '<div class="stat-empty">"' + escapeHtml(studentId) + '" 학번의 제출 기록을 찾을 수 없어요. 목록에서 선택해보세요.</div>';
+                return;
+            }
+            const avg = (rows.reduce((s, r) => s + (Number(r.score) || 0), 0) / rows.length).toFixed(1);
+            body.innerHTML = `<div class="group-bar-meta" style="margin-bottom:10px; font-size:0.8rem;">🙋 <b style="color:var(--text-main);">${escapeHtml(studentId)}</b> · 총 ${rows.length}건 제출 · 평균 ${avg}점</div>`
+                + buildScoreTrendSVG(rows)
+                + buildOverviewRowsHTML(rows, 'closeClassStatsModal');
+        }
+
+        document.getElementById('classStatsModal').addEventListener('click', function (e) {
+            if (e.target === this) closeClassStatsModal();
+        });
+
+        function sortBy(key) {
+            if (sortKey === key) sortDir *= -1; else { sortKey = key; sortDir = 1; }
+            renderTable();
+        }
+
+        // 🌟 [수정] "학년"과 "반"을 각각 따로 검색할 수 있도록, 학번 형식(1번째=학년,
+        // 2~3번째=반, 4~5번째=번호. 예: 10101 → 1학년 01반 01번)에서 각각 뽑아냅니다.
+        // (r.className이 실제로 채워져 있으면 그 값도 함께 확인합니다.)
+        function getStudentGradePart(studentId) {
+            const sid = String(studentId || '');
+            return /^[0-9]{5}$/.test(sid) ? sid.substring(0, 1) : ''; // "1" 형태
+        }
+        function getStudentClassPart(studentId) {
+            const sid = String(studentId || '');
+            return /^[0-9]{5}$/.test(sid) ? sid.substring(1, 3) : ''; // "01" 형태
+        }
+
+        // 숫자 검색어와 학번에서 뽑아낸 자리(앞자리 0 포함 가능)를 비교. "1"과 "01"을 같은 값으로 취급.
+        function numPartMatches(part, query) {
+            if (!part) return false;
+            const partNum = String(parseInt(part, 10));
+            const qNum = /^[0-9]+$/.test(query) ? String(parseInt(query, 10)) : '';
+            return (qNum && partNum === qNum) || part.indexOf(query) !== -1;
+        }
+
+        function getFiltered() {
+            const gradeQ = document.getElementById('gradeFilterInput').value.trim();
+            const classQ = document.getElementById('classFilterInput').value.trim();
+            const q = document.getElementById('searchInput').value.trim();
+            const unit = document.getElementById('unitFilter').value;
+            const fb = document.getElementById('fbFilter').value;
+
+            return allRows.filter(r => {
+                if (gradeQ) {
+                    const gradePart = getStudentGradePart(r.studentId); // 예: "1"
+                    if (!numPartMatches(gradePart, gradeQ)) return false;
+                }
+                if (classQ) {
+                    const classPart = getStudentClassPart(r.studentId); // 예: "01"
+                    const classMatch = numPartMatches(classPart, classQ) ||
+                        (String(r.className || '').indexOf(classQ) !== -1); // className을 쓰는 경우 대비
+                    if (!classMatch) return false;
+                }
+                if (q && String(r.studentId).indexOf(q) === -1) return false;
+                if (unit && r.unitTitle !== unit) return false;
+                if (fb === 'pending' && r.feedback) return false;
+                if (fb === 'done' && !r.feedback) return false;
+                return true;
+            }).sort((a, b) => {
+                let av = a[sortKey], bv = b[sortKey];
+                if (sortKey === 'timestamp') { av = new Date(av).getTime() || 0; bv = new Date(bv).getTime() || 0; }
+                if (sortKey === 'score') { av = Number(av) || 0; bv = Number(bv) || 0; }
+                if (sortKey === 'feedback') { av = a.feedback ? 1 : 0; bv = b.feedback ? 1 : 0; }
+                if (av < bv) return -1 * sortDir;
+                if (av > bv) return 1 * sortDir;
+                return 0;
+            });
+        }
+
+        function selKey(r) { return String(r.studentId) + '__' + String(r.unitId); }
+
+        function syncSelectAllCheckbox(rows) {
+            const cb = document.getElementById('selectAllCheckbox');
+            if (!cb) return;
+            const total = rows.length;
+            const selectedInView = rows.filter(r => selectedKeys.has(selKey(r))).length;
+            cb.checked = total > 0 && selectedInView === total;
+            cb.indeterminate = selectedInView > 0 && selectedInView < total;
+        }
+
+        function renderTable() {
+            const rows = getFiltered();
+            const tbody = document.getElementById('tableBody');
+            const empty = document.getElementById('emptyState');
+            syncSelectAllCheckbox(rows);
+
+            if (!rows.length) {
+                tbody.innerHTML = '';
+                document.getElementById('dataTable').style.display = allRows.length ? 'table' : 'none';
+                empty.style.display = 'block';
+                empty.querySelector('.icon').nextSibling ? null : null;
+                empty.innerHTML = allRows.length
+                    ? '<div class="icon">🔍</div>검색 조건에 맞는 데이터가 없습니다.'
+                    : '<div class="icon">📭</div>아직 제출된 데이터가 없습니다.';
+                return;
+            }
+            document.getElementById('dataTable').style.display = 'table';
+            empty.style.display = 'none';
+
+            tbody.innerHTML = rows.map(r => {
+                const scoreClass = (Number(r.score) || 0) >= 70 ? '' : 'low';
+                // 🌟 [수정] "피드백 작성"(선생님이 하는 일)과 "피드백 확인"(학생이 읽었는지)은
+                // 주체가 달라서 칸을 분리함. 작성 전이면 확인 여부 자체가 의미 없으므로 — 표시.
+                const fbBadge = r.feedback
+                    ? '<span class="fb-badge done">✅ 완료</span>'
+                    : '<span class="fb-badge pending">⏳ 대기</span>';
+                const readBadge = !r.feedback
+                    ? '<span style="color:#cbd5e1; font-size:0.8rem;">—</span>'
+                    : (r.feedbackReadAt
+                        ? '<span class="fb-badge read" title="학생이 확인했어요">👀 읽음</span>'
+                        : '<span class="fb-badge unread" title="학생이 아직 확인하지 않았어요">🔔 안읽음</span>');
+                const concernBadge = (hasConcern(r.memo) || hasConcern(r.reflection))
+                    ? ' <span class="concern-flag" title="소감/노트에 도움이 필요하다는 표현이 있어요">💭</span>' : '';
+                // 🌟 [수정] 재제출 요청 여부도 "피드백 확인" 옆에 별도 칸으로 표시 (단원 칸의 아이콘은 중복이라 제거)
+                const resubmitCell = r.resubmitRequested
+                    ? '<span class="fb-badge resubmit" title="교사가 재제출을 요청했어요">🔄 요청됨</span>'
+                    : '<span style="color:#cbd5e1; font-size:0.8rem;">—</span>';
+                const checked = selectedKeys.has(selKey(r)) ? 'checked' : '';
+                return `<tr onclick='openDetail(${JSON.stringify(r.studentId)}, ${JSON.stringify(r.unitId)})'>
+                    <td class="col-check" onclick="event.stopPropagation()">
+                        <input type="checkbox" class="row-check" ${checked}
+                            onchange="toggleRowSelect(${JSON.stringify(r.studentId)}, ${JSON.stringify(r.unitId)}, this.checked)">
+                    </td>
+                    <td class="student-id" title="이 학생의 전체 제출 이력 보기"
+                        onclick='event.stopPropagation(); openStudentOverview(${JSON.stringify(r.studentId)})'>${escapeHtml(r.studentId)}</td>
+                    <td>${escapeHtml(r.unitTitle || r.unitId || '')}${concernBadge}</td>
+                    <td class="col-center"><span class="score-pill ${scoreClass}">${escapeHtml(r.score)}</span></td>
+                    <td class="col-time">${formatDate(r.timestamp)}</td>
+                    <td class="col-feedback">${fbBadge}</td>
+                    <td class="col-feedback">${readBadge}</td>
+                    <td class="col-feedback">${resubmitCell}</td>
+                    <td class="col-del">
+                        <button class="row-del-btn" title="이 기록 삭제"
+                            onclick='event.stopPropagation(); openRowDeleteConfirm(${JSON.stringify(r.studentId)}, ${JSON.stringify(r.unitId)}, ${JSON.stringify(r.unitTitle || r.unitId || "")})'>🗑</button>
+                    </td>
+                    <td class="col-pin">
+                        <button class="row-pin-btn" title="이 학생 PIN 초기화"
+                            onclick='event.stopPropagation(); openPinResetConfirm(${JSON.stringify(r.studentId)})'>🔑</button>
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        // ── 학급/학년 일괄 재제출 요청 ────────────────────────────────────────────
+        function toggleRowSelect(studentId, unitId, checked) {
+            const key = String(studentId) + '__' + String(unitId);
+            if (checked) selectedKeys.add(key); else selectedKeys.delete(key);
+            syncSelectAllCheckbox(getFiltered());
+            updateBulkBar();
+        }
+
+        function toggleSelectAll(checked) {
+            const rows = getFiltered();
+            rows.forEach(r => {
+                const key = selKey(r);
+                if (checked) selectedKeys.add(key); else selectedKeys.delete(key);
+            });
+            renderTable();
+            updateBulkBar();
+        }
+
+        function clearSelection() {
+            selectedKeys.clear();
+            renderTable();
+            updateBulkBar();
+        }
+
+        function updateBulkBar() {
+            const btn = document.getElementById('bulkResubmitBtn');
+            const clearBtn = document.getElementById('bulkClearBtn');
+            const n = selectedKeys.size;
+            if (btn) {
+                btn.disabled = n === 0;
+                btn.textContent = n > 0 ? `🔄 선택 ${n}건 재제출 요청` : '🔄 선택 재제출 요청';
+            }
+            if (clearBtn) clearBtn.style.display = n > 0 ? 'inline-block' : 'none';
+        }
+
+        function openBulkResubmitConfirm() {
+            const targets = allRows.filter(r => selectedKeys.has(selKey(r)));
+            if (!targets.length) return;
+            bulkResubmitTargets = targets;
+            document.getElementById('bulkResubmitCount').textContent = targets.length + '건';
+            const listEl = document.getElementById('bulkResubmitList');
+            const shown = targets.slice(0, 20).map(r => `${escapeHtml(r.studentId)} · ${escapeHtml(r.unitTitle || r.unitId || '')}`);
+            listEl.innerHTML = shown.join('<br>') + (targets.length > 20 ? `<br>… 외 ${targets.length - 20}건 더` : '');
+            document.getElementById('bulkResubmitConfirmModal').style.display = 'flex';
+        }
+
+        function closeBulkResubmitConfirm() {
+            document.getElementById('bulkResubmitConfirmModal').style.display = 'none';
+        }
+
+        function confirmBulkResubmit() {
+            const targets = bulkResubmitTargets;
+            if (!targets.length) return;
+            const btn = document.getElementById('bulkResubmitConfirmBtn');
+            const total = targets.length;
+            let done = 0, failed = 0;
+            btn.disabled = true;
+            btn.innerHTML = `<span class="spin"></span> 처리 중 (0/${total})`;
+
+            function next(i) {
+                if (i >= total) {
+                    closeBulkResubmitConfirm();
+                    selectedKeys.clear();
+                    renderTable();
+                    updateBulkBar();
+                    btn.disabled = false;
+                    btn.textContent = '재제출 요청';
+                    showToast(failed === 0
+                        ? `🔄 ${done}건 재제출을 요청했습니다`
+                        : `${done}건 요청 완료, ${failed}건 실패`);
+                    return;
+                }
+                const row = targets[i];
+                const payload = { action: 'requestResubmit', secret: ADMIN_SECRET, studentId: row.studentId, unitId: row.unitId, requested: true };
+                fetch(ENDPOINT, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify(payload)
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (!data.ok) throw new Error(data.error || '실패');
+                        row.resubmitRequested = true;
+                        done++;
+                    })
+                    .catch(() => { failed++; })
+                    .finally(() => {
+                        btn.innerHTML = `<span class="spin"></span> 처리 중 (${i + 1}/${total})`;
+                        next(i + 1);
+                    });
+            }
+            next(0);
+        }
+
+        function formatDate(v) {
+            const d = new Date(v);
+            if (isNaN(d.getTime())) return escapeHtml(v || '');
+            const pad = n => String(n).padStart(2, '0');
+            return `${d.getFullYear()}.${pad(d.getMonth() + 1)}.${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+        }
+
+        function escapeHtml(s) {
+            return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        }
+
+        function openDetail(studentId, unitId) {
+            const row = allRows.find(r => String(r.studentId) === String(studentId) && String(r.unitId) === String(unitId));
+            if (!row) return;
+            currentDetail = { studentId, unitId };
+
+            document.getElementById('detailTitle').textContent = `${row.studentId} · ${row.unitTitle || row.unitId}`;
+            document.getElementById('detailSub').textContent = '제출 ' + formatDate(row.timestamp) +
+                (row.elapsedSeconds ? ` · 소요 ${row.elapsedSeconds}초` : '');
+
+            const memoEl = document.getElementById('detailMemo');
+            const reflEl = document.getElementById('detailReflection');
+            memoEl.innerHTML = row.memo ? highlightConcernHtml(row.memo) : '';
+            memoEl.classList.toggle('empty', !row.memo);
+            reflEl.innerHTML = row.reflection ? highlightConcernHtml(row.reflection) : '';
+            reflEl.classList.toggle('empty', !row.reflection);
+
+            renderQuickPhrases();
+            renderResubmitToggleBtn(row);
+            document.getElementById('feedbackInput').value = row.feedback || '';
+            document.getElementById('fbMeta').textContent = row.feedbackDate ? `마지막 저장: ${row.feedbackDate}` : '아직 저장된 피드백이 없습니다.';
+
+            document.getElementById('detailModal').style.display = 'flex';
+        }
+
+        function closeDetail() {
+            document.getElementById('detailModal').style.display = 'none';
+            currentDetail = null;
+        }
+
+        function saveFeedback() {
+            if (!currentDetail) return;
+            const text = document.getElementById('feedbackInput').value;
+            const btn = document.getElementById('saveFeedbackBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spin"></span> 저장 중...';
+
+            const payload = {
+                action: 'feedback',
+                secret: ADMIN_SECRET,
+                studentId: currentDetail.studentId,
+                unitId: currentDetail.unitId,
+                feedback: text
+            };
+
+            fetch(ENDPOINT, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify(payload)
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (!data.ok) throw new Error(data.error || '저장 실패');
+                    const row = allRows.find(r => String(r.studentId) === String(currentDetail.studentId) && String(r.unitId) === String(currentDetail.unitId));
+                    if (row) {
+                        row.feedback = text;
+                        row.feedbackDate = new Date().toISOString();
+                    }
+                    showToast('✅ 피드백이 저장되었습니다');
+                    renderStats();
+                    renderTable();
+                    closeDetail();
+                })
+                .catch(err => showToast('저장 실패: ' + err.message))
+                .finally(() => {
+                    btn.disabled = false;
+                    btn.innerHTML = '피드백 저장';
+                });
+        }
+
+        document.getElementById('detailModal').addEventListener('click', function (e) {
+            if (e.target === this) closeDetail();
+        });
+
+        // ── 재제출 요청 (선생님이 이 제출 건에 "다시 제출해달라" 표시) ──────────────────────
+        // 서버에 저장되므로, 학생이 다른 날/다른 기기에서 학번+PIN으로 피드백을 확인해도 보입니다.
+        function renderResubmitToggleBtn(row) {
+            const btn = document.getElementById('resubmitToggleBtn');
+            if (!btn) return;
+            if (row.resubmitRequested) {
+                btn.classList.add('active');
+                btn.textContent = '🔄 요청됨 (취소)';
+                btn.title = '재제출 요청됨 — 클릭하면 취소';
+            } else {
+                btn.classList.remove('active');
+                btn.textContent = '🔄 재제출 요청';
+                btn.title = '클릭하면 학생에게 재제출을 요청합니다';
+            }
+        }
+
+        function toggleResubmitRequest() {
+            if (!currentDetail) return;
+            const row = allRows.find(r => String(r.studentId) === String(currentDetail.studentId) && String(r.unitId) === String(currentDetail.unitId));
+            if (!row) return;
+            const newState = !row.resubmitRequested;
+            const btn = document.getElementById('resubmitToggleBtn');
+            btn.disabled = true;
+
+            const payload = { action: 'requestResubmit', secret: ADMIN_SECRET, studentId: row.studentId, unitId: row.unitId, requested: newState };
+            fetch(ENDPOINT, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify(payload)
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (!data.ok) throw new Error(data.error || '처리 실패');
+                    row.resubmitRequested = newState;
+                    renderResubmitToggleBtn(row);
+                    renderTable();
+                    showToast(newState ? '🔄 재제출을 요청했습니다' : '재제출 요청을 취소했습니다');
+                })
+                .catch(err => showToast('처리 실패: ' + err.message))
+                .finally(() => { btn.disabled = false; });
+        }
+
+        // ── PIN 초기화 (학생이 PIN을 잊어버렸을 때) ──────────────────────────────────
+        // 🌟 [수정] 상세보기 모달을 열지 않아도 표에서 바로 누를 수 있도록, 행의 🔑 버튼이
+        // studentId를 직접 넘겨줍니다. PIN은 학번 단위로 저장되므로(단원별이 아님) 그 학생의
+        // 어떤 단원 행에서 눌러도 같은 PIN 등록이 초기화됩니다.
+        let pinResetTarget = null; // studentId
+
+        function openPinResetConfirm(studentId) {
+            if (!studentId) return;
+            pinResetTarget = studentId;
+            document.getElementById('pinResetLabel').textContent = studentId;
+            document.getElementById('pinResetConfirmBtn').disabled = false;
+            document.getElementById('pinResetConfirmBtn').innerHTML = '초기화';
+            document.getElementById('pinResetConfirmModal').style.display = 'flex';
+        }
+
+        function closePinResetConfirm() {
+            document.getElementById('pinResetConfirmModal').style.display = 'none';
+            pinResetTarget = null;
+        }
+
+        function confirmResetPin() {
+            if (!pinResetTarget) return;
+            const studentId = pinResetTarget;
+            const btn = document.getElementById('pinResetConfirmBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spin"></span> 초기화 중...';
+
+            const payload = { action: 'resetPin', secret: ADMIN_SECRET, studentId: studentId };
+
+            fetch(ENDPOINT, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify(payload)
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (!data.ok) throw new Error(data.error === 'NOT_FOUND' ? '등록된 PIN이 없습니다.' : (data.error || '초기화 실패'));
+                    showToast(`🔑 ${studentId} 학생의 PIN이 초기화되었습니다`);
+                    closePinResetConfirm();
+                })
+                .catch(err => showToast('초기화 실패: ' + err.message))
+                .finally(() => {
+                    btn.disabled = false;
+                    btn.innerHTML = '초기화';
+                });
+        }
+
+        document.getElementById('pinResetConfirmModal').addEventListener('click', function (e) {
+            if (e.target === this) closePinResetConfirm();
+        });
+
+        // ── 전체 학생 PIN 초기화 ──────────────────────────────────
+        function openPinResetAllConfirm() {
+            document.getElementById('pinResetAllConfirmBtn').disabled = false;
+            document.getElementById('pinResetAllConfirmBtn').innerHTML = '전체 초기화';
+            document.getElementById('pinResetAllConfirmModal').style.display = 'flex';
+        }
+
+        function closePinResetAllConfirm() {
+            document.getElementById('pinResetAllConfirmModal').style.display = 'none';
+        }
+
+        function confirmResetAllPins() {
+            const btn = document.getElementById('pinResetAllConfirmBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spin"></span> 초기화 중...';
+
+            const payload = { action: 'resetAllPins', secret: ADMIN_SECRET };
+
+            fetch(ENDPOINT, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify(payload)
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (!data.ok) throw new Error(data.error || '초기화 실패');
+                    closePinResetAllConfirm();
+                    showToast('🔑 전체 학생의 PIN이 초기화되었습니다');
+                })
+                .catch(err => showToast('초기화 실패: ' + err.message))
+                .finally(() => {
+                    btn.disabled = false;
+                    btn.innerHTML = '전체 초기화';
+                });
+        }
+
+        document.getElementById('pinResetAllConfirmModal').addEventListener('click', function (e) {
+            if (e.target === this) closePinResetAllConfirm();
+        });
+
+        document.getElementById('bulkResubmitConfirmModal').addEventListener('click', function (e) {
+            if (e.target === this) closeBulkResubmitConfirm();
+        });
+
+        // ── 전체 삭제 ──────────────────────────────────
+        const DELETE_CONFIRM_WORD = '전체삭제';
+
+        function openDeleteConfirm() {
+            document.getElementById('deleteRowCount').textContent = allRows.length;
+            document.getElementById('deleteConfirmInput').value = '';
+            document.getElementById('deleteConfirmBtn').disabled = true;
+            document.getElementById('deleteConfirmModal').style.display = 'flex';
+            setTimeout(() => document.getElementById('deleteConfirmInput').focus(), 50);
+        }
+
+        function closeDeleteConfirm() {
+            document.getElementById('deleteConfirmModal').style.display = 'none';
+        }
+
+        function checkDeleteConfirmInput() {
+            const val = document.getElementById('deleteConfirmInput').value.trim();
+            document.getElementById('deleteConfirmBtn').disabled = (val !== DELETE_CONFIRM_WORD);
+        }
+
+        function confirmDeleteAll() {
+            const btn = document.getElementById('deleteConfirmBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spin"></span> 삭제 중...';
+
+            const payload = { action: 'clearAll', secret: ADMIN_SECRET };
+
+            fetch(ENDPOINT, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify(payload)
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (!data.ok) throw new Error(data.error || '삭제 실패');
+                    allRows = [];
+                    populateUnitFilter();
+                    renderStats();
+                    renderTable();
+                    closeDeleteConfirm();
+                    showToast('🗑 전체 데이터가 삭제되었습니다');
+                })
+                .catch(err => showToast('삭제 실패: ' + err.message))
+                .finally(() => {
+                    btn.innerHTML = '완전히 삭제';
+                    // 다음에 열 때 다시 입력해야 하므로 disabled 상태는 openDeleteConfirm에서 재설정됨
+                });
+        }
+
+        document.getElementById('deleteConfirmModal').addEventListener('click', function (e) {
+            if (e.target === this) closeDeleteConfirm();
+        });
+
+        // ── 개별 기록 삭제 ──────────────────────────────────
+        let rowToDelete = null; // { studentId, unitId }
+
+        function openRowDeleteConfirm(studentId, unitId, label) {
+            rowToDelete = { studentId, unitId };
+            document.getElementById('rowDeleteLabel').textContent = `${studentId} · ${label}`;
+            document.getElementById('rowDeleteConfirmBtn').disabled = false;
+            document.getElementById('rowDeleteConfirmBtn').innerHTML = '삭제';
+            document.getElementById('rowDeleteConfirmModal').style.display = 'flex';
+        }
+
+        function closeRowDeleteConfirm() {
+            document.getElementById('rowDeleteConfirmModal').style.display = 'none';
+            rowToDelete = null;
+        }
+
+        function confirmDeleteRow() {
+            if (!rowToDelete) return;
+            const btn = document.getElementById('rowDeleteConfirmBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spin"></span> 삭제 중...';
+
+            const payload = { action: 'deleteRow', secret: ADMIN_SECRET, studentId: rowToDelete.studentId, unitId: rowToDelete.unitId };
+
+            fetch(ENDPOINT, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify(payload)
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (!data.ok) throw new Error(data.error || '삭제 실패');
+                    allRows = allRows.filter(r => !(String(r.studentId) === String(rowToDelete.studentId) && String(r.unitId) === String(rowToDelete.unitId)));
+                    populateUnitFilter();
+                    renderStats();
+                    renderTable();
+                    closeRowDeleteConfirm();
+                    showToast('🗑 기록이 삭제되었습니다');
+                })
+                .catch(err => {
+                    showToast('삭제 실패: ' + err.message);
+                    btn.disabled = false;
+                    btn.innerHTML = '삭제';
+                });
+        }
+
+        document.getElementById('rowDeleteConfirmModal').addEventListener('click', function (e) {
+            if (e.target === this) closeRowDeleteConfirm();
+        });
+
+        // ── 소감/노트 걱정 키워드 하이라이트 ──────────────────────────────────
+        // 학생이 소감이나 배움노트에 "어렵다", "모르겠다" 류의 표현을 남기면
+        // 표에서 💭 표시로 눈에 띄게 하고, 상세보기에서는 노란색으로 하이라이트합니다.
+        const CONCERN_KEYWORDS = ['어렵', '모르겠', '헷갈', '이해가 안', '잘 모르', '어려워', '힘들', '모르는'];
+
+        function hasConcern(text) {
+            if (!text) return false;
+            const s = String(text);
+            return CONCERN_KEYWORDS.some(k => s.indexOf(k) !== -1);
+        }
+
+        function highlightConcernHtml(text) {
+            let s = escapeHtml(text || '');
+            CONCERN_KEYWORDS.forEach(k => {
+                const ek = escapeHtml(k);
+                if (!ek) return;
+                s = s.split(ek).join(`<mark class="hl-concern">${ek}</mark>`);
+            });
+            return s;
+        }
+
+        // ── 학생별 통합 뷰 (학번 클릭 시 그 학생의 전체 제출 이력 모아보기) ──────
+        function openStudentOverview(studentId) {
+            const rows = allRows.filter(r => String(r.studentId) === String(studentId))
+                .sort((a, b) => (new Date(b.timestamp).getTime() || 0) - (new Date(a.timestamp).getTime() || 0));
+            if (!rows.length) return;
+            const avg = (rows.reduce((s, r) => s + (Number(r.score) || 0), 0) / rows.length).toFixed(1);
+            document.getElementById('overviewTitle').textContent = `🙋 ${studentId}`;
+            document.getElementById('overviewSub').textContent = `총 ${rows.length}건 제출 · 평균 ${avg}점`;
+            document.getElementById('overviewBody').innerHTML = buildOverviewRowsHTML(rows, 'closeStudentOverview');
+            document.getElementById('overviewChart').innerHTML = buildScoreTrendSVG(rows);
+            document.getElementById('overviewModal').style.display = 'flex';
+        }
+
+        function closeStudentOverview() {
+            document.getElementById('overviewModal').style.display = 'none';
+        }
+
+        // 🌟 [추가] 제출 이력 목록(단원명/점수/피드백 상태)을 카드 목록 HTML로 만들어줌.
+        // 학생별 통합 뷰와 학급/학년 통계의 "학생별" 탭에서 함께 재사용.
+        // closeFn: 행을 클릭해 상세보기로 이동하기 전에 닫아야 할 모달의 닫기 함수 이름
+        function buildOverviewRowsHTML(rows, closeFn) {
+            return rows.map(r => {
+                const fbBadge = r.feedback
+                    ? '<span class="fb-badge done">✅ 완료</span>'
+                    : '<span class="fb-badge pending">⏳ 대기</span>';
+                const concernBadge = (hasConcern(r.memo) || hasConcern(r.reflection))
+                    ? ' <span class="concern-flag" title="소감/노트에 도움이 필요하다는 표현이 있어요">💭</span>' : '';
+                const resubmitBadge = r.resubmitRequested
+                    ? ' <span class="resubmit-flag" title="재제출을 요청했어요">🔄</span>' : '';
+                return `<div class="overview-row" onclick='${closeFn}(); openDetail(${JSON.stringify(r.studentId)}, ${JSON.stringify(r.unitId)})'>
+                    <div style="min-width:0;">
+                        <div style="font-weight:800; font-size:0.9rem;">${escapeHtml(r.unitTitle || r.unitId || '')}${concernBadge}${resubmitBadge}</div>
+                        <div style="font-size:0.75rem; color:var(--text-sub); margin-top:2px;">${formatDate(r.timestamp)}</div>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:8px; flex-shrink:0;">
+                        <span class="score-pill ${(Number(r.score) || 0) >= 70 ? '' : 'low'}">${escapeHtml(r.score)}</span>
+                        ${fbBadge}
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        // 🌟 [추가] 학생 한 명의 제출 이력을 시간순(오래된→최신)으로 이어, 점수가 어떻게
+        // 바뀌어왔는지 한눈에 볼 수 있는 꺾은선 그래프를 SVG로 직접 그림.
+        function truncateLabel(s, maxLen) {
+            s = String(s || '');
+            return s.length > maxLen ? s.slice(0, maxLen) + '…' : s;
+        }
+
+        // 🌟 [추가/수정] "3. 숫자의 디지털 표현", "1. 디지털 데이터의 가치"처럼 "~의 ..."로 끝나는
+        // 단원 제목을 마지막 "의" 뒤에서 두 줄로 나눔 (예: "3. 숫자의" / "디지털 표현",
+        // "1. 디지털 데이터의" / "가치"). "의"가 없는 제목(예: "2. 비트란?")은 null → 한 줄 표시 유지.
+        function splitUnitLabel(title) {
+            const s = String(title || '');
+            const m = s.match(/^(\d+\.\s*.+의)\s+(\S.*)$/);
+            return m ? { line1: m[1], line2: m[2] } : null;
+        }
+
+        function buildScoreTrendSVG(rows) {
+            const asc = [...rows].sort((a, b) => (new Date(a.timestamp).getTime() || 0) - (new Date(b.timestamp).getTime() || 0));
+            if (asc.length < 2) {
+                return '<div class="trend-chart-empty">📈 제출이 2건 이상 쌓이면 점수 변화 그래프가 여기 표시돼요.</div>';
+            }
+            // 🌟 [수정] x축=단원명, y축=20점 단위 눈금으로 표시. 단원명이 길 수 있어 아래쪽
+            // 여백(padB)을 넉넉히 주고, 라벨을 비스듬히(-35도) 기울여서 겹치지 않게 함.
+            const W = 460, H = 190, padL = 56, padR = 16, padT = 14, padB = 58;
+            const innerW = W - padL - padR, innerH = H - padT - padB;
+            const n = asc.length;
+            const xFor = i => padL + (n > 1 ? (innerW * i / (n - 1)) : innerW / 2);
+            const yFor = score => padT + innerH - (Math.max(0, Math.min(100, Number(score) || 0)) / 100) * innerH;
+            const refY = yFor(70);
+            const axisY = padT + innerH;
+
+            const pts = asc.map((r, i) => ({ x: xFor(i), y: yFor(r.score), r }));
+            const pathD = pts.map((p, i) => (i === 0 ? 'M' : 'L') + p.x.toFixed(1) + ' ' + p.y.toFixed(1)).join(' ');
+
+            // y축: 0~100점을 20점 간격으로 가로 눈금선 + 작은 숫자 라벨
+            const yTicks = [0, 20, 40, 60, 80, 100];
+            const yGrid = yTicks.map(t => {
+                const y = yFor(t);
+                return `<line class="trend-grid" x1="${padL}" y1="${y.toFixed(1)}" x2="${W - padR}" y2="${y.toFixed(1)}"/>` +
+                    `<text class="trend-ylabel" x="${(padL - 6).toFixed(1)}" y="${(y + 3).toFixed(1)}" text-anchor="end">${t}</text>`;
+            }).join('');
+
+            // x축: 각 점마다 단원명을 짧게 잘라 비스듬히 표시 (전체 이름은 점에 마우스를 올리면 나옴)
+            const xLabels = pts.map(p => {
+                const rawTitle = p.r.unitTitle || p.r.unitId || '';
+                const lx = p.x.toFixed(1), ly = (axisY + 12).toFixed(1);
+                const split = splitUnitLabel(rawTitle);
+                if (split) {
+                    // 3~7단원: "N. 주제의" / "디지털 표현" 두 줄, 둘 다 비스듬히(-35도) 표시
+                    return `<text class="trend-label" x="${lx}" y="${ly}" text-anchor="end" transform="rotate(-35 ${lx} ${ly})">` +
+                        `<tspan x="${lx}" dy="0">${escapeHtml(split.line1)}</tspan>` +
+                        `<tspan x="${lx}" dy="10">${escapeHtml(split.line2)}</tspan>` +
+                        `</text>`;
+                }
+                // 1, 2단원: 기존처럼 한 줄로 짧게 잘라 표시
+                const label = truncateLabel(rawTitle, 7);
+                return `<text class="trend-label" x="${lx}" y="${ly}" text-anchor="end" transform="rotate(-35 ${lx} ${ly})">${escapeHtml(label)}</text>`;
+            }).join('');
+
+            const circles = pts.map(p => {
+                const low = (Number(p.r.score) || 0) < 70;
+                const title = `${escapeHtml(p.r.unitTitle || p.r.unitId || '')} · ${escapeHtml(p.r.score)}점 · ${formatDate(p.r.timestamp)}`;
+                return `<circle class="trend-point ${low ? 'low' : ''}" cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="5"><title>${title}</title></circle>`;
+            }).join('');
+
+            return `<div class="trend-chart-wrap">
+                <svg viewBox="0 0 ${W} ${H}" width="100%" height="${H}" role="img" aria-label="학생 점수 변화 그래프 (가로축: 단원, 세로축: 점수)">
+                    ${yGrid}
+                    <line class="trend-ref" x1="${padL}" y1="${refY.toFixed(1)}" x2="${W - padR}" y2="${refY.toFixed(1)}" stroke-dasharray="3,3"/>
+                    <line class="trend-axis" x1="${padL}" y1="${axisY.toFixed(1)}" x2="${W - padR}" y2="${axisY.toFixed(1)}"/>
+                    <path class="trend-line" d="${pathD}"/>
+                    ${circles}
+                    ${xLabels}
+                </svg>
+            </div>`;
+        }
+
+        document.getElementById('overviewModal').addEventListener('click', function (e) {
+            if (e.target === this) closeStudentOverview();
+        });
+
+        // ── 반 학번 생성 & 미제출 학생 확인 ──────────────────────────────────
+        // 🌟 [수정] 학번 목록을 이 브라우저가 아니라 서버(구글시트 "반명단")에 저장합니다.
+        // 그래야 다른 컴퓨터나 다른 브라우저에서 대시보드를 열어도 같은 학번 목록을 볼 수 있어요.
+        let currentRoster = [];
+
+        function fetchRoster() {
+            const url = ENDPOINT + '?action=roster&secret=' + encodeURIComponent(ADMIN_SECRET);
+            return fetch(url)
+                .then(res => res.json())
+                .then(data => { currentRoster = (data.ok && data.roster) ? data.roster : []; })
+                .catch(() => { currentRoster = []; });
+        }
+
+        function saveRosterToServer(roster) {
+            return fetch(ENDPOINT, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: 'saveRoster', secret: ADMIN_SECRET, roster: roster })
+            })
+                .then(res => res.json())
+                .then(data => { if (!data.ok) throw new Error(data.error || '저장 실패'); });
+        }
+
+        function renderRosterList() {
+            const wrap = document.getElementById('rosterListWrap');
+            if (!currentRoster.length) {
+                wrap.innerHTML = '<div style="color:var(--text-sub); font-size:0.85rem; text-align:center; padding:20px 0;">등록된 학번이 없습니다.</div>';
+                return;
+            }
+            wrap.innerHTML = currentRoster.map((r, i) => `
+                <div class="roster-row">
+                    <span class="roster-label">${parseInt(r.grade, 10)}학년 ${parseInt(r.cls, 10)}반 · ${r.start}~${r.end}번 (${r.end - r.start + 1}명)</span>
+                    <button class="row-del-btn" onclick="deleteRosterEntry(${i})" title="삭제">🗑</button>
+                </div>`).join('');
+        }
+
+        function addRosterEntry() {
+            const grade = document.getElementById('rosterGradeInput').value;
+            const clsRaw = document.getElementById('rosterClassInput').value.trim();
+            const start = parseInt(document.getElementById('rosterStartInput').value, 10);
+            const end = parseInt(document.getElementById('rosterEndInput').value, 10);
+            if (!clsRaw || !/^[0-9]+$/.test(clsRaw)) { showToast('반을 숫자로 입력해주세요'); return; }
+            if (!start || !end || start < 1 || end < start || end > 99) { showToast('번호 범위를 올바르게 입력해주세요'); return; }
+            const cls = String(parseInt(clsRaw, 10)).padStart(2, '0');
+            const updated = currentRoster.concat([{ grade, cls, start, end }]);
+            saveRosterToServer(updated)
+                .then(() => {
+                    currentRoster = updated;
+                    renderRosterList();
+                    document.getElementById('rosterClassInput').value = '';
+                    document.getElementById('rosterStartInput').value = '';
+                    document.getElementById('rosterEndInput').value = '';
+                })
+                .catch(err => showToast('저장 실패: ' + err.message));
+        }
+
+        function deleteRosterEntry(i) {
+            const updated = currentRoster.slice();
+            updated.splice(i, 1);
+            saveRosterToServer(updated)
+                .then(() => { currentRoster = updated; renderRosterList(); })
+                .catch(err => showToast('삭제 실패: ' + err.message));
+        }
+
+        function openRosterModal() {
+            document.getElementById('rosterListWrap').innerHTML = '<div style="text-align:center; padding:20px 0; color:var(--text-sub);">불러오는 중...</div>';
+            document.getElementById('rosterModal').style.display = 'flex';
+            fetchRoster().then(() => renderRosterList());
+        }
+
+        function closeRosterModal() {
+            document.getElementById('rosterModal').style.display = 'none';
+        }
+
+        document.getElementById('rosterModal').addEventListener('click', function (e) {
+            if (e.target === this) closeRosterModal();
+        });
+
+        function checkMissingStudents() {
+            const unit = document.getElementById('unitFilter').value;
+            if (!unit) { showToast('먼저 확인할 단원을 선택해주세요 (단원 필터)'); return; }
+            if (!currentRoster.length) { showToast('먼저 학번을 등록해주세요'); openRosterModal(); return; }
+
+            const gradeQ = document.getElementById('gradeFilterInput').value;
+            const classQ = document.getElementById('classFilterInput').value;
+            const submitted = new Set(allRows.filter(r => r.unitTitle === unit).map(r => String(r.studentId)));
+
+            let expected = [];
+            currentRoster.forEach(entry => {
+                if (gradeQ && entry.grade !== gradeQ) return;
+                if (classQ && entry.cls !== classQ) return;
+                for (let no = entry.start; no <= entry.end; no++) {
+                    expected.push(entry.grade + entry.cls + String(no).padStart(2, '0'));
+                }
+            });
+            expected = [...new Set(expected)].sort();
+            const missing = expected.filter(id => !submitted.has(id));
+
+            document.getElementById('missingTitle').textContent = `📋 ${unit}`;
+            const submittedCount = expected.length - missing.length;
+            document.getElementById('missingSub').textContent =
+                `등록 학번 ${expected.length}명 중 ${submittedCount}명 제출 · ${missing.length}명 미제출`;
+            const body = document.getElementById('missingBody');
+            if (!expected.length) {
+                body.innerHTML = '<div style="text-align:center; padding:30px 0; color:var(--text-sub);">현재 필터에 해당하는 등록 학번이 없습니다.</div>';
+            } else if (!missing.length) {
+                body.innerHTML = '<div style="text-align:center; padding:30px 0; color:var(--success-green); font-weight:800;">🎉 전원 제출했습니다!</div>';
+            } else {
+                body.innerHTML = missing.map(id => `<div class="student-id missing-id-row">${escapeHtml(id)}</div>`).join('');
+            }
+            document.getElementById('missingModal').style.display = 'flex';
+        }
+
+        function closeMissingModal() {
+            document.getElementById('missingModal').style.display = 'none';
+        }
+
+        document.getElementById('missingModal').addEventListener('click', function (e) {
+            if (e.target === this) closeMissingModal();
+        });
+
+        // ── 피드백 빠른 문구 ──────────────────────────────────
+        // 🌟 [수정] 문구를 이 브라우저가 아니라 서버(구글시트 "빠른문구")에 저장합니다.
+        // 그래야 다른 컴퓨터나 다른 브라우저에서 대시보드를 열어도 같은 문구 목록을 씁니다.
+        const DEFAULT_PHRASES = [
+            '정말 잘했어요! 👍',
+            '핵심 개념을 정확히 이해했네요.',
+            '조금 더 자세히 설명해볼까요?',
+            '수고했어요. 예시를 들어보면 더 좋을 것 같아요.',
+            '노력한 흔적이 보여요, 조금만 더 힘내봐요!'
+        ];
+        let currentPhrases = DEFAULT_PHRASES.slice();
+
+        function fetchPhrases() {
+            const url = ENDPOINT + '?action=phrases&secret=' + encodeURIComponent(ADMIN_SECRET);
+            return fetch(url)
+                .then(res => res.json())
+                .then(data => {
+                    currentPhrases = (data.ok && data.phrases && data.phrases.length) ? data.phrases : DEFAULT_PHRASES.slice();
+                    renderQuickPhrases();
+                })
+                .catch(() => {
+                    currentPhrases = DEFAULT_PHRASES.slice();
+                    renderQuickPhrases();
+                });
+        }
+
+        function renderQuickPhrases() {
+            const wrap = document.getElementById('quickPhraseRow');
+            if (!wrap) return;
+            wrap.innerHTML = currentPhrases.map(p =>
+                `<button type="button" class="quick-phrase-btn" onclick='insertPhrase(${JSON.stringify(p)})'>${escapeHtml(p)}</button>`
+            ).join('');
+        }
+
+        function insertPhrase(text) {
+            const input = document.getElementById('feedbackInput');
+            const cur = input.value;
+            input.value = (cur && !/\s$/.test(cur)) ? cur + ' ' + text : cur + text;
+            input.focus();
+        }
+
+        function openPhraseManageModal() {
+            document.getElementById('phraseManageInput').value = currentPhrases.join('\n');
+            document.getElementById('phraseManageModal').style.display = 'flex';
+        }
+
+        function closePhraseManageModal() {
+            document.getElementById('phraseManageModal').style.display = 'none';
+        }
+
+        function savePhrasesFromManage() {
+            const lines = document.getElementById('phraseManageInput').value.split('\n').map(s => s.trim()).filter(Boolean);
+            const finalPhrases = lines.length ? lines : DEFAULT_PHRASES.slice();
+            const btn = document.getElementById('phraseManageSaveBtn');
+            if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spin"></span> 저장 중...'; }
+
+            fetch(ENDPOINT, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: 'savePhrases', secret: ADMIN_SECRET, phrases: finalPhrases })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (!data.ok) throw new Error(data.error || '저장 실패');
+                    currentPhrases = finalPhrases;
+                    renderQuickPhrases();
+                    closePhraseManageModal();
+                    showToast('빠른 문구가 저장되었습니다');
+                })
+                .catch(err => showToast('저장 실패: ' + err.message))
+                .finally(() => {
+                    if (btn) { btn.disabled = false; btn.innerHTML = '저장'; }
+                });
+        }
+
+        document.getElementById('phraseManageModal').addEventListener('click', function (e) {
+            if (e.target === this) closePhraseManageModal();
+        });
+    </script>
+</body>
+</html>
