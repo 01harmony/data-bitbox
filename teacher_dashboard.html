@@ -69,7 +69,7 @@
     #setupScreen { display: flex; align-items: center; justify-content: center; min-height: 70vh; }
     .setup-card {
         position: relative; background: var(--grad-card); border-radius: 28px; padding: 44px 40px 40px;
-        width: 440px; max-width: 92vw; box-shadow: var(--shadow-lg); text-align: center;
+        width: 500px; max-width: 92vw; box-shadow: var(--shadow-lg); text-align: center;
         border: 1px solid rgba(15,23,42,0.04); overflow: hidden;
     }
     .setup-card::before {
@@ -117,7 +117,7 @@
     .setup-guide-body {
         background: #fff; border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 12px 12px;
         padding: 16px 18px; font-size: 0.8rem; color: var(--text-main); line-height: 1.75;
-        box-shadow: var(--shadow-xs);
+        box-shadow: var(--shadow-xs); word-break: keep-all;
     }
     .setup-guide-body ol { margin: 0; padding-left: 20px; }
     .setup-guide-body li { margin-bottom: 9px; }
@@ -471,7 +471,7 @@
                             <li>"액세스 권한"을 반드시 <b>모든 사용자</b>로 설정한 뒤 <b>[배포]</b>를 클릭합니다. 권한 승인 창이 뜨면 허용해주세요.</li>
                             <li>배포가 끝나면 나오는 <b>웹 앱 URL</b>을 복사해서, 아래 "Apps Script 웹 앱 URL" 칸에 붙여넣습니다.</li>
                             <li>방금 Code.gs에 입력한 <code>ADMIN_SECRET</code> 값을 그대로, 아래 "관리자 비밀값" 칸에 입력합니다.</li>
-                            <li><b>[연결하기]</b>를 누르면 완료! 이 정보는 지금 사용 중인 브라우저에만 저장되므로, 다른 컴퓨터·다른 브라우저에서 열 땐 같은 방법으로 한 번 더 입력해주세요.</li>
+                            <li><b>[연결하기]</b>를 누르면 완료!<br>이 정보는 지금 사용 중인 브라우저에만 저장되므로, 다른 컴퓨터·다른 브라우저에서 열 땐 같은 방법으로 한 번 더 입력해주세요.</li>
                         </ol>
                     </div>
                 </details>
