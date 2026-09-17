@@ -814,6 +814,8 @@
     <script>
         let ENDPOINT = '';
         let ADMIN_SECRET = '';
+        const DEMO_ENDPOINT = 'https://script.google.com/macros/s/AKfycbxukOY8oIDe6UrbD4tqqg3cnzQ1bQUVUXcmnLmRMkhh4N8E09Yf6RSC8w54dSck1RSX/exec';
+        const DEMO_SECRET = 'bitbox-teacher-only';
         let allRows = [];
         let sortKey = 'timestamp';
         let sortDir = -1; // 최신순 기본
@@ -831,6 +833,13 @@
 
         window.onload = function () {
             renderQuickPhrases();
+            const isDemo = new URLSearchParams(location.search).get('demo') === '1';
+            if (isDemo) {
+                document.getElementById('endpointInput').value = DEMO_ENDPOINT;
+                document.getElementById('adminSecretInput').value = DEMO_SECRET;
+                connect();
+                return;
+            }
             const savedEndpoint = localStorage.getItem(LS_ENDPOINT);
             const savedSecret = localStorage.getItem(LS_SECRET);
             if (savedEndpoint && savedSecret) {
