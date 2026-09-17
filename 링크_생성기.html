@@ -23,6 +23,11 @@
   .desc { font-size: 0.85rem; color: #57534e; line-height: 1.6; margin: 0 0 22px; word-break: keep-all; }
   .desc b { color: #0f766e; }
   .desc a { color: #0f766e; }
+  .warn-note {
+    background: #fffbeb; border: 1px solid rgba(217,119,6,0.35); border-radius: 8px;
+    padding: 10px 14px; font-size: 0.78rem; color: #92400e; line-height: 1.6;
+    margin: 0 0 20px; word-break: keep-all;
+  }
   label { display: block; font-size: 0.82rem; font-weight: 700; color: #333; margin-bottom: 6px; }
   input {
     width: 100%; padding: 11px 12px; border: 1.5px solid #e2e8f0; border-radius: 8px;
@@ -68,6 +73,8 @@
       학습 결과를 선생님께 제출할 수 있습니다.<br>
       선생님은 교사 대시보드를 통해 학습 데이터를 관리할 수 있습니다.
     </p>
+
+    <div class="warn-note">⚠️ 이 창에서 학생용 링크를 새로 생성하지 않으면, 다른 선생님 또는 저작자의 구글 스프레드시트로 학생용 데이터가 제출됩니다.</div>
 
     <label for="ep">웹 앱 URL</label>
     <input id="ep" placeholder="https://script.google.com/macros/s/.../exec">
