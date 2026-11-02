@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>개인정보 처리방침 - 데이터 비트박스</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Noto+Sans+KR:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: #060614;
+            color: #c8d0e0;
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 0.95rem;
+            line-height: 1.8;
+            min-height: 100vh;
+        }
+
+        /* 배경 별 캔버스 */
+        #starBg {
+            position: fixed; inset: 0;
+            pointer-events: none; z-index: 0;
+        }
+
+        /* 스캔라인 */
+        .scanline {
+            position: fixed; inset: 0;
+            background: repeating-linear-gradient(
+                to bottom,
+                transparent 0px, transparent 3px,
+                rgba(0,0,0,0.06) 3px, rgba(0,0,0,0.06) 4px
+            );
+            pointer-events: none; z-index: 1;
+        }
+
+        .page-wrap {
+            position: relative; z-index: 2;
+            max-width: 820px;
+            margin: 0 auto;
+            padding: 48px 24px 80px;
+        }
+
+        /* 뒤로가기 */
+        .back-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.78rem; font-weight: 700; letter-spacing: 1.5px;
+            color: rgba(0,245,196,0.7);
+            text-decoration: none;
+            border: 1px solid rgba(0,245,196,0.25);
+            padding: 8px 18px; border-radius: 6px;
+            transition: all 0.2s;
+            margin-bottom: 40px;
+        }
+        .back-btn:hover {
+            color: #00f5c4;
+            border-color: rgba(0,245,196,0.6);
+            background: rgba(0,245,196,0.06);
+            box-shadow: 0 0 16px rgba(0,245,196,0.15);
+        }
+
+        /* 헤더 */
+        .doc-header {
+            margin-bottom: 48px;
+            padding-bottom: 28px;
+            border-bottom: 1px solid rgba(0,245,196,0.15);
+        }
+        .doc-badge {
+            display: inline-block;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem; font-weight: 700; letter-spacing: 2px;
+            color: #00f5c4;
+            border: 1px solid rgba(0,245,196,0.4);
+            padding: 4px 12px; border-radius: 4px;
+            margin-bottom: 16px;
+            background: rgba(0,245,196,0.05);
+        }
+        .doc-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(1.3rem, 3vw, 1.8rem);
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+        .doc-title span { color: #00f5c4; }
+        .doc-meta {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.78rem;
+            color: rgba(200,208,224,0.45);
+            letter-spacing: 0.5px;
+        }
+
+        /* 인트로 박스 */
+        .intro-box {
+            background: rgba(0,245,196,0.05);
+            border: 1px solid rgba(0,245,196,0.18);
+            border-left: 3px solid #00f5c4;
+            border-radius: 8px;
+            padding: 18px 22px;
+            margin-bottom: 40px;
+            color: rgba(200,208,224,0.85);
+            font-size: 0.92rem;
+            line-height: 1.75;
+        }
+
+        /* 조항 */
+        .article {
+            margin-bottom: 36px;
+        }
+        .article-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.82rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: #00f5c4;
+            margin-bottom: 6px;
+        }
+        .article h3 {
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #e8edf5;
+            margin-bottom: 14px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+        }
+        .article p {
+            color: rgba(200,208,224,0.8);
+            margin-bottom: 10px;
+            font-size: 0.93rem;
+        }
+        .article ul {
+            list-style: none;
+            padding: 0;
+            margin: 8px 0 12px;
+        }
+        .article ul li {
+            position: relative;
+            padding-left: 20px;
+            margin-bottom: 7px;
+            color: rgba(200,208,224,0.8);
+            font-size: 0.92rem;
+        }
+        .article ul li::before {
+            content: '○';
+            position: absolute; left: 0;
+            color: rgba(0,245,196,0.6);
+            font-size: 0.75rem;
+            top: 3px;
+        }
+
+        /* 하이라이트 항목 */
+        .highlight-item {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 6px;
+            padding: 14px 18px;
+            margin: 10px 0;
+        }
+        .highlight-item li::before { color: rgba(0,245,196,0.7); }
+
+        /* 책임자 박스 */
+        .contact-box {
+            background: rgba(10,132,255,0.07);
+            border: 1px solid rgba(10,132,255,0.25);
+            border-radius: 10px;
+            padding: 22px 26px;
+            margin-top: 12px;
+        }
+        .contact-box .contact-row {
+            display: flex; align-items: center; gap: 12px;
+            margin-bottom: 8px;
+        }
+        .contact-box .contact-row:last-child { margin-bottom: 0; }
+        .contact-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem; font-weight: 700;
+            color: rgba(90,200,250,0.7);
+            letter-spacing: 1px;
+            min-width: 70px;
+        }
+        .contact-value {
+            color: #e8edf5;
+            font-size: 0.93rem;
+        }
+        .contact-value a {
+            color: #5ac8fa;
+            text-decoration: none;
+        }
+        .contact-value a:hover { text-decoration: underline; }
+
+        /* 외부기관 */
+        .agency-list {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-top: 12px;
+        }
+        .agency-list li {
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            color: rgba(200,208,224,0.75);
+        }
+        .agency-list li:last-child { margin-bottom: 0; }
+        .agency-list a {
+            color: #5ac8fa;
+            text-decoration: none;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.82rem;
+        }
+        .agency-list a:hover { text-decoration: underline; }
+
+        /* 부칙 */
+        .addendum {
+            margin-top: 48px;
+            padding-top: 24px;
+            border-top: 1px solid rgba(255,255,255,0.07);
+            text-align: center;
+        }
+        .addendum p {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.78rem;
+            color: rgba(200,208,224,0.35);
+            letter-spacing: 1px;
+        }
+
+        /* 하단 */
+        .footer-bar {
+            text-align: center;
+            margin-top: 56px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+        .footer-bar a {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.72rem;
+            color: rgba(200,208,224,0.3);
+            text-decoration: none;
+            letter-spacing: 1px;
+            transition: color 0.2s;
+        }
+        .footer-bar a:hover { color: rgba(0,245,196,0.6); }
+    </style>
+</head>
+<body>
+
+<canvas id="starBg"></canvas>
+<div class="scanline"></div>
+
+<div class="page-wrap">
+
+    <a class="back-btn" href="index.html">← 메인으로 돌아가기</a>
+
+    <div class="doc-header">
+        <div class="doc-badge">PRIVACY POLICY</div>
+        <h1 class="doc-title">「데이터 <span>비트박스</span>」 개인정보 처리방침</h1>
+        <p class="doc-meta">시행일 : 2026년 10월 30일 &nbsp;|&nbsp; DATA BITBOX</p>
+    </div>
+
+    <div class="intro-box">
+        《데이터 비트박스》는 학습결과 제출과 피드백 제공을 위해 최소한의 개인정보와 이용 기록을 처리합니다.
+    </div>
+
+    <!-- 제1조 -->
+    <div class="article">
+        <div class="article-title">제1조</div>
+        <h3>개인정보의 처리 목적</h3>
+        <p>운영자는 다음의 목적을 위하여 개인정보를 처리합니다. 처리한 개인정보는 다음의 목적 이외의 용도로는 이용하지 않으며, 이용 목적이 변경되는 경우에는 「개인정보 보호법」 제18조에 따라 별도의 동의를 받는 등 필요한 조치를 이행합니다.</p>
+        <ul class="highlight-item">
+            <li>학습 활동 결과(배움노트, 배움활동 소감, 단원 퀴즈 점수)의 확인과 학생별 피드백</li>
+        </ul>
+    </div>
+
+    <!-- 제2조 -->
+    <div class="article">
+        <div class="article-title">제2조</div>
+        <h3>처리하는 개인정보의 항목</h3>
+        <p>서비스는 학생이 활동 결과를 운영자에게 전송하는 경우에만 다음 항목을 처리합니다.</p>
+        <ul>
+            <li>회원가입·로그인 없음</li>
+            <li>학습 결과 기록: 학번, 배움노트, 배움활동 소감, 단원 퀴즈 점수</li>
+            <li>운영자 개인 지메일 계정의 저장소에 저장되고 외부로 전송되지 않음</li>
+        </ul>
+        <p>개인정보는 다음의 방법으로 수집합니다.</p>
+        <ul>
+            <li>제출 화면에서 학생이 학번을 직접 입력(선택 사항)하며 그 외 수집하는 정보 없음</li>
+        </ul>
+    </div>
+
+    <!-- 제3조 -->
+    <div class="article">
+        <div class="article-title">제3조</div>
+        <h3>개인정보의 처리 및 보유 기간</h3>
+        <ul class="highlight-item">
+            <li>전송된 학번, 배움노트, 배움활동 소감, 단원 퀴즈 점수는 해당 학기 종료 시까지 보관한 뒤 지체 없이 파기합니다.</li>
+        </ul>
+    </div>
+
+    <!-- 제4조 -->
+    <div class="article">
+        <div class="article-title">제4조</div>
+        <h3>개인정보의 제3자 제공</h3>
+        <p>운영자는 정보주체의 개인정보를 제1조에서 명시한 범위 내에서만 처리하며, 제3자에게 제공하지 않습니다. 다만 정보주체의 별도 동의가 있거나 법률에 특별한 규정이 있는 경우에는 예외로 합니다.</p>
+    </div>
+
+    <!-- 제5조 -->
+    <div class="article">
+        <div class="article-title">제5조</div>
+        <h3>개인정보 처리의 위탁</h3>
+        <p>운영자는 개인정보 처리업무를 외부에 위탁하지 않습니다.</p>
+    </div>
+
+    <!-- 제6조 -->
+    <div class="article">
+        <div class="article-title">제6조</div>
+        <h3>만 14세 미만 아동의 개인정보 처리</h3>
+        <p>만 14세 미만 이용자는 보호자 또는 학교의 적법한 동의와 지도 아래 서비스를 이용해야 합니다. 운영자는 학습 목적에 필요한 범위를 넘는 개인정보 입력을 요구하지 않습니다.</p>
+        <ul>
+            <li>동의 방법: 학번, 배움노트, 배움활동 소감, 단원 퀴즈 점수 입력은 선택 사항이며 제출하지 않으면 운영자의 지메일 계정 저장소에 저장되지 않음</li>
+            <li>법정대리인은 아동의 개인정보에 대하여 열람, 정정·삭제, 처리정지를 요구할 수 있습니다.</li>
+        </ul>
+    </div>
+
+    <!-- 제7조 -->
+    <div class="article">
+        <div class="article-title">제7조</div>
+        <h3>개인정보의 파기 절차 및 방법</h3>
+        <p>운영자는 보유 기간의 경과, 처리 목적 달성 등 개인정보가 불필요하게 되었을 때에는 지체 없이 해당 개인정보를 파기합니다.</p>
+        <ul>
+            <li>파기 절차: 파기 사유가 발생한 개인정보를 확인한 뒤 파기합니다.</li>
+            <li>파기 방법: 전자적 파일은 복구하기 어려운 방식으로 삭제합니다.</li>
+        </ul>
+    </div>
+
+    <!-- 제8조 -->
+    <div class="article">
+        <div class="article-title">제8조</div>
+        <h3>정보주체와 법정대리인의 권리·의무 및 행사방법</h3>
+        <p>정보주체(만 14세 미만 아동의 경우 법정대리인)는 운영자에 대해 언제든지 개인정보 열람·정정·삭제·처리정지 요구 등의 권리를 행사할 수 있습니다.</p>
+        <ul>
+            <li>행사 방법: 제10조의 개인정보 보호책임자에게 서면, 전자우편 등으로 요청할 수 있으며, 운영자는 이에 대해 지체 없이 조치합니다.</li>
+            <li>권리 행사는 법정대리인이나 위임을 받은 자 등 대리인을 통하여 할 수도 있습니다.</li>
+        </ul>
+    </div>
+
+    <!-- 제9조 -->
+    <div class="article">
+        <div class="article-title">제9조</div>
+        <h3>개인정보의 안전성 확보조치</h3>
+        <p>운영자는 개인정보의 안전성 확보를 위해 다음과 같은 조치를 하고 있습니다.</p>
+        <ul>
+            <li>HTTPS 기반 암호화 통신을 사용합니다.</li>
+            <li>입력값을 서버·브라우저 저장소에 자동 저장하지 않습니다.</li>
+            <li>서비스 제공에 필요한 최소 범위의 정보만 처리하도록 설계합니다.</li>
+        </ul>
+    </div>
+
+    <!-- 제10조 -->
+    <div class="article">
+        <div class="article-title">제10조</div>
+        <h3>개인정보 보호책임자</h3>
+        <p>운영자는 개인정보 처리에 관한 업무를 총괄해서 책임지고, 정보주체의 불만 처리 및 피해 구제 등을 위하여 아래와 같이 개인정보 보호책임자를 지정하고 있습니다.</p>
+        <div class="contact-box">
+            <div class="contact-row">
+                <span class="contact-label">성명·직위</span>
+                <span class="contact-value">서윤주 교사</span>
+            </div>
+            <div class="contact-row">
+                <span class="contact-label">이메일</span>
+                <span class="contact-value">
+                    <a href="mailto:cleoseoo.tr.kr@gmail.com">cleoseoo.tr.kr@gmail.com</a>
+                </span>
+            </div>
+        </div>
+        <p style="margin-top:16px;">정보주체는 개인정보 침해로 인한 구제를 받기 위하여 아래 기관에 분쟁 해결이나 상담을 신청할 수 있습니다.</p>
+        <ul class="agency-list">
+            <li>개인정보분쟁조정위원회 &nbsp;<strong>1833-6972</strong> &nbsp;
+                <a href="https://www.kopico.go.kr" target="_blank" rel="noopener">www.kopico.go.kr</a>
+            </li>
+            <li>개인정보침해신고센터 &nbsp;국번 없이 <strong>118</strong> &nbsp;
+                <a href="https://privacy.kisa.or.kr" target="_blank" rel="noopener">privacy.kisa.or.kr</a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- 제11조 -->
+    <div class="article">
+        <div class="article-title">제11조</div>
+        <h3>개인정보 처리방침의 변경</h3>
+        <p>본 방침이 변경되는 경우 서비스 화면 또는 별도 공지를 통해 안내합니다. 중요한 변경이 있을 때에는 변경 사유와 시행일을 확인할 수 있도록 고지합니다.</p>
+    </div>
+
+    <!-- 부칙 -->
+    <div class="addendum">
+        <p>[ 부칙 ]&nbsp;&nbsp;&nbsp;본 방침은 2026년 10월 30일부터 시행합니다.</p>
+    </div>
+
+    <div class="footer-bar">
+        <a href="index.html">⬡ DATA BITBOX · 데이터 비트박스 ⬡</a>
+    </div>
+
+</div>
+
+<script>
+// 배경 별
+(function(){
+    const c = document.getElementById('starBg');
+    const ctx = c.getContext('2d');
+    let stars = [];
+    function resize(){
+        c.width = innerWidth; c.height = innerHeight;
+        stars = Array.from({length:160}, ()=>({
+            x: Math.random()*innerWidth, y: Math.random()*innerHeight,
+            r: Math.random()*1.2+0.2, o: Math.random()*0.6+0.1,
+            sp: Math.random()*0.012+0.003, phase: Math.random()*Math.PI*2
+        }));
+    }
+    let t = 0;
+    function draw(){
+        ctx.clearRect(0,0,c.width,c.height);
+        stars.forEach(s=>{
+            ctx.globalAlpha = s.o*(0.5+0.5*Math.sin(t*s.sp+s.phase));
+            ctx.fillStyle = '#fff';
+            ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2); ctx.fill();
+        });
+        ctx.globalAlpha = 1; t++;
+        requestAnimationFrame(draw);
+    }
+    resize(); addEventListener('resize', resize); draw();
+})();
+</script>
+
+</body>
+</html>
